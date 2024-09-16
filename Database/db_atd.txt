@@ -1,3 +1,4 @@
+-- 1
 CREATE TABLE admin (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -5,7 +6,7 @@ CREATE TABLE admin (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
+-- 2
 CREATE TABLE student (    
     id CHAR(10) PRIMARY KEY,
     lastname VARCHAR(50),
@@ -20,7 +21,7 @@ CREATE TABLE student (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
+-- 3
 CREATE TABLE teacher (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     lastname VARCHAR(50),
@@ -34,7 +35,7 @@ CREATE TABLE teacher (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
+-- 4
 CREATE TABLE semester (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
@@ -42,12 +43,12 @@ CREATE TABLE semester (
     start_date DATE NOT NULL,
     end_date DATE NOT NULL
 );
-
+-- 5
 CREATE TABLE term (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL
 );
-
+-- 6
 CREATE TABLE course (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -57,6 +58,82 @@ CREATE TABLE course (
     term_id INT(11),
     CONSTRAINT fk_term_id FOREIGN KEY (term_id) REFERENCES term(id)
 );
+-- 7
+CREATE TABLE class (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    course_id INT(11),
+    teacher_id INT(11),
+    semester_id INT(11),
+    CONSTRAINT fk_course_id FOREIGN KEY (course_id) REFERENCES course(id),
+    CONSTRAINT fk_teacher_id FOREIGN KEY (teacher_id) REFERENCES teacher(id),
+    CONSTRAINT fk_semester_id FOREIGN KEY (semester_id) REFERENCES semester(id)
+);
+-- 8
+CREATE TABLE class_student (
+    class_id INT(11) NOT NULL,
+    student_id CHAR(10) NOT NULL,
+    CONSTRAINT fk_class_student_class_id FOREIGN KEY (class_id) REFERENCES class(id),
+    CONSTRAINT fk_class_student_student_id FOREIGN KEY (student_id) REFERENCES student(id),
+    PRIMARY KEY (class_id, student_id)
+);
+-- 9
+CREATE TABLE attendance (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    class_id INT(11) NOT NULL,
+    student_id CHAR(10) NOT NULL,
+    attendance_date DATE NOT NULL,
+    status ENUM('Present', 'Absent', 'Late') NOT NULL,
+    note VARCHAR(255) NOT NULL,
+    CONSTRAINT fk_class_id FOREIGN KEY (class_id) REFERENCES class(id),
+    CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES student(id)
+);
+-- 10
+CREATE TABLE schedule (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    class_id INT(11) NOT NULL,
+    day_of_week ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    CONSTRAINT fk_schedule_class_id FOREIGN KEY (class_id) REFERENCES class(id)
+);
+
+-- 11
+CREATE TABLE attendance_report (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    class_id INT(11) NOT NULL,
+    student_id CHAR(10) NOT NULL,
+    total_present INT DEFAULT 0,
+    total_absent INT DEFAULT 0,
+    total_late INT DEFAULT 0,
+    CONSTRAINT fk_attendance_report_class_id FOREIGN KEY (class_id) REFERENCES class(id),
+    CONSTRAINT fk_attendance_report_student_id FOREIGN KEY (student_id) REFERENCES student(id)
+);
+
+
+
+INSERT INTO term (name) VALUES
+('Học kỳ 1'),
+('Học kỳ 2'),
+('Học kỳ 3'),
+('Học kỳ 4'),
+('Học kỳ 5'),
+('Học kỳ 6'),
+('Học kỳ 7'),
+('Học kỳ 8');
+
+
+INSERT INTO semester (name, is_active, start_date, end_date) 
+VALUES ('HK1 (2021 - 2022)', 0 , '2021-03-10', '2022-01-18'),
+       ('HK2 (2021 - 2022)', 0 , '2022-03-04', '2022-05-11'),
+       ('HK1 (2022 - 2023)', 0 , '2022-09-10', '2022-12-30'),
+       ('HK2 (2022 - 2023)', 0 , '2026-02-08', '2023-06-05'),
+       ('HK3 (Hè 2022 - 2023)', 0 , '2023-07-03', '2023-07-14'),
+       ('HK1 (2023 - 2024)', 0 , '2023-10-30', '2023-12-15'),
+       ('HK2 (2023 - 2024)', 0 , '2024-01-17', '2025-04-26'),
+       ('HK3 (Hè 2023 - 2024)', 0 , '2024-07-10', '2024-08-07'),
+       ('HK1 (2024 - 2025)', 1 , '2024-08-15', '2025-12-17');
+
 
 
 INSERT INTO course (name, credits, theory_hours, practice_hours, term_id) 
@@ -104,27 +181,8 @@ VALUES
 ('Phát triển phần mềm ứng dụng thông minh', 3, 15, 60, 7);
 
 
-INSERT INTO term (name) VALUES
-('Học kỳ 1'),
-('Học kỳ 2'),
-('Học kỳ 3'),
-('Học kỳ 4'),
-('Học kỳ 5'),
-('Học kỳ 6'),
-('Học kỳ 7'),
-('Học kỳ 8');
 
 
-INSERT INTO semester (name, is_active, start_date, end_date) 
-VALUES ('HK1 (2021 - 2022)', 0 , '2021-03-10', '2022-01-18'),
-       ('HK2 (2021 - 2022)', 0 , '2022-03-04', '2022-05-11'),
-       ('HK1 (2022 - 2023)', 0 , '2022-09-10', '2022-12-30'),
-       ('HK2 (2022 - 2023)', 0 , '2026-02-08', '2023-06-05'),
-       ('HK3 (Hè 2022 - 2023)', 0 , '2023-07-03', '2023-07-14'),
-       ('HK1 (2023 - 2024)', 0 , '2023-10-30', '2023-12-15'),
-       ('HK2 (2023 - 2024)', 0 , '2024-01-17', '2025-04-26'),
-       ('HK3 (Hè 2023 - 2024)', 0 , '2024-07-10', '2024-08-07'),
-       ('HK1 (2024 - 2025)', 1 , '2024-08-15', '2025-12-17');
 
 
 INSERT INTO admin (username, password) 
