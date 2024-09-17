@@ -5,37 +5,20 @@ session_start();
 // Lấy thông tin từ form
 $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';
-$role = $_POST['role'] ?? '';
 
 // Tạo biến để lưu thông tin người dùng
 $userData = null;
 $pageRedirect = 'index.php'; // Trang index
 
-// Kiểm tra vai trò người dùng và thực hiện truy vấn tương ứng
-if ($role == 'admin') {
-    $sql = "SELECT * FROM admin WHERE username = ? AND password = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$username, $password]);
-    //$userData = $stmt->fetch(PDO::FETCH_OBJ);
-    $userData = $stmt->fetchObject();
-    $pageRedirect = 'Role/admin.php';
+// Tạo truy vấn để lấy thông tin người dùng
+$sql = "SELECT * FROM users WHERE username = ? AND password = ?";
 
-} elseif ($role == 'teacher') {
-    $sql = "SELECT * FROM teacher WHERE username = ? AND password = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$username, $password]);
-    //$userData = $stmt->fetch(PDO::FETCH_OBJ);
-    $userData = $stmt->fetchObject();
-    $pageRedirect = 'Role/teacher.php';
+// Chuẩn bị câu lệnh SQL và thực thi
+$stmt = $conn->prepare($sql);
+$stmt->execute([$username, $password]);
 
-} elseif ($role == 'student') {
-    $sql = "SELECT * FROM student WHERE username = ? AND password = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$username, $password]);
-    //$userData = $stmt->fetch(PDO::FETCH_OBJ);
-    $userData = $stmt->fetchObject();
-    $pageRedirect = 'Role/student.php';
-}
+// Lấy kết quả
+$userData = $stmt->fetchObject();
 
 // Xử lý kết quả đăng nhập
 if ($userData === false) {
@@ -43,8 +26,19 @@ if ($userData === false) {
     header("Location: index.php?error=" . urlencode($error));
     exit;
 } else {
-    $_SESSION['username'] = $username;
-    $_SESSION['role'] = $role;
+    // Lưu thông tin người dùng vào phiên
+    $_SESSION['username'] = $userData->username;
+    $_SESSION['role'] = $userData->role;
+
+    // Chuyển hướng theo vai trò người dùng
+    if ($userData->role == 'admin') {
+        $pageRedirect = 'Role/admin.php';
+    } elseif ($userData->role == 'teacher') {
+        $pageRedirect = 'Role/teacher.php';
+    } elseif ($userData->role == 'student') {
+        $pageRedirect = 'Role/student.php';
+    }
+
     header("Location: $pageRedirect");
     exit;
 }

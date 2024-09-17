@@ -20,22 +20,28 @@
         if (isset($_POST['logout'])) {
             session_unset();
             session_destroy();
-            header("Location: ../index.php"); // Redirect to the login page
+            header("Location: ../index.php");
             exit();
         }
 
         $username = $_SESSION['username'];
 
-        // Fetch user details
-        $userSql = "SELECT lastname, firstname FROM student WHERE username = ?";
+        // Fetch user ID based on username
+        $userSql = "SELECT id FROM users WHERE username = ?";
         $userStm = $conn->prepare($userSql);
         $userStm->execute([$username]);
-        $userData = $userStm->fetch(PDO::FETCH_OBJ);
+        $user = $userStm->fetch(PDO::FETCH_OBJ);
 
-
+        if ($user) {
+            // Fetch student details using user ID
+            $studentSql = "SELECT lastname, firstname FROM students WHERE id = ?";
+            $studentStm = $conn->prepare($studentSql);
+            $studentStm->execute([$user->id]);
+            $studentData = $studentStm->fetch(PDO::FETCH_OBJ);
+        }
 
         // Fetch all active semesters
-        $semesterSql = "SELECT * FROM semester WHERE is_active = 1";
+        $semesterSql = "SELECT * FROM semesters WHERE is_active = 1";
         $semesterStm = $conn->prepare($semesterSql);
         $semesterStm->execute();
         $semesters = $semesterStm->fetchAll(PDO::FETCH_OBJ);
@@ -43,9 +49,6 @@
         // Get selected semester ID from the form, default to the first active semester if not set
         $selectedSemesterId = $_POST['semester_id'] ?? $semesters[0]->id;
         ?>
-        <!---->
-
-        <!-- Header with logout button -->
         <header class="mb-4 bg-success">
             <div class="d-flex justify-content-between align-items-center">
                 <h1>Header</h1>
@@ -54,7 +57,6 @@
                 </form>
             </div>
         </header>
-
 
         <form method="post" class="mb-4">
             <div class="form-group">
@@ -70,26 +72,15 @@
             </div>
         </form>
 
-        <!---->
+        <!-- Display welcome message -->
         <?php
-        // Display welcome message
-        if (!isset($welcomeDisplayed) && !empty($userData)) {
-            $lastname = htmlspecialchars($userData->lastname);
-            $firstname = htmlspecialchars($userData->firstname);
+        if (!empty($studentData)) {
+            $lastname = htmlspecialchars($studentData->lastname);
+            $firstname = htmlspecialchars($studentData->firstname);
             echo "<h2 class='mb-4 welcome-message'>Xin chào, $lastname $firstname</h2>";
-            $welcomeDisplayed = true;
         }
         ?>
     </div>
-
-
-
-
-
-
-
-
-
 </body>
 
 </html>

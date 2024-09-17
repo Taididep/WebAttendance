@@ -8,6 +8,17 @@
     <title>Teacher</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* CSS cho hiệu ứng hover toàn bộ hàng */
+        .table-hover tbody tr:hover {
+            background-color: #FF0000; /* Màu nền khi hover */
+            cursor: pointer; /* Con trỏ chuột khi hover */
+        }
+
+        .table-hover tbody tr {
+            transition: background-color 0.3s; /* Hiệu ứng chuyển màu nền */
+        }
+    </style>
 </head>
 
 <body>
@@ -16,36 +27,51 @@
         <?php
         session_start();
 
-        // Handle logout
+        // Xử lý đăng xuất
         if (isset($_POST['logout'])) {
             session_unset();
             session_destroy();
-            header("Location: ../index.php"); // Redirect to the login page
+            header("Location: ../index.php"); // Chuyển hướng đến trang đăng nhập
             exit();
         }
 
         $username = $_SESSION['username'];
 
-        // Fetch user details
-        $userSql = "SELECT lastname, firstname FROM teacher WHERE username = ?";
+        // Lấy ID người dùng dựa trên tên đăng nhập
+        $userSql = "SELECT id FROM users WHERE username = ?";
         $userStm = $conn->prepare($userSql);
         $userStm->execute([$username]);
-        $userData = $userStm->fetch(PDO::FETCH_OBJ);
+        $user = $userStm->fetch(PDO::FETCH_OBJ);
 
+        if ($user) {
+            // Lấy thông tin giáo viên sử dụng ID người dùng
+            $teacherSql = "SELECT lastname, firstname FROM teachers WHERE id = ?";
+            $teacherStm = $conn->prepare($teacherSql);
+            $teacherStm->execute([$user->id]);
+            $teacherData = $teacherStm->fetch(PDO::FETCH_OBJ);
+        }
 
-
-        // Fetch all active semesters
-        $semesterSql = "SELECT * FROM semester WHERE is_active = 1";
+        // Lấy tất cả học kỳ đang hoạt động
+        $semesterSql = "SELECT * FROM semesters WHERE is_active = 1";
         $semesterStm = $conn->prepare($semesterSql);
         $semesterStm->execute();
         $semesters = $semesterStm->fetchAll(PDO::FETCH_OBJ);
 
-        // Get selected semester ID from the form, default to the first active semester if not set
+        // Lấy ID học kỳ đã chọn từ form, mặc định là học kỳ đầu tiên nếu không được đặt
         $selectedSemesterId = $_POST['semester_id'] ?? $semesters[0]->id;
-        ?>
-        <!---->
 
-        <!-- Header with logout button -->
+        // Lấy danh sách các lớp học do giáo viên giảng dạy trong học kỳ đã chọn
+        $classesSql = "
+            SELECT c.id, c.name, cr.name AS course_name, s.name AS semester_name 
+            FROM classes c
+            JOIN courses cr ON c.course_id = cr.id
+            JOIN semesters s ON c.semester_id = s.id
+            WHERE c.teacher_id = ? AND c.semester_id = ?";
+        $classesStm = $conn->prepare($classesSql);
+        $classesStm->execute([$user->id, $selectedSemesterId]);
+        $classes = $classesStm->fetchAll(PDO::FETCH_OBJ);
+        ?>
+        <!-- Header với nút đăng xuất -->
         <header class="mb-4 bg-success">
             <div class="d-flex justify-content-between align-items-center">
                 <h1>Header</h1>
@@ -54,7 +80,6 @@
                 </form>
             </div>
         </header>
-
 
         <form method="post" class="mb-4">
             <div class="form-group">
@@ -70,26 +95,44 @@
             </div>
         </form>
 
-        <!---->
+        <!-- Hiển thị thông điệp chào mừng -->
         <?php
-        // Display welcome message
-        if (!isset($welcomeDisplayed) && !empty($userData)) {
-            $lastname = htmlspecialchars($userData->lastname);
-            $firstname = htmlspecialchars($userData->firstname);
+        if (!empty($teacherData)) {
+            $lastname = htmlspecialchars($teacherData->lastname);
+            $firstname = htmlspecialchars($teacherData->firstname);
             echo "<h2 class='mb-4 welcome-message'>Xin chào, $lastname $firstname</h2>";
-            $welcomeDisplayed = true;
         }
         ?>
+
+        <!-- Hiển thị danh sách lớp học cho học kỳ đã chọn -->
+        <h3 class="mb-4">Danh sách các lớp học trong học kỳ hiện tại:</h3>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên lớp</th>
+                    <th>Tên khóa học</th>
+                    <th>Tên học kỳ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($classes)) { ?>
+                    <?php foreach ($classes as $class) { ?>
+                        <tr onclick="window.location.href='../attendance.php?class_id=<?php echo htmlspecialchars($class->id); ?>'">
+                            <td><?php echo htmlspecialchars($class->id); ?></td>
+                            <td><?php echo htmlspecialchars($class->name); ?></td>
+                            <td><?php echo htmlspecialchars($class->course_name); ?></td>
+                            <td><?php echo htmlspecialchars($class->semester_name); ?></td>
+                        </tr>
+                    <?php } ?>
+                <?php } else { ?>
+                    <tr>
+                        <td colspan="4" class="text-center">Không có lớp học nào trong học kỳ này.</td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
     </div>
-
-
-
-
-
-
-
-
-
 </body>
 
 </html>

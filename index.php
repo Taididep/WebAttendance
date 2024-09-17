@@ -34,7 +34,7 @@
                     <div class="card-body">
                         <?php if (isset($_GET['error'])) { ?>
                             <div class="alert alert-danger" role="alert">
-                                <?php echo htmlspecialchars($_GET['error']); ?>
+                                <?php echo htmlspecialchars(string: $_GET['error']); ?>
                             </div>
                         <?php } ?>
                         <form id="loginForm" action="login.php" method="post">
@@ -51,16 +51,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="roleSelect">Role</label>
-                                <select class="form-control" id="roleSelect" name="role">
-                                    <option value="admin">Admin</option>
-                                    <option value="student">Student</option>
-                                    <option value="teacher">Teacher</option>
-                                </select>
-                            </div>
-
                             <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
                         </form>
                     </div>
