@@ -71,6 +71,17 @@
         $attendanceDatesStm = $conn->prepare($attendanceDatesSql);
         $attendanceDatesStm->execute([$classId]);
         $attendanceDates = $attendanceDatesStm->fetchAll(PDO::FETCH_COLUMN);
+
+        // Lấy danh sách học sinh từ lớp cụ thể và ngày điểm danh cụ thể
+        $studentsSql = "
+            SELECT s.id, s.lastname, s.firstname, s.class, s.gender, s.birthday, a.status, a.note
+            FROM students s
+            JOIN attendances a ON s.id = a.student_id
+            WHERE a.class_id = ? AND a.attendance_date = ?
+        ";
+        $studentsStm = $conn->prepare($studentsSql);
+        $studentsStm->execute([$classId, $attendanceDate]);
+        $students = $studentsStm->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
         <!-- Header với nút quay lại -->
@@ -97,6 +108,44 @@
                 </select>
             </div>
         </form>
+
+        <!-- Hiển thị danh sách học sinh -->
+        <?php if ($attendanceDate): ?>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Họ</th>
+                        <th>Tên</th>
+                        <th>Lớp</th>
+                        <th>Giới tính</th>
+                        <th>Ngày sinh</th>
+                        <th>Trạng thái</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($students) > 0): ?>
+                        <?php foreach ($students as $student): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($student['id']); ?></td>
+                                <td><?php echo htmlspecialchars($student['lastname']); ?></td>
+                                <td><?php echo htmlspecialchars($student['firstname']); ?></td>
+                                <td><?php echo htmlspecialchars($student['class']); ?></td>
+                                <td><?php echo htmlspecialchars($student['gender']); ?></td>
+                                <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($student['birthday']))); ?></td>
+                                <td><?php echo htmlspecialchars($student['status']); ?></td>
+                                <td><?php echo htmlspecialchars($student['note']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="8" class="text-center">Không có dữ liệu</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
     </div>
 </body>
 

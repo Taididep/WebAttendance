@@ -85,7 +85,7 @@
                 <select name="semester_id" id="semester_id" class="form-control" onchange="this.form.submit()">
                     <?php foreach($semesters as $semester) { ?>
                         <option value="<?php echo htmlspecialchars($semester->id); ?>"
-                            <?php if ($semester->id == $selectedSemesterId) echo 'selected'; ?>>
+                            <?php if ($semester->id == $selectedSemesterId) echo 'selected'; ?> >
                             <?php echo htmlspecialchars($semester->name . " (" . date('d/m/Y', strtotime($semester->start_date)) . " - " . date('d/m/Y', strtotime($semester->end_date)) . ")"); ?>
                         </option>
                     <?php } ?>
@@ -107,6 +107,7 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
+                    <th>ID lớp</th>
                     <th>Tên lớp</th>
                     <th>Tên Môn Học</th>
                 </tr>
@@ -116,13 +117,14 @@
                 <?php if (!empty($classes)) { ?>
                     <?php foreach ($classes as $class) { ?>
                         <tr onclick="window.location.href='../attendance.php?class_id=<?php echo htmlspecialchars($class->id); ?>'">
+                            <td><?php echo htmlspecialchars($class->id); ?></td>
                             <td><?php echo htmlspecialchars($class->class_name); ?></td>
                             <td><?php echo htmlspecialchars($class->course_name); ?></td>
                         </tr>
                     <?php } ?>
                 <?php } else { ?>
                     <tr>
-                        <td colspan="2" class="text-center">Không có lớp học nào trong học kỳ này.</td>
+                        <td colspan="3" class="text-center">Không có lớp học nào trong học kỳ này.</td>
                     </tr>
                 <?php } ?>
             </tbody>
