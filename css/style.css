@@ -1,0 +1,15 @@
+
+
+/* style.css */
+.table-hover tbody tr:hover {
+    background-color: #FF0000;
+    /* Màu nền khi hover */
+    cursor: pointer;
+    /* Con trỏ chuột khi hover */
+}
+.table-hover tbody tr {
+    transition: background-color 0.3s;
+    /* Hiệu ứng chuyển màu nền */
+}
+
+

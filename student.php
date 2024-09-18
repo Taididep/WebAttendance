@@ -12,7 +12,7 @@
 
 <body>
     <div class="container mt-5 animate__animated animate__fadeIn">
-        <?php include '../Connect/connect.php'; ?>
+        <?php include 'connect/connect.php'; ?>
         <?php
         session_start();
 

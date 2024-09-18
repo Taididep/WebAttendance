@@ -16,24 +16,18 @@ CREATE TABLE semesters (
     start_date DATE NOT NULL,
     end_date DATE NOT NULL
 );
--- 3
-CREATE TABLE terms (
-    id INT(11) AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
-);
 
--- 4
+
+-- 3
 CREATE TABLE courses (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     credits INT NOT NULL,
     theory_hours INT NOT NULL,
-    practice_hours INT NOT NULL,
-    term_id INT(11),
-    CONSTRAINT fk_term_id FOREIGN KEY (term_id) REFERENCES terms(id)
+    practice_hours INT NOT NULL
 );
 
--- 5
+-- 4
 CREATE TABLE students (
     id INT(11) PRIMARY KEY,
     lastname VARCHAR(50),
@@ -46,7 +40,7 @@ CREATE TABLE students (
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 6
+-- 5
 CREATE TABLE teachers (
     id INT(11) PRIMARY KEY,
     lastname VARCHAR(50),
@@ -58,7 +52,7 @@ CREATE TABLE teachers (
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 7
+-- 6
 CREATE TABLE classes (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -69,7 +63,8 @@ CREATE TABLE classes (
     CONSTRAINT fk_teacher_id FOREIGN KEY (teacher_id) REFERENCES teachers(id),
     CONSTRAINT fk_semester_id FOREIGN KEY (semester_id) REFERENCES semesters(id)
 );
--- 8
+
+-- 7
 CREATE TABLE class_students (
     class_id INT(11) NOT NULL,
     student_id INT(11) NOT NULL,
@@ -77,7 +72,7 @@ CREATE TABLE class_students (
     CONSTRAINT fk_class_student_student_id FOREIGN KEY (student_id) REFERENCES students(id),
     PRIMARY KEY (class_id, student_id)
 );
--- 9
+-- 8
 CREATE TABLE attendances (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     class_id INT(11) NOT NULL,
@@ -88,17 +83,17 @@ CREATE TABLE attendances (
     CONSTRAINT fk_class_id FOREIGN KEY (class_id) REFERENCES classes(id),
     CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES students(id)
 );
--- 10
+-- 9
 CREATE TABLE schedules (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     class_id INT(11) NOT NULL,
-    day_of_week ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+    day_of_week ENUM('Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', Thứ 7', 'Chủ Nhật') NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     CONSTRAINT fk_schedule_class_id FOREIGN KEY (class_id) REFERENCES classes(id)
 );
 
--- 11
+-- 10
 CREATE TABLE attendance_reports (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     class_id INT(11) NOT NULL,
@@ -194,66 +189,53 @@ VALUES ('HK1 (2021 - 2022)', 0 , '2021-03-10', '2022-01-18'),
        ('HK1 (2024 - 2025)', 1 , '2024-08-15', '2025-12-17');
 
 -- 3
-INSERT INTO terms (name) VALUES
-('Học kỳ 1'),
-('Học kỳ 2'),
-('Học kỳ 3'),
-('Học kỳ 4'),
-('Học kỳ 5'),
-('Học kỳ 6'),
-('Học kỳ 7'),
-('Học kỳ 8');
+INSERT INTO courses (name, credits, theory_hours, practice_hours) 
+VALUES 
+('Nhập môn lập trình', 3, 45, 0),
+('Thực hành nhập môn lập trình', 2, 0, 60),
+('Kỹ năng ứng dụng Công nghệ Thông tin', 2, 0, 75),
+('Giải tích', 3, 45, 0),
+('Hệ điều hành', 3, 45, 0),
+('Thực hành Hệ điều hành', 1, 0, 30),
+('Kiến trúc máy tính', 3, 45, 0),
+('Kỹ thuật lập trình', 2, 30, 0),
+('Thực hành kỹ thuật lập trình', 1, 0, 30),
+('Đại số tuyến tính', 2, 30, 0),
+('Anh Văn 1', 3, 45, 0),
+('Anh Văn 2', 3, 45, 0),
+('Cấu trúc dữ liệu và giải thuật', 3, 45, 0),
+('Mạng máy tính', 3, 45, 0),
+('Thực hành cấu trúc dữ liệu và giải thuật', 1, 0, 60),
+('Thực hành mạng máy tính', 1, 0, 30),
+('Cấu trúc rời rạc', 3, 45, 0),
+('Thực hành Cấu trúc rời rạc', 1, 0, 30),
+('Phương pháp nghiên cứu khoa học', 2, 30, 0),
+('Phân tích thiết kế thuật toán', 2, 30, 0),
+('Thiết kế web', 3, 15, 60),
+('Lập trình hướng đối tượng', 3, 45, 0),
+('Thực hành lập trình hướng đối tượng', 1, 0, 30),
+('Cơ sở dữ liệu', 3, 45, 0),
+('Thực hành cơ sở dữ liệu', 1, 0, 30),
+('Anh văn 3', 3, 45, 0),
+('Hệ quản trị cơ sở dữ liệu', 3, 45, 0),
+('Thực hành hệ quản trị cơ sở dữ liệu', 1, 0, 30),
+('Lập trình Web', 3, 15, 60),
+('Trí tuệ nhân tạo', 3, 45, 0),
+('Thực hành trí tuệ nhân tạo', 1, 0, 30),
+('Công Nghệ Java', 3, 15, 60),
+('Phân tích thiết kế hệ thống thông tin', 3, 45, 0),
+('Thực hành phân tích thiết kế hệ thống thông tin', 1, 0, 30),
+('Lập trình mã nguồn mở', 3, 15, 60),
+('Phát triển ứng dụng di động', 3, 15, 60),
+('Ảo hóa và điện toán đám mây', 2, 30, 0),
+('Công nghệ phần mềm nâng cao', 3, 45, 0),
+('Kiểm định phần mềm', 2, 30, 0),
+('Thực hành kiểm định phần mềm', 1, 0, 30),
+('Phát triển phần mềm ứng dụng thông minh', 3, 15, 60);
 
 
 
 -- 4
-INSERT INTO courses (name, credits, theory_hours, practice_hours, term_id) 
-VALUES 
-('Nhập môn lập trình', 3, 45, 0, 1),
-('Thực hành nhập môn lập trình', 2, 0, 60, 1),
-('Kỹ năng ứng dụng Công nghệ Thông tin', 2, 0, 75, 1),
-('Giải tích', 3, 45, 0, 1),
-('Hệ điều hành', 3, 45, 0, 2),
-('Thực hành Hệ điều hành', 1, 0, 30, 2),
-('Kiến trúc máy tính', 3, 45, 0, 2),
-('Kỹ thuật lập trình', 2, 30, 0, 2),
-('Thực hành kỹ thuật lập trình', 1, 0, 30, 2),
-('Đại số tuyến tính', 2, 30, 0, 2),
-('Anh Văn 1', 3, 45, 0, 2),
-('Anh Văn 2', 3, 45, 0, 2),
-('Cấu trúc dữ liệu và giải thuật', 3, 45, 0, 3),
-('Mạng máy tính', 3, 45, 0, 3),
-('Thực hành cấu trúc dữ liệu và giải thuật', 1, 0, 60, 3),
-('Thực hành mạng máy tính', 1, 0, 30, 3),
-('Cấu trúc rời rạc', 3, 45, 0, 3),
-('Thực hành Cấu trúc rời rạc', 1, 0, 30, 3),
-('Phương pháp nghiên cứu khoa học', 2, 30, 0, 3),
-('Phân tích thiết kế thuật toán', 2, 30, 0, 3),
-('Thiết kế web', 3, 15, 60, 4),
-('Lập trình hướng đối tượng', 3, 45, 0, 4),
-('Thực hành lập trình hướng đối tượng', 1, 0, 30, 4),
-('Cơ sở dữ liệu', 3, 45, 0, 4),
-('Thực hành cơ sở dữ liệu', 1, 0, 30, 4),
-('Anh văn 3', 3, 45, 0, 4),
-('Hệ quản trị cơ sở dữ liệu', 3, 45, 0, 5),
-('Thực hành hệ quản trị cơ sở dữ liệu', 1, 0, 30, 5),
-('Lập trình Web', 3, 15, 60, 5),
-('Trí tuệ nhân tạo', 3, 45, 0, 5),
-('Thực hành trí tuệ nhân tạo', 1, 0, 30, 5),
-('Công Nghệ Java', 3, 15, 60, 6),
-('Phân tích thiết kế hệ thống thông tin', 3, 45, 0, 6),
-('Thực hành phân tích thiết kế hệ thống thông tin', 1, 0, 30, 6),
-('Lập trình mã nguồn mở', 3, 15, 60, 6),
-('Phát triển ứng dụng di động', 3, 15, 60, 6),
-('Ảo hóa và điện toán đám mây', 2, 30, 0, 6),
-('Công nghệ phần mềm nâng cao', 3, 45, 0, 7),
-('Kiểm định phần mềm', 2, 30, 0, 7),
-('Thực hành kiểm định phần mềm', 1, 0, 30, 7),
-('Phát triển phần mềm ứng dụng thông minh', 3, 15, 60, 7);
-
-
-
--- 5
 INSERT INTO students (id, lastname, firstname, email, phone, class, birthday, gender) 
 VALUES 
 (2001216114, 'Đinh Văn', 'Tài', 'dinhvantai079@gmail.com', '0901234578', '12DHTH02', '2003-03-30', 'Nam'),
@@ -312,7 +294,7 @@ VALUES
 
 
 
--- 6
+-- 5
 INSERT INTO teachers (id, lastname, firstname, email, phone, birthday, gender) 
 VALUES 
 (1000001234, 'Trần Thị Vân', 'Anh', 'vanAnh123@example.com', '0903456789', '1995-01-01', 'Nữ'),
@@ -330,194 +312,84 @@ VALUES
 (1000001246, 'Hoàng Thị', 'Ngọc', 'hoangngoc707@example.com', '0914567890', '1984-11-05', 'Nữ');
 
 
--- 7
+-- 6
 INSERT INTO classes (name, course_id, teacher_id, semester_id)
 VALUES
-('A103', 32, 1000001234, 9),
-('A204', 33, 1000001234, 9),
-('A405', 34, 1000001238, 9),
-('A201', 35, 1000001238, 9),
-('B402', 36, 1000001238, 9),
-('A402', 37, 1000001234, 9),
-('A307', 38, 1000001234, 9),
-('B504', 39, 1000001236, 9),
-('A203', 40, 1000001235, 9),
-('A102', 41, 1000001237, 9);
+('A404', 24, 1000001234, 8),
+('A205', 25, 1000001234, 8),
+('A102', 24, 1000001234, 8),
+('A303', 25, 1000001234, 8),
+
+('A103', 28, 1000001234, 9),
+('A101', 28, 1000001234, 9),
+('A304', 27, 1000001234, 9),
+('A503', 33, 1000001234, 9),
+('A503', 24, 1000001234, 9)
+
+
+-- 7
+INSERT INTO class_students (class_id, student_id)
+VALUES
+(1, 2001216114), (1, 2001210224), (1, 2001211785), (1, 2001215678), (1, 2001216789), 
+(1, 2001217890), (1, 2001218901), (1, 2001219012), (1, 2001210123), (1, 2001211234),
+(1, 2001212346), (1, 2001213457), (1, 2001214568), (1, 2001215679), (1, 2001216780),
+(1, 2001217891), (1, 2001218902), (1, 2001219013), (1, 2001223456), (1, 2001224567),
+(1, 2001225678), (1, 2001226789), (1, 2001227890), (1, 2001228901), (1, 2001229012),
+(1, 2001230123), (1, 2001231234);
+INSERT INTO class_students (class_id, student_id)
+VALUES
+(2, 2001216114), (2, 2001210224), (2, 2001211785), (2, 2001215678), (2, 2001216789),
+(2, 2001217890), (2, 2001218901), (2, 2001219012), (2, 2001210123), (2, 2001211234),
+(2, 2001212346), (2, 2001213457), (2, 2001214568), (2, 2001215679), (2, 2001216780),
+(2, 2001217891), (2, 2001218902), (2, 2001219013), (2, 2001223456), (2, 2001224567),
+(2, 2001225678), (2, 2001226789), (2, 2001227890), (2, 2001228901), (2, 2001229012),
+(2, 2001230123), (2, 2001231234);
+INSERT INTO class_students (class_id, student_id)
+VALUES
+(3, 2001216114), (3, 2001210224), (3, 2001211785), (3, 2001215678), (3, 2001216789),
+(3, 2001217890), (3, 2001218901), (3, 2001219012), (3, 2001210123), (3, 2001211234),
+(3, 2001212346), (3, 2001213457), (3, 2001214568), (3, 2001215679), (3, 2001216780),
+(3, 2001217891), (3, 2001218902), (3, 2001219013), (3, 2001223456), (3, 2001224567),
+(3, 2001225678), (3, 2001226789), (3, 2001227890), (3, 2001228901), (3, 2001229012),
+(3, 2001230123), (3, 2001231234);
+INSERT INTO class_students (class_id, student_id)
+VALUES
+(4, 2001216114), (4, 2001210224), (4, 2001211785), (4, 2001215678), (4, 2001216789),
+(4, 2001217890), (4, 2001218901), (4, 2001219012), (4, 2001210123), (4, 2001211234),
+(4, 2001212346), (4, 2001213457), (4, 2001214568), (4, 2001215679), (4, 2001216780),
+(4, 2001217891), (4, 2001218902), (4, 2001219013), (4, 2001223456), (4, 2001224567),
+(4, 2001225678), (4, 2001226789), (4, 2001227890), (4, 2001228901), (4, 2001229012),
+(4, 2001230123), (4, 2001231234);
+INSERT INTO class_students (class_id, student_id)
+VALUES
+(5, 2001216114), (5, 2001210224), (5, 2001211785), (5, 2001215678), (5, 2001216789),
+(5, 2001217890), (5, 2001218901), (5, 2001219012), (5, 2001210123), (5, 2001211234),
+(5, 2001212346), (5, 2001213457), (5, 2001214568), (5, 2001215679), (5, 2001216780),
+(5, 2001217891), (5, 2001218902), (5, 2001219013), (5, 2001223456), (5, 2001224567),
+(5, 2001225678), (5, 2001226789), (5, 2001227890), (5, 2001228901), (5, 2001229012),
+(5, 2001230123), (5, 2001231234);
 
 
 -- 8
-INSERT INTO class_students (class_id, student_id) 
+INSERT INTO schedules (class_id, day_of_week, start_time, end_time)
 VALUES
-(1, 2001216114), (1, 2001210224), (1, 2001211785), (1, 2001212345), (1, 2001213456), 
-(1, 2001214567), (1, 2001215678), (1, 2001216789), (1, 2001217890), (1, 2001218901),
-(1, 2001219012), (1, 2001210123), (1, 2001211234), (1, 2001212346), (1, 2001213457),
-(1, 2001214568), (1, 2001215679), (1, 2001216780), (1, 2001217891), (1, 2001218902),
-(1, 2001219013), (1, 2001223456), (1, 2001224567), (1, 2001225678), (1, 2001226789),
-(1, 2001227890), (1, 2001228901), (1, 2001229012), (1, 2001230123), (1, 2001231234),
-(2, 2001216114), (2, 2001210224), (2, 2001211785), (2, 2001212345), (2, 2001213456), 
-(2, 2001214567), (2, 2001215678), (2, 2001216789), (2, 2001217890), (2, 2001218901),
-(2, 2001219012), (2, 2001210123), (2, 2001211234), (2, 2001212346), (2, 2001213457),
-(2, 2001214568), (2, 2001215679), (2, 2001216780), (2, 2001217891), (2, 2001218902),
-(2, 2001219013), (2, 2001223456), (2, 2001224567), (2, 2001225678), (2, 2001226789),
-(2, 2001227890), (2, 2001228901), (2, 2001229012), (2, 2001230123), (2, 2001231234),
-(3, 2001216114), (3, 2001210224), (3, 2001211785), (3, 2001212345), (3, 2001213456), 
-(3, 2001214567), (3, 2001215678), (3, 2001216789), (3, 2001217890), (3, 2001218901),
-(3, 2001219012), (3, 2001210123), (3, 2001211234), (3, 2001212346), (3, 2001213457),
-(3, 2001214568), (3, 2001215679), (3, 2001216780), (3, 2001217891), (3, 2001218902),
-(3, 2001219013), (3, 2001223456), (3, 2001224567), (3, 2001225678), (3, 2001226789),
-(3, 2001227890), (3, 2001228901), (3, 2001229012), (3, 2001230123), (3, 2001231234),
-(4, 2001216114), (4, 2001210224), (4, 2001211785), (4, 2001212345), (4, 2001213456), 
-(4, 2001214567), (4, 2001215678), (4, 2001216789), (4, 2001217890), (4, 2001218901),
-(4, 2001219012), (4, 2001210123), (4, 2001211234), (4, 2001212346), (4, 2001213457),
-(4, 2001214568), (4, 2001215679), (4, 2001216780), (4, 2001217891), (4, 2001218902),
-(4, 2001219013), (4, 2001223456), (4, 2001224567), (4, 2001225678), (4, 2001226789),
-(4, 2001227890), (4, 2001228901), (4, 2001229012), (4, 2001230123), (4, 2001231234),
-(5, 2001216114), (5, 2001210224), (5, 2001211785), (5, 2001212345), (5, 2001213456), 
-(5, 2001214567), (5, 2001215678), (5, 2001216789), (5, 2001217890), (5, 2001218901),
-(5, 2001219012), (5, 2001210123), (5, 2001211234), (5, 2001212346), (5, 2001213457),
-(5, 2001214568), (5, 2001215679), (5, 2001216780), (5, 2001217891), (5, 2001218902),
-(5, 2001219013), (5, 2001223456), (5, 2001224567), (5, 2001225678), (5, 2001226789),
-(5, 2001227890), (5, 2001228901), (5, 2001229012), (5, 2001230123), (5, 2001231234);
+(1, 'Monday', '07:00:00', '09:15:00'),
+(2, 'Wednesday', '07:00:00', '10:45:00'),
+(3, 'Thursday', '12:30:00', '16:15:00'),
+(4, 'Saturday', '12:30:00', '14:45:00'),
+(5, 'Tuesday', '07:00:00', '10:45:00'),
+(6, 'Tuesday', '12:30:00', '16:15:00'),
+(7, 'Wednesday', '12:30:00', '14:45:00'),
+(8, 'Thursday', '12:30:00', '14:45:00'),
+(9, 'Saturday', '07:00:00', '09:15:00');
+
 
 -- 9
--- Các lớp A1, A2 kéo dài 4 hoặc 5 tiết
-INSERT INTO schedules (class_id, day_of_week, start_time, end_time) VALUES
-(1, 'Monday', '07:00:00', '09:15:00'),
-(2, 'Tuesday', '09:40:00', '11:55:00'),
-(3, 'Wednesday', '07:00:00', '10:45:00'),
-(4, 'Thursday', '12:30:00', '14:45:00'),
-(5, 'Friday', '15:10:00', '17:25:00'),
-(6, 'Saturday', '12:30:00', '16:15:00'),
-(7, 'Sunday', '18:00:00', '20:15:00'),
-(8, 'Monday', '18:00:00', '21:00:00'),
-(9, 'Tuesday', '07:00:00', '09:15:00'),
-(10, 'Wednesday', '09:40:00', '11:55:00');
+INSERT INTO attendances (class_id, student_id, attendance_date, status, note)
+VALUES
 
 
 -- 10
-INSERT INTO attendances (class_id, student_id, attendance_date, status, note)
-VALUES
-(1, 2001216114, '2024-09-01', 'Present', NULL),
-(1, 2001210224, '2024-09-01', 'Absent', 'Sick'),
-(1, 2001211785, '2024-09-01', 'Late', 'Traffic'),
-(1, 2001212345, '2024-09-01', 'Present', NULL),
-(1, 2001213456, '2024-09-01', 'Present', NULL),
-(1, 2001214567, '2024-09-01', 'Present', NULL),
-(1, 2001215678, '2024-09-01', 'Absent', 'Family Emergency'),
-(1, 2001216789, '2024-09-01', 'Present', NULL),
-(1, 2001217890, '2024-09-01', 'Present', NULL),
-(1, 2001218901, '2024-09-01', 'Late', 'Doctor Appointment'),
-(1, 2001219012, '2024-09-01', 'Present', NULL),
-(1, 2001210123, '2024-09-01', 'Absent', 'Holiday'),
-(1, 2001211234, '2024-09-01', 'Present', NULL),
-(1, 2001212346, '2024-09-01', 'Present', NULL),
-(1, 2001213457, '2024-09-01', 'Absent', 'Sick'),
-(1, 2001214568, '2024-09-01', 'Present', NULL),
-(1, 2001215679, '2024-09-01', 'Late', 'Car Problem'),
-(1, 2001216780, '2024-09-01', 'Present', NULL),
-(1, 2001217891, '2024-09-01', 'Absent', 'Family Emergency'),
-(1, 2001218902, '2024-09-01', 'Present', NULL),
-(1, 2001219013, '2024-09-01', 'Late', 'Traffic'),
-(1, 2001223456, '2024-09-01', 'Present', NULL),
-(1, 2001224567, '2024-09-01', 'Present', NULL),
-(1, 2001225678, '2024-09-01', 'Absent', 'Doctor Appointment'),
-(1, 2001226789, '2024-09-01', 'Present', NULL),
-(1, 2001227890, '2024-09-01', 'Late', 'Traffic'),
-(1, 2001228901, '2024-09-01', 'Present', NULL),
-(1, 2001229012, '2024-09-01', 'Present', NULL),
-(1, 2001230123, '2024-09-01', 'Absent', 'Holiday'),
-(1, 2001231234, '2024-09-01', 'Present', NULL),
-(1, 2001232345, '2024-09-01', 'Present', NULL),
-(1, 2001233456, '2024-09-01', 'Late', 'Doctor Appointment'),
-(1, 2001234567, '2024-09-01', 'Present', NULL),
-(2, 2001214567, '2024-09-01', 'Present', NULL),
-(2, 2001215678, '2024-09-01', 'Late', 'Doctor Appointment'),
-(2, 2001216789, '2024-09-01', 'Present', NULL),
-(2, 2001217890, '2024-09-01', 'Absent', 'Holiday'),
-(2, 2001218901, '2024-09-01', 'Present', NULL),
-(2, 2001219012, '2024-09-01', 'Absent', 'Family Emergency'),
-(2, 2001210123, '2024-09-01', 'Present', NULL),
-(2, 2001211234, '2024-09-01', 'Present', NULL),
-(2, 2001212346, '2024-09-01', 'Absent', 'Travel'),
-(2, 2001213457, '2024-09-01', 'Present', NULL),
-(2, 2001214568, '2024-09-01', 'Late', 'Traffic'),
-(2, 2001215679, '2024-09-01', 'Present', NULL),
-(2, 2001216780, '2024-09-01', 'Absent', 'Family'),
-(2, 2001217891, '2024-09-01', 'Present', NULL),
-(2, 2001218902, '2024-09-01', 'Present', NULL),
-(2, 2001219013, '2024-09-01', 'Absent', 'Holiday'),
-(2, 2001223456, '2024-09-01', 'Present', NULL),
-(2, 2001224567, '2024-09-01', 'Present', NULL),
-(2, 2001225678, '2024-09-01', 'Late', 'Car Problem'),
-(2, 2001226789, '2024-09-01', 'Present', NULL),
-(2, 2001227890, '2024-09-01', 'Absent', 'Family Emergency'),
-(2, 2001228901, '2024-09-01', 'Present', NULL),
-(2, 2001229012, '2024-09-01', 'Present', NULL),
-(2, 2001230123, '2024-09-01', 'Absent', 'Travel'),
-(2, 2001231234, '2024-09-01', 'Present', NULL),
-(2, 2001232345, '2024-09-01', 'Present', NULL),
-(2, 2001233456, '2024-09-01', 'Late', 'Doctor Appointment'),
-(2, 2001234567, '2024-09-01', 'Present', NULL),
-(2, 2001214567, '2024-09-01', 'Present', NULL),
-(2, 2001215678, '2024-09-01', 'Late', 'Doctor Appointment'),
-(2, 2001216789, '2024-09-01', 'Present', NULL),
-(2, 2001217890, '2024-09-01', 'Absent', 'Holiday'),
-(2, 2001218901, '2024-09-01', 'Present', NULL),
-(2, 2001219012, '2024-09-01', 'Absent', 'Family Emergency'),
-(2, 2001210123, '2024-09-01', 'Present', NULL),
-(2, 2001211234, '2024-09-01', 'Present', NULL),
-(2, 2001212346, '2024-09-01', 'Absent', 'Travel'),
-(2, 2001213457, '2024-09-01', 'Present', NULL),
-(2, 2001214568, '2024-09-01', 'Late', 'Traffic'),
-(2, 2001215679, '2024-09-01', 'Present', NULL),
-(2, 2001216780, '2024-09-01', 'Absent', 'Family'),
-(2, 2001217891, '2024-09-01', 'Present', NULL),
-(2, 2001218902, '2024-09-01', 'Present', NULL),
-(2, 2001219013, '2024-09-01', 'Absent', 'Holiday'),
-(2, 2001223456, '2024-09-01', 'Present', NULL),
-(2, 2001224567, '2024-09-01', 'Present', NULL),
-(2, 2001225678, '2024-09-01', 'Late', 'Car Problem'),
-(2, 2001226789, '2024-09-01', 'Present', NULL),
-(2, 2001227890, '2024-09-01', 'Absent', 'Family Emergency'),
-(2, 2001228901, '2024-09-01', 'Present', NULL),
-(2, 2001229012, '2024-09-01', 'Present', NULL),
-(2, 2001230123, '2024-09-01', 'Absent', 'Travel'),
-(2, 2001231234, '2024-09-01', 'Present', NULL),
-(2, 2001232345, '2024-09-01', 'Present', NULL),
-(2, 2001233456, '2024-09-01', 'Late', 'Doctor Appointment'),
-(2, 2001234567, '2024-09-01', 'Present', NULL),
-(3, 2001219012, '2024-09-01', 'Present', NULL),
-(3, 2001210123, '2024-09-01', 'Late', 'Car Problem'),
-(3, 2001211234, '2024-09-01', 'Present', NULL),
-(3, 2001212346, '2024-09-01', 'Absent', 'Sick'),
-(3, 2001213457, '2024-09-01', 'Present', NULL),
-(3, 2001214568, '2024-09-01', 'Late', 'Family Emergency'),
-(3, 2001215679, '2024-09-01', 'Present', NULL),
-(3, 2001216780, '2024-09-01', 'Absent', 'Travel'),
-(3, 2001217891, '2024-09-01', 'Present', NULL),
-(3, 2001218902, '2024-09-01', 'Present', NULL),
-(3, 2001219013, '2024-09-01', 'Late', 'Traffic'),
-(3, 2001223456, '2024-09-01', 'Present', NULL),
-(3, 2001224567, '2024-09-01', 'Present', NULL),
-(3, 2001225678, '2024-09-01', 'Absent', 'Family Emergency'),
-(3, 2001226789, '2024-09-01', 'Present', NULL),
-(3, 2001227890, '2024-09-01', 'Late', 'Doctor Appointment'),
-(3, 2001228901, '2024-09-01', 'Present', NULL),
-(3, 2001229012, '2024-09-01', 'Present', NULL),
-(3, 2001230123, '2024-09-01', 'Absent', 'Holiday'),
-(3, 2001231234, '2024-09-01', 'Present', NULL),
-(3, 2001232345, '2024-09-01', 'Present', NULL),
-(3, 2001233456, '2024-09-01', 'Late', 'Car Problem'),
-(3, 2001234567, '2024-09-01', 'Present', NULL),
-(3, 2001235678, '2024-09-01', 'Absent', 'Sick'),
-(3, 2001236789, '2024-09-01', 'Present', NULL),
-(3, 2001237890, '2024-09-01', 'Present', NULL),
-(3, 2001238901, '2024-09-01', 'Absent', 'Holiday'),
-(3, 2001240123, '2024-09-01', 'Present', NULL),
-(3, 2001241234, '2024-09-01', 'Present', NULL);
-
-
--- 11
 INSERT INTO attendance_reports (class_id, student_id, total_present, total_absent, total_late)
 SELECT
     class_id,

@@ -8,23 +8,13 @@
     <title>Teacher</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* CSS cho hiệu ứng hover toàn bộ hàng */
-        .table-hover tbody tr:hover {
-            background-color: #FF0000; /* Màu nền khi hover */
-            cursor: pointer; /* Con trỏ chuột khi hover */
-        }
-
-        .table-hover tbody tr {
-            transition: background-color 0.3s; /* Hiệu ứng chuyển màu nền */
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
     <div class="container mt-5 animate__animated animate__fadeIn">
-        <?php include '../Connect/connect.php'; ?>
         <?php
+        include 'connect/connect.php';
         session_start();
 
         // Xử lý đăng xuất
@@ -35,7 +25,7 @@
             exit();
         }
 
-        $username = $_SESSION['username'];
+        $username = $_SESSION['username'] ?? '';
 
         // Lấy ID người dùng dựa trên tên đăng nhập
         $userSql = "SELECT id FROM users WHERE username = ?";
@@ -51,30 +41,38 @@
             $teacherData = $teacherStm->fetch(PDO::FETCH_OBJ);
         }
 
-        // Lấy tất cả học kỳ đang hoạt động
-        $semesterSql = "SELECT * FROM semesters WHERE is_active = 1";
+        // Lấy danh sách học kỳ
+        $semesterSql = "SELECT * FROM semesters ORDER BY id DESC";
         $semesterStm = $conn->prepare($semesterSql);
         $semesterStm->execute();
         $semesters = $semesterStm->fetchAll(PDO::FETCH_OBJ);
 
         // Lấy ID học kỳ đã chọn từ form, mặc định là học kỳ đầu tiên nếu không được đặt
-        $selectedSemesterId = $_POST['semester_id'] ?? $semesters[0]->id;
+        $selectedSemesterId = $_POST['semester_id'] ?? ($semesters[0]->id ?? '');
 
-        // Lấy danh sách các lớp học do giáo viên giảng dạy trong học kỳ đã chọn
+        // Lấy danh sách các lớp học
         $classesSql = "
-            SELECT c.id, c.name, cr.name AS course_name, s.name AS semester_name 
-            FROM classes c
-            JOIN courses cr ON c.course_id = cr.id
-            JOIN semesters s ON c.semester_id = s.id
-            WHERE c.teacher_id = ? AND c.semester_id = ?";
+            SELECT 
+                c.id, 
+                c.name AS class_name, 
+                cr.name AS course_name
+            FROM 
+                classes c
+            JOIN 
+                courses cr ON c.course_id = cr.id
+            WHERE 
+                c.teacher_id = ? 
+                AND c.semester_id = ?
+        ";
         $classesStm = $conn->prepare($classesSql);
         $classesStm->execute([$user->id, $selectedSemesterId]);
         $classes = $classesStm->fetchAll(PDO::FETCH_OBJ);
         ?>
-        <!-- Header với nút đăng xuất -->
+
+        <!-- Header -->
         <header class="mb-4 bg-success">
             <div class="d-flex justify-content-between align-items-center">
-                <h1>Header</h1>
+                <h1>Dashboard</h1>
                 <form method="post">
                     <button type="submit" name="logout" class="btn btn-danger">Đăng xuất</button>
                 </form>
@@ -86,9 +84,9 @@
                 <label for="semester_id">Chọn học kỳ:</label>
                 <select name="semester_id" id="semester_id" class="form-control" onchange="this.form.submit()">
                     <?php foreach($semesters as $semester) { ?>
-                        <option value="<?php echo htmlspecialchars($semester->id) ?>"
-                            <?php if ($semester->id == $selectedSemesterId) echo 'selected' ?>>
-                            <?php echo htmlspecialchars($semester->name . " (" . date('d/m/Y', strtotime($semester->start_date)) . " - " . date('d/m/Y', strtotime($semester->end_date)) . ")") ?>
+                        <option value="<?php echo htmlspecialchars($semester->id); ?>"
+                            <?php if ($semester->id == $selectedSemesterId) echo 'selected'; ?>>
+                            <?php echo htmlspecialchars($semester->name . " (" . date('d/m/Y', strtotime($semester->start_date)) . " - " . date('d/m/Y', strtotime($semester->end_date)) . ")"); ?>
                         </option>
                     <?php } ?>
                 </select>
@@ -105,29 +103,26 @@
         ?>
 
         <!-- Hiển thị danh sách lớp học cho học kỳ đã chọn -->
-        <h3 class="mb-4">Danh sách các lớp học trong học kỳ hiện tại:</h3>
+        <h3 class="mb-4">Danh sách các lớp học:</h3>
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Tên lớp</th>
-                    <th>Tên khóa học</th>
-                    <th>Tên học kỳ</th>
+                    <th>Tên Môn Học</th>
                 </tr>
             </thead>
+
             <tbody>
                 <?php if (!empty($classes)) { ?>
                     <?php foreach ($classes as $class) { ?>
                         <tr onclick="window.location.href='../attendance.php?class_id=<?php echo htmlspecialchars($class->id); ?>'">
-                            <td><?php echo htmlspecialchars($class->id); ?></td>
-                            <td><?php echo htmlspecialchars($class->name); ?></td>
+                            <td><?php echo htmlspecialchars($class->class_name); ?></td>
                             <td><?php echo htmlspecialchars($class->course_name); ?></td>
-                            <td><?php echo htmlspecialchars($class->semester_name); ?></td>
                         </tr>
                     <?php } ?>
                 <?php } else { ?>
                     <tr>
-                        <td colspan="4" class="text-center">Không có lớp học nào trong học kỳ này.</td>
+                        <td colspan="2" class="text-center">Không có lớp học nào trong học kỳ này.</td>
                     </tr>
                 <?php } ?>
             </tbody>

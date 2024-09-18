@@ -9,89 +9,94 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* CSS cho hiệu ứng hover toàn bộ hàng */
-        .table-hover tbody tr:hover {
-            background-color: #FF0000; /* Màu nền khi hover */
-            cursor: pointer; /* Con trỏ chuột khi hover */
+        /* Định dạng cho modal */
+        .modal {
+            display: none; /* Ẩn mặc định */
+            position: fixed; /* Giữ cố định vị trí */
+            z-index: 1000; /* Hiển thị trên cùng */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ phía sau */
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto; /* Khoảng cách từ trên và canh giữa */
+            padding: 20px;
+            border-radius: 10px;
+            width: 50%;
+            position: relative; /* Để định vị nút đóng */
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
-    <div class="container mt-5 animate__animated animate__fadeIn">
-        <?php include 'Connect/connect.php'; ?>
+    <div class="container mt-5">
+        <?php include 'connect/connect.php'; ?>
         <?php
         session_start();
 
         // Kiểm tra và lấy ID lớp từ URL
-        if (!isset($_GET['class_id']) || !is_numeric($_GET['class_id'])) {
+        $classId = isset($_GET['class_id']) && is_numeric($_GET['class_id']) ? (int)$_GET['class_id'] : 0;
+        $attendanceDate = isset($_GET['attendance_date']) ? $_GET['attendance_date'] : '';
+
+        if ($classId <= 0) {
             echo "<p class='text-danger'>Lỗi: ID lớp không hợp lệ.</p>";
             exit();
         }
 
-        $classId = (int)$_GET['class_id'];
-
-        // Lấy thông tin lớp học
+        // Lấy thông tin lớp
         $classSql = "SELECT name FROM classes WHERE id = ?";
         $classStm = $conn->prepare($classSql);
         $classStm->execute([$classId]);
         $class = $classStm->fetch(PDO::FETCH_OBJ);
 
         if (!$class) {
-            echo "<p class='text-danger'>Lỗi: Không tìm thấy lớp học.</p>";
+            echo "<p class='text-danger'>Lỗi: Không tìm thấy thông tin lớp.</p>";
             exit();
         }
 
-        // Lấy danh sách sinh viên trong lớp
-        $studentsSql = "SELECT s.id, s.lastname, s.firstname, s.class, s.birthday, s.gender
-                        FROM students s
-                        JOIN attendances a ON s.id = a.student_id
-                        WHERE a.class_id = ?
-                        GROUP BY s.id";
-        $studentsStm = $conn->prepare($studentsSql);
-        $studentsStm->execute([$classId]);
-        $students = $studentsStm->fetchAll(PDO::FETCH_OBJ);
+        // Lấy danh sách ngày điểm danh đã có
+        $attendanceDatesSql = "SELECT DISTINCT attendance_date FROM attendances WHERE class_id = ?";
+        $attendanceDatesStm = $conn->prepare($attendanceDatesSql);
+        $attendanceDatesStm->execute([$classId]);
+        $attendanceDates = $attendanceDatesStm->fetchAll(PDO::FETCH_COLUMN);
         ?>
+
         <!-- Header với nút quay lại -->
         <header class="mb-4 bg-success">
             <div class="d-flex justify-content-between align-items-center">
                 <h1>Danh sách sinh viên lớp <?php echo htmlspecialchars($class->name); ?></h1>
-                <a href="Role/teacher.php" class="btn btn-primary">Quay lại</a>
+                <a href="teacher.php" class="btn btn-primary">Quay lại</a>
             </div>
         </header>
 
-        <!-- Hiển thị danh sách sinh viên -->
-        <h3 class="mb-4">Danh sách sinh viên:</h3>
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>MSSV</th>
-                    <th>Họ</th>
-                    <th>Tên</th>
-                    <th>Giới tính</th>
-                    <th>Tên Lớp</th>
-                    <th>Ngày sinh</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($students)) { ?>
-                    <?php foreach ($students as $student) { ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($student->id); ?></td>
-                            <td><?php echo htmlspecialchars($student->lastname); ?></td>
-                            <td><?php echo htmlspecialchars($student->firstname); ?></td>
-                            <td><?php echo htmlspecialchars($student->gender); ?></td>
-                            <td><?php echo htmlspecialchars($student->class); ?></td>
-                            <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($student->birthday))); ?></td>
-                        </tr>
+        <!-- Form chọn ngày điểm danh hiện tại -->
+        <form method="get" class="mb-4">
+            <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($classId); ?>">
+            <div class="form-group">
+                <label for="attendance_date">Ngày điểm danh:</label>
+                <select name="attendance_date" id="attendance_date" class="form-control" onchange="this.form.submit()">
+                    <option value="">Chọn ngày</option>
+                    <?php foreach ($attendanceDates as $date) { ?>
+                        <option value="<?php echo htmlspecialchars($date); ?>"
+                            <?php if ($date == $attendanceDate) echo 'selected'; ?>>
+                            <?php echo htmlspecialchars(date('d/m/Y', strtotime($date))); ?>
+                        </option>
                     <?php } ?>
-                <?php } else { ?>
-                    <tr>
-                        <td colspan="6" class="text-center">Không có sinh viên nào trong lớp này.</td>
-                    </tr>
-                <?php } ?>
-            </tbody>
-        </table>
+                </select>
+            </div>
+        </form>
     </div>
 </body>
 

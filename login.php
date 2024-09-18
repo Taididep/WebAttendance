@@ -1,5 +1,5 @@
 <?php
-include 'Connect/connect.php';
+include 'connect/connect.php';
 session_start();
 
 // Lấy thông tin từ form
@@ -32,11 +32,11 @@ if ($userData === false) {
 
     // Chuyển hướng theo vai trò người dùng
     if ($userData->role == 'admin') {
-        $pageRedirect = 'Role/admin.php';
+        $pageRedirect = 'admin.php';
     } elseif ($userData->role == 'teacher') {
-        $pageRedirect = 'Role/teacher.php';
+        $pageRedirect = 'teacher.php';
     } elseif ($userData->role == 'student') {
-        $pageRedirect = 'Role/student.php';
+        $pageRedirect = 'student.php';
     }
 
     header("Location: $pageRedirect");
