@@ -6,85 +6,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách sinh viên</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* Định dạng cho modal */
-        .modal {
-            display: none; /* Ẩn mặc định */
-            position: fixed; /* Giữ cố định vị trí */
-            z-index: 1000; /* Hiển thị trên cùng */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ phía sau */
-        }
-
-        .modal-content {
-            background-color: #fff;
-            margin: 15% auto; /* Khoảng cách từ trên và canh giữa */
-            padding: 20px;
-            border-radius: 10px;
-            width: 50%;
-            position: relative; /* Để định vị nút đóng */
-        }
-
-        .close {
-            position: absolute;
-            right: 15px;
-            top: 10px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 
 <body>
     <div class="container mt-5">
-        <?php include 'connect/connect.php'; ?>
         <?php
         session_start();
+        include 'functions.php';
 
-        // Kiểm tra và lấy ID lớp từ URL
+        // Kiểm tra và lấy ID lớp và ngày điểm danh từ URL
         $classId = isset($_GET['class_id']) && is_numeric($_GET['class_id']) ? (int)$_GET['class_id'] : 0;
         $attendanceDate = isset($_GET['attendance_date']) ? $_GET['attendance_date'] : '';
+        $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 10; // Số sinh viên mỗi trang
+        $offset = ($page - 1) * $limit;
 
         if ($classId <= 0) {
             echo "<p class='text-danger'>Lỗi: ID lớp không hợp lệ.</p>";
             exit();
         }
 
-        // Lấy thông tin lớp
-        $classSql = "SELECT name FROM classes WHERE id = ?";
-        $classStm = $conn->prepare($classSql);
-        $classStm->execute([$classId]);
-        $class = $classStm->fetch(PDO::FETCH_OBJ);
-
+        // Lấy thông tin lớp, ngày điểm danh và danh sách học sinh
+        $class = getClassInfo($conn, $classId);
         if (!$class) {
             echo "<p class='text-danger'>Lỗi: Không tìm thấy thông tin lớp.</p>";
             exit();
         }
+        $attendanceDates = getAttendanceDates($conn, $classId);
 
-        // Lấy danh sách ngày điểm danh đã có
-        $attendanceDatesSql = "SELECT DISTINCT attendance_date FROM attendances WHERE class_id = ?";
-        $attendanceDatesStm = $conn->prepare($attendanceDatesSql);
-        $attendanceDatesStm->execute([$classId]);
-        $attendanceDates = $attendanceDatesStm->fetchAll(PDO::FETCH_COLUMN);
-
-        // Lấy danh sách học sinh từ lớp cụ thể và ngày điểm danh cụ thể
-        $studentsSql = "
-            SELECT s.id, s.lastname, s.firstname, s.class, s.gender, s.birthday, a.status, a.note
-            FROM students s
-            JOIN attendances a ON s.id = a.student_id
-            WHERE a.class_id = ? AND a.attendance_date = ?
-        ";
-        $studentsStm = $conn->prepare($studentsSql);
-        $studentsStm->execute([$classId, $attendanceDate]);
-        $students = $studentsStm->fetchAll(PDO::FETCH_ASSOC);
+        // Cập nhật để lấy sinh viên phân trang
+        $students = getStudents($conn, $classId, $attendanceDate, $limit, $offset);
+        $totalStudents = getTotalStudents($conn, $classId, $attendanceDate);
+        $totalPages = ceil($totalStudents / $limit);
         ?>
 
-        <!-- Header với nút quay lại -->
         <header class="mb-4 bg-success">
             <div class="d-flex justify-content-between align-items-center">
                 <h1>Danh sách sinh viên lớp <?php echo htmlspecialchars($class->name); ?></h1>
@@ -92,7 +48,6 @@
             </div>
         </header>
 
-        <!-- Form chọn ngày điểm danh hiện tại -->
         <form method="get" class="mb-4">
             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($classId); ?>">
             <div class="form-group">
@@ -109,7 +64,6 @@
             </div>
         </form>
 
-        <!-- Hiển thị danh sách học sinh -->
         <?php if ($attendanceDate): ?>
             <table class="table table-striped">
                 <thead>
@@ -134,8 +88,17 @@
                                 <td><?php echo htmlspecialchars($student['class']); ?></td>
                                 <td><?php echo htmlspecialchars($student['gender']); ?></td>
                                 <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($student['birthday']))); ?></td>
-                                <td><?php echo htmlspecialchars($student['status']); ?></td>
-                                <td><?php echo htmlspecialchars($student['note']); ?></td>
+                                <td>
+                                    <select name="status[<?php echo $student['id']; ?>]" class="form-control">
+                                        <option value="Present" <?php if ($student['status'] == 'Present') echo 'selected'; ?>>Present</option>
+                                        <option value="Absent" <?php if ($student['status'] == 'Absent') echo 'selected'; ?>>Absent</option>
+                                        <option value="Late" <?php if ($student['status'] == 'Late') echo 'selected'; ?>>Late</option>
+                                        <option value="" <?php if ($student['status'] == '') echo 'selected'; ?>></option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" name="note[<?php echo $student['id']; ?>]" class="form-control" value="<?php echo htmlspecialchars($student['note']); ?>">
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -145,6 +108,19 @@
                     <?php endif; ?>
                 </tbody>
             </table>
+
+            <!-- Phân trang -->
+            <nav>
+                <ul class="pagination">
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                            <a class="page-link" href="?class_id=<?php echo htmlspecialchars($classId); ?>&attendance_date=<?php echo htmlspecialchars($attendanceDate); ?>&page=<?php echo $i; ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        </li>
+                    <?php endfor; ?>
+                </ul>
+            </nav>
         <?php endif; ?>
     </div>
 </body>
