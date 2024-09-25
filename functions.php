@@ -50,11 +50,6 @@ function getAttendanceByStudent($conn, $classId, $studentId, $attendanceDate) {
     $stmt->execute([$classId, $studentId, $attendanceDate]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
-
-
-
-
-
 //Hàm dành cho attendance
 //
 function checkAttendanceExists($conn, $classId, $studentId, $attendanceDate) {
@@ -105,11 +100,6 @@ function createAttendanceDate($conn, $classId, $attendanceDate) {
         return false;
     }
 }
-
-
-
-
-
 ?>
 
 

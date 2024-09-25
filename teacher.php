@@ -115,7 +115,7 @@
             <tbody>
                 <?php if (!empty($classes)) { ?>
                     <?php foreach ($classes as $class) { ?>
-                        <tr onclick="window.location.href='../attendance.php?class_id=<?php echo htmlspecialchars($class->id); ?>'">
+                        <tr onclick="window.location.href='../attendance_list.php?class_id=<?php echo htmlspecialchars($class->id); ?>'">
                             <td><?php echo htmlspecialchars($class->id); ?></td>
                             <td><?php echo htmlspecialchars($class->class_name); ?></td>
                             <td><?php echo htmlspecialchars($class->course_name); ?></td>
