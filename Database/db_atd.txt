@@ -78,11 +78,13 @@ CREATE TABLE attendances (
     class_id INT(11) NOT NULL,
     student_id INT(11) NOT NULL,
     attendance_date DATE NOT NULL,
-    status ENUM('Present', 'Absent', 'Late', '') NOT NULL,
+    status ENUM('Present', 'Absent', 'Late') NOT NULL,
     note VARCHAR(255),
     CONSTRAINT fk_class_id FOREIGN KEY (class_id) REFERENCES classes(id),
-    CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES students(id)
+    CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES students(id),
+    CONSTRAINT unique_attendance UNIQUE (class_id, student_id, attendance_date)
 );
+
 -- 9
 CREATE TABLE schedules (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -386,7 +388,7 @@ VALUES
 
 -- 9
 -- 18/09/2024
-INSERT INTO attendances (class_id, student_id, attendance_date, status, note)
+INSERT INTO attendances (class_id, student_id, attendance_date, status , note)
 VALUES
 (1, 2001216114, '2024-09-18', 'Present', ''),
 (1, 2001210224, '2024-09-18', 'Absent', ''),
@@ -529,7 +531,7 @@ VALUES
 (5, 2001231234, '2024-09-18', 'Present', '')
 
 -- 17/09/2024
-INSERT INTO attendances (class_id, student_id, attendance_date, status, note)
+INSERT INTO attendances (class_id, student_id, attendance_date, status , note)
 VALUES
 (1, 2001216114, '2024-09-17', 'Present', ''),
 (1, 2001210224, '2024-09-17', 'Absent', ''),

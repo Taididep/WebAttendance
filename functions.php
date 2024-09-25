@@ -45,10 +45,65 @@ function getTotalStudents($conn, $classId, $attendanceDate) {
 
 //lấy danh sách học sinh theo ngày và lớp
 function getAttendanceByStudent($conn, $classId, $studentId, $attendanceDate) {
-    $query = "SELECT * FROM attendances WHERE class_id = ? AND student_id = ? AND attendance_date = ?";
-    $stmt = $conn->prepare($query);
+    $sql = "SELECT * FROM attendances WHERE class_id = ? AND student_id = ? AND attendance_date = ?";
+    $stmt = $conn->prepare($sql);
     $stmt->execute([$classId, $studentId, $attendanceDate]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+
+
+
+
+//Hàm dành cho attendance
+//
+function checkAttendanceExists($conn, $classId, $studentId, $attendanceDate) {
+    $sql = "SELECT * FROM attendances WHERE class_id = ? AND student_id = ? AND attendance_date = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$classId, $studentId, $attendanceDate]);
+    return $stmt->fetch(PDO::FETCH_ASSOC); // Trả về một mảng duy nhất
+}
+
+function updateAttendance($conn, $classId, $studentId, $attendanceDate, $status, $note) {
+    $sql = "UPDATE attendances SET `status` = ?, note = ? WHERE class_id = ? AND student_id = ? AND attendance_date = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$status, $note, $classId, $studentId, $attendanceDate]);
+}
+
+function insertAttendance($conn, $classId, $studentId, $attendanceDate, $status, $note) {
+    $sql = "INSERT INTO attendances (class_id, student_id, attendance_date, `status`, note) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$classId, $studentId, $attendanceDate, $status, $note]);
+}
+
+function createAttendanceDate($conn, $classId, $attendanceDate) {
+    // Bắt đầu giao dịch
+    $conn->beginTransaction();
+    
+    try {
+        // Lấy danh sách học sinh trong lớp
+        $sqlStudents = "SELECT id FROM students WHERE id IN (SELECT student_id FROM class_students WHERE class_id = ?)";
+        $stmStudents = $conn->prepare($sqlStudents);
+        $stmStudents->execute([$classId]);
+        $students = $stmStudents->fetchAll(PDO::FETCH_ASSOC);
+
+        // Chuẩn bị câu lệnh chèn điểm danh
+        $sql = "INSERT INTO attendances (class_id, student_id, attendance_date, status) VALUES (?, ?, ?, ?)";
+        $stm = $conn->prepare($sql);
+        
+        // Lặp qua danh sách học sinh và chèn điểm danh
+        foreach ($students as $student) {
+            $stm->execute([$classId, $student['id'], $attendanceDate, 'Absent']); // Mặc định là 'Absent'
+        }
+
+        // Cam kết giao dịch
+        $conn->commit();
+        return true;
+    } catch (Exception $e) {
+        // Nếu có lỗi, rollback giao dịch
+        $conn->rollBack();
+        return false;
+    }
 }
 
 
