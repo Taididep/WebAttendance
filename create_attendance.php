@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'functions.php';
+include 'function.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $classId = isset($_POST['class_id']) ? (int)$_POST['class_id'] : 0;

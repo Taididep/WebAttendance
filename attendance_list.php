@@ -20,25 +20,29 @@
 </head>
 <body>
     <?php
-    include 'function.php'; // Thêm đường dẫn tới function.php
-
+    include 'function.php';
     // Lấy class_id từ URL
     $class_id = $_GET['class_id'];
 
     // Lấy danh sách sinh viên và thông tin lớp học
-    $result_students = getStudentsByClassId($conn, $class_id); // Truyền $conn vào hàm
+    $result_students = getStudentsByClassId($conn, $class_id);
 
     // Lấy tên lớp từ kết quả đầu tiên
     $class_name = count($result_students) > 0 ? $result_students[0]['class_name'] : '';
 
     // Lấy danh sách các ngày điểm danh cho lớp học này
-    $dates = getAttendanceDatesByClassId($conn, $class_id); // Truyền $conn vào hàm
+    $dates = getAttendanceDatesByClassId($conn, $class_id);
 
     // Lấy tất cả dữ liệu điểm danh cho lớp học này
-    $attendances = getAttendanceDataByClassId($conn, $class_id); // Truyền $conn vào hàm
+    $attendances = getAttendanceDataByClassId($conn, $class_id);
     ?>
 
     <h2>Attendance List for Class: <?php echo $class_name; ?></h2>
+    <!-- Nút xuất file Excel -->
+    <form action="attendance_export.php" method="post">
+        <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
+        <button type="submit">Xuất ra file Excel</button>
+    </form>
     <table>
         <thead>
             <tr>
@@ -53,35 +57,34 @@
                 <?php endforeach; ?>
             </tr>
         </thead>
-        <tbody>
-            <?php
-            if (count($result_students) > 0) {
-                $index = 1;
-                foreach ($result_students as $student) {
-                    echo "<tr>";
-                    echo "<td>" . $index++ . "</td>";
-                    echo "<td>" . $student['student_id'] . "</td>";
-                    echo "<td>" . $student['lastname'] . "</td>";
-                    echo "<td>" . $student['firstname'] . "</td>";
-                    echo "<td>" . $student['gender'] . "</td>";
-                    echo "<td>" . date('d/m/Y', strtotime($student['birthday'])) . "</td>";
+            <tbody>
+                <?php
+                if (count($result_students) > 0) {
+                    foreach ($result_students as $student) {
+                        echo "<tr>";
+                        echo "<td>" . $student['stt'] . "</td>"; // Lấy STT từ database
+                        echo "<td>" . $student['student_id'] . "</td>";
+                        echo "<td>" . $student['lastname'] . "</td>";
+                        echo "<td>" . $student['firstname'] . "</td>";
+                        echo "<td>" . $student['gender'] . "</td>";
+                        echo "<td>" . date('d/m/Y', strtotime($student['birthday'])) . "</td>";
 
-                    // Hiển thị trạng thái điểm danh cho mỗi ngày
-                    foreach ($dates as $date) {
-                        if (isset($attendances[$student['student_id']][$date])) {
-                            echo "<td>" . $attendances[$student['student_id']][$date] . "</td>";
-                        } else {
-                            echo "<td>Absent</td>"; // Nếu không có dữ liệu thì mặc định là vắng mặt
+                        // Hiển thị trạng thái điểm danh cho mỗi ngày
+                        foreach ($dates as $date) {
+                            if (isset($attendances[$student['student_id']][$date])) {
+                                echo "<td>" . $attendances[$student['student_id']][$date] . "</td>";
+                            } else {
+                                echo "<td>Absent</td>"; // Nếu không có dữ liệu thì mặc định là vắng mặt
+                            }
                         }
-                    }
 
-                    echo "</tr>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='6'>No students found for this class.</td></tr>";
                 }
-            } else {
-                echo "<tr><td colspan='6'>No students found for this class.</td></tr>";
-            }
-            ?>
-        </tbody>
+                ?>
+            </tbody>
     </table>
 </body>
 </html>

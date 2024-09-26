@@ -4,16 +4,19 @@ include 'connect/connect.php'; // Đảm bảo bạn đã kết nối với CSDL
 // Lấy danh sách sinh viên trong lớp
 function getStudentsByClassId($conn, $class_id) {
     $stmt = $conn->prepare("
-        SELECT s.id as student_id, s.lastname, s.firstname, s.gender, s.birthday, c.name as class_name 
+        SELECT cs.stt, s.id AS student_id, s.lastname, s.firstname, s.gender, s.birthday, c.name AS class_name 
         FROM students s 
         JOIN class_students cs ON s.id = cs.student_id
         JOIN classes c ON cs.class_id = c.id
         WHERE c.id = :class_id
+        ORDER BY cs.stt ASC
     ");
     $stmt->bindValue(':class_id', $class_id, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
 }
+
 
 // Lấy danh sách các ngày điểm danh
 function getAttendanceDatesByClassId($conn, $class_id) {
@@ -43,4 +46,12 @@ function getAttendanceDataByClassId($conn, $class_id) {
     }
     return $attendances;
 }
+
+function createAttendanceDate($conn, $classId, $date) {
+    $stmt = $conn->prepare("INSERT INTO attendance_dates (class_id, date) VALUES (:class_id, :date)");
+    $stmt->bindValue(':class_id', $classId, PDO::PARAM_INT);
+    $stmt->bindValue(':date', $date);
+    return $stmt->execute();
+}
+
 ?>
