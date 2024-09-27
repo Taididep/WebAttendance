@@ -54,4 +54,23 @@ function createAttendanceDate($conn, $classId, $date) {
     return $stmt->execute();
 }
 
+// Lấy ngày tiếp theo để điểm danh
+function getNextAttendanceDate($conn, $class_id) {
+    $stmt = $conn->prepare("
+        SELECT MAX(attendance_date) AS max_date 
+        FROM attendances 
+        WHERE class_id = :class_id
+    ");
+    $stmt->bindValue(':class_id', $class_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $max_date = $stmt->fetchColumn();
+
+    if ($max_date) {
+        $next_date = date('Y-m-d', strtotime($max_date . ' +1 day'));
+        return $next_date;
+    }
+
+    return date('Y-m-d'); // Nếu không có ngày nào, trả về ngày hiện tại
+}
+
 ?>

@@ -35,14 +35,27 @@
 
     // Lấy tất cả dữ liệu điểm danh cho lớp học này
     $attendances = getAttendanceDataByClassId($conn, $class_id);
+
+    // Lấy ngày tiếp theo để điểm danh
+    $next_date = getNextAttendanceDate($conn, $class_id);
     ?>
 
-    <h2>Attendance List for Class: <?php echo $class_name; ?></h2>
+    <h2>Danh sách điểm danh cho lớp: <?php echo $class_name; ?></h2>
+    <h3>Ngày tiếp theo để điểm danh: <?php echo date('d/m/Y', strtotime($next_date)); ?></h3>
+    
     <!-- Nút xuất file Excel -->
     <form action="attendance_export.php" method="post">
         <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
         <button type="submit">Xuất ra file Excel</button>
     </form>
+
+    <!-- Form để thêm điểm danh cho ngày tiếp theo -->
+    <form action="attendance_process.php" method="post">
+        <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
+        <input type="hidden" name="attendance_date" value="<?php echo $next_date; ?>">
+        <button type="submit">Thêm điểm danh cho ngày <?php echo date('d/m/Y', strtotime($next_date)); ?></button>
+    </form>
+
     <table>
         <thead>
             <tr>
@@ -57,34 +70,34 @@
                 <?php endforeach; ?>
             </tr>
         </thead>
-            <tbody>
-                <?php
-                if (count($result_students) > 0) {
-                    foreach ($result_students as $student) {
-                        echo "<tr>";
-                        echo "<td>" . $student['stt'] . "</td>"; // Lấy STT từ database
-                        echo "<td>" . $student['student_id'] . "</td>";
-                        echo "<td>" . $student['lastname'] . "</td>";
-                        echo "<td>" . $student['firstname'] . "</td>";
-                        echo "<td>" . $student['gender'] . "</td>";
-                        echo "<td>" . date('d/m/Y', strtotime($student['birthday'])) . "</td>";
+        <tbody>
+            <?php
+            if (count($result_students) > 0) {
+                foreach ($result_students as $student) {
+                    echo "<tr>";
+                    echo "<td>" . $student['stt'] . "</td>"; // Lấy STT từ database
+                    echo "<td>" . $student['student_id'] . "</td>";
+                    echo "<td>" . $student['lastname'] . "</td>";
+                    echo "<td>" . $student['firstname'] . "</td>";
+                    echo "<td>" . $student['gender'] . "</td>";
+                    echo "<td>" . date('d/m/Y', strtotime($student['birthday'])) . "</td>";
 
-                        // Hiển thị trạng thái điểm danh cho mỗi ngày
-                        foreach ($dates as $date) {
-                            if (isset($attendances[$student['student_id']][$date])) {
-                                echo "<td>" . $attendances[$student['student_id']][$date] . "</td>";
-                            } else {
-                                echo "<td>Absent</td>"; // Nếu không có dữ liệu thì mặc định là vắng mặt
-                            }
+                    // Hiển thị trạng thái điểm danh cho mỗi ngày
+                    foreach ($dates as $date) {
+                        if (isset($attendances[$student['student_id']][$date])) {
+                            echo "<td>" . $attendances[$student['student_id']][$date] . "</td>";
+                        } else {
+                            echo "<td>Absent</td>"; // Nếu không có dữ liệu thì mặc định là vắng mặt
                         }
-
-                        echo "</tr>";
                     }
-                } else {
-                    echo "<tr><td colspan='6'>No students found for this class.</td></tr>";
+
+                    echo "</tr>";
                 }
-                ?>
-            </tbody>
+            } else {
+                echo "<tr><td colspan='6'>Không có sinh viên nào trong lớp này.</td></tr>";
+            }
+            ?>
+        </tbody>
     </table>
 </body>
 </html>
