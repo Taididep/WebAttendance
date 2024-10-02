@@ -34,9 +34,9 @@
         if ($userData->role == 'admin') {
             $pageRedirect = 'admin.php';
         } elseif ($userData->role == 'teacher') {
-            $pageRedirect = 'teacher.php';
+            $pageRedirect = 'Teacher/teacher.php';
         } elseif ($userData->role == 'student') {
-            $pageRedirect = 'student.php';
+            $pageRedirect = 'Student/student.php';
         }
 
         header("Location: $pageRedirect");

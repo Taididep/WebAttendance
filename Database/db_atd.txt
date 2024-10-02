@@ -48,7 +48,7 @@ CREATE TABLE teachers (
     email VARCHAR(100),
     phone VARCHAR(15),
     birthday DATE NOT NULL,
-    gender ENUM('Nam', 'Nữ', 'Other'),
+    gender ENUM('Nam', 'Nữ'),
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 

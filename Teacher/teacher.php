@@ -1,10 +1,10 @@
 <?php
 session_start();
-include 'connect/connect.php';
+include '../Connect/connect.php';
 
 // Kiểm tra xem người dùng đã đăng nhập chưa
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'teacher') {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit;
 }
 
@@ -146,28 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_class'])) {
     exit();
 }
 
-// Xử lý chỉnh sửa thông tin cá nhân
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_profile'])) {
-    $lastname = trim($_POST['lastname']);
-    $firstname = trim($_POST['firstname']);
-    $email = trim($_POST['email']);
-    $phone = trim($_POST['phone']);
-    $birthday = $_POST['birthday'];
-    $gender = $_POST['gender'];
-
-    $updateProfileSql = "UPDATE teachers SET lastname = ?, firstname = ?, email = ?, phone = ?, birthday = ?, gender = ? WHERE id = ?";
-    $updateProfileStm = $conn->prepare($updateProfileSql);
-    
-    if ($updateProfileStm->execute([$lastname, $firstname, $email, $phone, $birthday, $gender, $_SESSION['user_id']])) {
-        $_SESSION['message'] = "Thông tin cá nhân đã được cập nhật thành công.";
-    } else {
-        $_SESSION['error'] = "Không thể cập nhật thông tin cá nhân.";
-    }
-    
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
-}
-
 // Lấy thông tin người dùng
 $username = $_SESSION['username'] ?? '';
 $userSql = "SELECT id FROM users WHERE username = ?";
@@ -175,14 +153,6 @@ $userStm = $conn->prepare($userSql);
 $userStm->execute([$username]);
 $user = $userStm->fetch(PDO::FETCH_OBJ);
 
-// Lấy thông tin giáo viên
-if ($user) {
-    $_SESSION['user_id'] = $user->id;
-    $teacherSql = "SELECT lastname, firstname, email, phone, birthday, gender FROM teachers WHERE id = ?";
-    $teacherStm = $conn->prepare($teacherSql);
-    $teacherStm->execute([$user->id]);
-    $teacherData = $teacherStm->fetch(PDO::FETCH_OBJ);
-}
 
 // Lấy danh sách học kỳ
 $semesterSql = "SELECT * FROM semesters ORDER BY id DESC";
@@ -229,7 +199,7 @@ $classes = $classesStm->fetchAll(PDO::FETCH_OBJ);
             <div class="d-flex justify-content-between align-items-center">
                 <h1>Dashboard</h1>
                 <div>
-                    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editProfileModal">
+                    <button type="button" class="btn btn-warning" onclick="window.location.href='teacher_detail.php?id=<?php echo $user->id; ?>'">
                         Chỉnh sửa thông tin
                     </button>
                     <form method="post" style="display:inline;">
@@ -303,56 +273,6 @@ $classes = $classesStm->fetchAll(PDO::FETCH_OBJ);
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
                                 <button type="submit" name="add_class" class="btn btn-primary">Thêm</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal chỉnh sửa thông tin cá nhân -->
-        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editProfileModalLabel">Chỉnh sửa thông tin cá nhân</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post">
-                            <div class="form-group">
-                                <label for="lastname">Họ:</label>
-                                <input type="text" name="lastname" value="<?php echo htmlspecialchars($teacherData->lastname); ?>" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="firstname">Tên:</label>
-                                <input type="text" name="firstname" value="<?php echo htmlspecialchars($teacherData->firstname); ?>" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Email:</label>
-                                <input type="email" name="email" value="<?php echo htmlspecialchars($teacherData->email); ?>" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Điện thoại:</label>
-                                <input type="text" name="phone" value="<?php echo htmlspecialchars($teacherData->phone); ?>" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="birthday">Ngày sinh:</label>
-                                <input type="date" name="birthday" value="<?php echo htmlspecialchars($teacherData->birthday); ?>" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="gender">Giới tính:</label>
-                                <select name="gender" class="form-control">
-                                    <option value="male" <?php if ($teacherData->gender === 'male') echo 'selected'; ?>>Nam</option>
-                                    <option value="female" <?php if ($teacherData->gender === 'female') echo 'selected'; ?>>Nữ</option>
-                                    <option value="other" <?php if ($teacherData->gender === 'other') echo 'selected'; ?>>Khác</option>
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                                <button type="submit" name="edit_profile" class="btn btn-primary">Cập nhật</button>
                             </div>
                         </form>
                     </div>
