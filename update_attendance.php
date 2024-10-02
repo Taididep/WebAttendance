@@ -1,30 +1,42 @@
 <?php
-include 'functions.php';
+include 'connect/connect.php';
+header('Content-Type: application/json');
 
-session_start();
+$data = json_decode(file_get_contents("php://input"), true);
 
-// Xử lý khi form được submit
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $classId = $_POST['class_id'];
-    $attendanceDate = $_POST['attendance_date'];
-    $statuses = $_POST['status']; // Mảng chứa trạng thái của từng sinh viên
-    $notes = $_POST['note']; // Mảng chứa ghi chú của từng sinh viên
+if ($data && is_array($data)) {
+    try {
+        $conn->beginTransaction();
+        
+        foreach ($data as $attendance) {
+            $student_id = $attendance['student_id'];
+            $date = $attendance['date'];
+            $status = $attendance['status'];
 
-    foreach ($statuses as $studentId => $status) {
-        $note = isset($notes[$studentId]) ? $notes[$studentId] : ''; // Ghi chú có thể rỗng
-
-        $attendanceRecord = checkAttendanceExists($conn, $classId, $studentId, $attendanceDate);        // Kiểm tra xem bản ghi có tồn tại không
-
-        if ($attendanceRecord) {
-            updateAttendance($conn, $classId, $studentId, $attendanceDate, $status, $note);            // Nếu tồn tại, tiến hành cập nhật
+            // Cập nhật điểm danh
+            $stmt = $conn->prepare("
+                INSERT INTO attendances (class_id, student_id, attendance_date, status)
+                VALUES (:class_id, :student_id, :attendance_date, :status)
+                ON DUPLICATE KEY UPDATE status = :status, updated_at = CURRENT_TIMESTAMP()
+            ");
+            $class_id = 1; // Thay đổi class_id theo lớp bạn muốn cập nhật
+            $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
+            $stmt->bindParam(':student_id', $student_id);
+            $stmt->bindParam(':attendance_date', $date);
+            $stmt->bindParam(':status', $status);
+            
+            $stmt->execute();
         }
-    }
 
-    // Đặt thông báo vào session
-    $_SESSION['message'] = "Cập nhật điểm danh thành công!";
-    
-    // Chuyển hướng về trang attendance.php
-    header("Location: attendance.php?class_id=" . $classId . "&attendance_date=" . $attendanceDate);
-    exit();
+        $conn->commit();
+        echo json_encode(['success' => true, 'message' => 'Cập nhật điểm danh thành công!']);
+    } catch (Exception $e) {
+        $conn->rollBack();
+        echo json_encode(['success' => false, 'message' => 'Lỗi thực thi câu lệnh: ' . $e->getMessage()]);
+    }
+} else {
+    echo json_encode(['success' => false, 'message' => 'Không có dữ liệu nào để cập nhật.']);
 }
+
+$conn = null; // Đóng kết nối
 ?>
