@@ -73,7 +73,7 @@ if (isset($_POST['edit_profile'])) {
                 <h1>Dashboard</h1>
                 <div>
                     <button type="button" class="btn btn-warning" onclick="window.location.href='student_detail.php?id=<?php echo $user->id; ?>'">
-                        Chỉnh sửa thông tin
+                        Thông tin cá nhân
                     </button>
                     <form method="post" style="display:inline;">
                         <button type="submit" name="logout" class="btn btn-danger">Đăng xuất</button>

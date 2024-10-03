@@ -25,25 +25,6 @@ if (!$student) {
     header("Location: student.php");
     exit();
 }
-
-// Xử lý cập nhật thông tin sinh viên
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_student'])) {
-    $lastname = trim($_POST['lastname']);
-    $firstname = trim($_POST['firstname']);
-    $email = trim($_POST['email']);
-    $phone = trim($_POST['phone']);
-    $birthday = $_POST['birthday'];
-    $gender = $_POST['gender'];
-
-    // Cập nhật thông tin sinh viên
-    if (updateStudentProfile($conn, $studentId, $lastname, $firstname, $email, $phone, $birthday, $gender)) {
-        $_SESSION['message'] = "Thông tin cá nhân đã được cập nhật.";
-        header("Location: student.php");
-        exit();
-    } else {
-        $_SESSION['error'] = "Không thể cập nhật thông tin.";
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -52,12 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_student'])) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh sửa thông tin cá nhân</title>
+    <title>Thông tin cá nhân sinh viên</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Chỉnh sửa thông tin cá nhân</h1>
+        <h1>Thông tin cá nhân sinh viên</h1>
 
         <!-- Hiển thị thông báo -->
         <?php if (isset($_SESSION['message'])): ?>
@@ -72,43 +53,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_student'])) {
             </div>
         <?php endif; ?>
 
-        <form method="post">
-            <div class="form-group">
-                <label for="lastname">Họ:</label>
-                <input type="text" name="lastname" id="lastname" value="<?php echo htmlspecialchars($student->lastname); ?>" class="form-control" required>
-            </div>
+        <!-- Hiển thị thông tin sinh viên dạng ngang -->
+        <div class="row">
+            <div class="col-md-4 font-weight-bold">Họ:</div>
+            <div class="col-md-8"><?php echo htmlspecialchars($student->lastname); ?></div>
+        </div>
 
-            <div class="form-group">
-                <label for="firstname">Tên:</label>
-                <input type="text" name="firstname" id="firstname" value="<?php echo htmlspecialchars($student->firstname); ?>" class="form-control" required>
-            </div>
+        <div class="row">
+            <div class="col-md-4 font-weight-bold">Tên:</div>
+            <div class="col-md-8"><?php echo htmlspecialchars($student->firstname); ?></div>
+        </div>
 
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($student->email); ?>" class="form-control" required>
-            </div>
+        <div class="row">
+            <div class="col-md-4 font-weight-bold">Email:</div>
+            <div class="col-md-8"><?php echo htmlspecialchars($student->email); ?></div>
+        </div>
 
-            <div class="form-group">
-                <label for="phone">Số điện thoại:</label>
-                <input type="text" name="phone" id="phone" value="<?php echo htmlspecialchars($student->phone); ?>" class="form-control">
-            </div>
+        <div class="row">
+            <div class="col-md-4 font-weight-bold">Số điện thoại:</div>
+            <div class="col-md-8"><?php echo htmlspecialchars($student->phone); ?></div>
+        </div>
 
-            <div class="form-group">
-                <label for="birthday">Ngày sinh:</label>
-                <input type="date" name="birthday" id="birthday" value="<?php echo htmlspecialchars($student->birthday); ?>" class="form-control" required>
-            </div>
+        <div class="row">
+            <div class="col-md-4 font-weight-bold">Ngày sinh:</div>
+            <div class="col-md-8"><?php echo htmlspecialchars($student->birthday); ?></div>
+        </div>
 
-            <div class="form-group">
-                <label for="gender">Giới tính:</label>
-                <select name="gender" id="gender" class="form-control" required>
-                    <option value="Nam" <?php if ($student->gender == 'Nam') echo 'selected'; ?>>Nam</option>
-                    <option value="Nữ" <?php if ($student->gender == 'Nữ') echo 'selected'; ?>>Nữ</option>
-                </select>
-            </div>
+        <div class="row">
+            <div class="col-md-4 font-weight-bold">Giới tính:</div>
+            <div class="col-md-8"><?php echo htmlspecialchars($student->gender); ?></div>
+        </div>
 
-            <button type="submit" name="update_student" class="btn btn-primary">Cập nhật</button>
+        <div class="mt-3">
             <a href="student.php" class="btn btn-secondary">Quay lại</a>
-        </form>
+            <a href="student_edit.php?id=<?php echo $studentId; ?>" class="btn btn-primary">Chỉnh sửa thông tin cá nhân</a>
+        </div>
     </div>
 </body>
 </html>
