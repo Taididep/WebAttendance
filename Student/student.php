@@ -64,23 +64,31 @@ if (isset($_POST['edit_profile'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">       
 </head>
 <body>
     <div class="container mt-5">
         <header class="mb-4 bg-success text-white p-3">
             <div class="d-flex justify-content-between align-items-center">
                 <h1>Dashboard</h1>
-                <div>
-                    <button type="button" class="btn btn-warning" onclick="window.location.href='student_detail.php?id=<?php echo $user->id; ?>'">
-                        Thông tin cá nhân
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <?php echo htmlspecialchars($studentData->lastname) . " " . htmlspecialchars($studentData->firstname); ?>
                     </button>
-                    <form method="post" style="display:inline;">
-                        <button type="submit" name="logout" class="btn btn-danger">Đăng xuất</button>
-                    </form>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <li>
+                            <a class="dropdown-item" href="student_detail.php?id=<?php echo $user->id; ?>">Thông tin cá nhân</a>
+                        </li>
+                        <li>
+                            <form method="post">
+                                <button type="submit" name="logout" class="dropdown-item">Đăng xuất</button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </header>
+
 
         <!-- Hiển thị thông báo -->
         <?php if (isset($_SESSION['message'])): ?>
@@ -97,7 +105,6 @@ if (isset($_POST['edit_profile'])) {
 
         <form method="post" class="mb-4">
             <div class="form-group">
-                <label for="semester_id">Chọn học kỳ:</label>
                 <select name="semester_id" id="semester_id" class="form-control" onchange="this.form.submit()">
                     <option value="">-- Chọn học kỳ --</option>
                     <?php foreach ($semesters as $semester): ?>
@@ -109,19 +116,10 @@ if (isset($_POST['edit_profile'])) {
                 </select>
             </div>
         </form>
-
-        <?php if (!empty($studentData)): ?>
-            <h2 class='mb-4'>Xin chào, <?php echo htmlspecialchars($studentData->lastname) . " " . htmlspecialchars($studentData->firstname); ?></h2>
-            <p>Mã số sinh viên: <strong><?php echo htmlspecialchars($studentData->id); ?></strong></p>
-        <?php endif; ?>
-
-        <!-- Các lớp học sẽ hiển thị dưới đây nếu có -->
-        <!-- (Tùy chỉnh theo yêu cầu của bạn) -->
-
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
 </body>
 </html>
