@@ -1,0 +1,33 @@
+
+Các nghiệp vụ, chức năng cần làm:
+1. Đăng Nhập (users,roles,user_roles)
+2. Đăng ký tài khoản
+3. Cập nhật thông tin cá nhân (students,teachers)
+4. Tab không lưu kết nối trước đó, Đăng xuất khi tắt tab(đăng xuất rồi mà vẫn vào dc link cũ là sai)
+
+
+5. Hiển thị học kỳ(combobox) -> chọn học kỳ -> Hiển thị các lớp (giao diện trang chủ)
+6. Khi nhấn vào lớp thì sẽ qua trang danh sách điểm danh
+
+
+7. Thêm(tạo), xóa, sửa(cập nhật) - Lớp học
+8. Thêm, xóa sinh viên trong bảng class_students(danh sách sinh viên trong cái lớp đó)
+
+9. Trang điểm danh lấy các cột (STT,MSSV, Họ Đệm, Tên, Ngày Sinh, Lớp học, Ngày diểm danh 1, Ngày điểm danh 2...)
++ ví dụ trong \Database\diemDanh.xlsm
++ lưu ý ngày điểm danh lấy từ bảng schedules
+
+10. Schedules được tạo sẵn hay gì đó... để coi lịch
+
+11. sử dụng thủ tục để tính thống kê cho attendance_reports 
+
+12. Chức năng comment(nhận xét)
+
+
+Lưu ý: 
+- Các bảng courses, course_types, semesters, roles gần như không có chỉnh sửa
+- Tất cả chức năng đều thông qua thủ tục không xài Select - (Stored Procedure)  ví dụ: CREATE PROCEDURE GetStudentById...
+- teacher coi được danh sách điểm danh và student thì không(chỉ biết là mình đã điểm danh)
+
+Gợi ý: 
+- Làm tương tự giao diện Google classrom
