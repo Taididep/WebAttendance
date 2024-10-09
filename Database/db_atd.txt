@@ -88,6 +88,7 @@ CREATE TABLE classes (
     CONSTRAINT fk_teacher_id FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),
     CONSTRAINT fk_semester_id FOREIGN KEY (semester_id) REFERENCES semesters(semester_id)
 );
+
 -- 6b
 CREATE TABLE class_students (
     stt INT(5) NOT NULL,
@@ -150,31 +151,31 @@ VALUES
 
 INSERT INTO users (user_id, username, password) 
 VALUES 
-(2001216114, '2001216114', 'password1'),
-(2001210224, '2001210224', 'password2'),
-(2001211785, '2001211785', 'password3'),
-(2001212345, '2001212345', 'password4'),
-(2001213456, '2001213456', 'password5'),
-(2001214567, '2001214567', 'password6'),
-(2001215678, '2001215678', 'password7'),
-(2001216789, '2001216789', 'password8'),
-(2001217890, '2001217890', 'password9'),
-(2001218901, '2001218901', 'password10'),
-(2001219012, '2001219012', 'password11'),
-(2001210123, '2001210123', 'password12'),
-(2001211234, '2001211234', 'password13'),
-(2001212346, '2001212346', 'password14'),
-(2001213457, '2001213457', 'password15'),
-(2001214568, '2001214568', 'password16'),
-(2001215679, '2001215679', 'password17'),
-(2001216780, '2001216780', 'password18'),
-(2001217891, '2001217891', 'password19'),
-(2001218902, '2001218902', 'password20');
+(2001216114, '2001216114', 'password'),
+(2001210224, '2001210224', 'password'),
+(2001211785, '2001211785', 'password'),
+(2001212345, '2001212345', 'password'),
+(2001213456, '2001213456', 'password'),
+(2001214567, '2001214567', 'password'),
+(2001215678, '2001215678', 'password'),
+(2001216789, '2001216789', 'password'),
+(2001217890, '2001217890', 'password'),
+(2001218901, '2001218901', 'password'),
+(2001219012, '2001219012', 'password'),
+(2001210123, '2001210123', 'password'),
+(2001211234, '2001211234', 'password'),
+(2001212346, '2001212346', 'password'),
+(2001213457, '2001213457', 'password'),
+(2001214568, '2001214568', 'password'),
+(2001215679, '2001215679', 'password'),
+(2001216780, '2001216780', 'password'),
+(2001217891, '2001217891', 'password'),
+(2001218902, '2001218902', 'password');
 INSERT INTO users (user_id, username, password) 
 VALUES 
-(1000001234, '1000001234', 'password1'),
-(1000001235, '1000001235', 'password2'),
-(1000001236, '1000001236', 'password3');
+(1000001234, '1000001234', 'password'),
+(1000001235, '1000001235', 'password'),
+(1000001236, '1000001236', 'password');
 
 -- 1c
 INSERT INTO user_roles (user_id, role_id)
@@ -316,9 +317,72 @@ INSERT INTO attendances (class_id, student_id, attendance_date, status , note)
 VALUES
 
 
--- 9
 
 
+
+
+
+
+-- Thủ tục trong login.php
+
+DELIMITER //
+
+CREATE PROCEDURE GetUserInfoByUsername(IN input_username VARCHAR(255))
+BEGIN
+    SELECT u.user_id, u.username, u.password, r.role_name 
+    FROM users u
+    JOIN user_roles ur ON u.user_id = ur.user_id
+    JOIN roles r ON ur.role_id = r.role_id
+    WHERE u.username = input_username;
+END //
+
+DELIMITER ;
+
+
+-- Thủ tục lấy tên giảng viên trong teacher.php
+
+DELIMITER
+CREATE PROCEDURE GetTeacherInfo(IN teacher_id_param INT)
+BEGIN
+    SELECT lastname, firstname 
+    FROM teachers 
+    WHERE teacher_id = teacher_id_param;
+END
+DELIMITER ;
+
+-- Thủ tục lấy tất cả học kỳ trong teacher.php
+
+DELIMITER //
+
+CREATE PROCEDURE GetAllSemesters()
+BEGIN
+    SELECT semester_id, semester_name FROM semesters;
+END //
+
+DELIMITER ;
+
+
+-- Thủ tục lấy danh sach lớp theo học kỳ trong teacher.php(get_classes.php)
+
+DELIMITER //
+
+CREATE PROCEDURE GetClassesBySemester(IN semester_id INT)
+BEGIN
+    SELECT 
+        c.class_id, 
+        c.class_name, 
+        co.course_name, 
+        s.semester_name, 
+        t.lastname, 
+        t.firstname 
+    FROM classes c
+    JOIN courses co ON c.course_id = co.course_id
+    JOIN semesters s ON c.semester_id = s.semester_id
+    JOIN teachers t ON c.teacher_id = t.teacher_id
+    WHERE c.semester_id = semester_id;
+END //
+
+DELIMITER ;
 
 
 

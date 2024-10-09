@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Sep 26, 2024 at 07:30 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Máy chủ: 127.0.0.1
+-- Thời gian đã tạo: Th10 09, 2024 lúc 11:03 AM
+-- Phiên bản máy phục vụ: 10.4.32-MariaDB
+-- Phiên bản PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,674 +18,266 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `db_atd`
+-- Cơ sở dữ liệu: `db_atd`
 --
+
+DELIMITER $$
+--
+-- Thủ tục
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
+    SELECT semester_id, semester_name FROM semesters;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemester` (IN `semester_id` INT)   BEGIN
+    SELECT 
+        c.class_id, 
+        c.class_name, 
+        co.course_name, 
+        s.semester_name, 
+        t.lastname, 
+        t.firstname 
+    FROM classes c
+    JOIN courses co ON c.course_id = co.course_id
+    JOIN semesters s ON c.semester_id = s.semester_id
+    JOIN teachers t ON c.teacher_id = t.teacher_id
+    WHERE c.semester_id = semester_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_param` INT)   BEGIN
+    SELECT lastname, firstname 
+    FROM teachers 
+    WHERE teacher_id = teacher_id_param;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_username` VARCHAR(255))   BEGIN
+    SELECT u.user_id, u.username, u.password, r.role_name 
+    FROM users u
+    JOIN user_roles ur ON u.user_id = ur.user_id
+    JOIN roles r ON ur.role_id = r.role_id
+    WHERE u.username = input_username;
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `attendances`
---
-
-CREATE TABLE `attendances` (
-  `id` int(11) NOT NULL,
-  `class_id` int(11) NOT NULL,
-  `student_id` int(11) NOT NULL,
-  `attendance_date` date NOT NULL,
-  `status` enum('Present','Absent','Late') NOT NULL,
-  `note` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `attendances`
---
-
-INSERT INTO `attendances` (`id`, `class_id`, `student_id`, `attendance_date`, `status`, `note`) VALUES
-(1, 1, 2001216114, '2024-09-17', 'Present', ''),
-(2, 1, 2001210224, '2024-09-17', 'Late', 'trễ 1 tiếng'),
-(3, 1, 2001211785, '2024-09-17', 'Present', ''),
-(4, 1, 2001215678, '2024-09-17', 'Present', ''),
-(5, 1, 2001216789, '2024-09-17', 'Absent', ''),
-(6, 1, 2001217890, '2024-09-17', 'Present', ''),
-(7, 1, 2001218901, '2024-09-17', 'Present', ''),
-(8, 1, 2001219012, '2024-09-17', 'Absent', ''),
-(9, 1, 2001210123, '2024-09-17', 'Late', 'trễ 10p'),
-(10, 1, 2001211234, '2024-09-17', 'Absent', ''),
-(11, 1, 2001212346, '2024-09-17', 'Present', ''),
-(12, 1, 2001213457, '2024-09-17', 'Present', ''),
-(13, 1, 2001214568, '2024-09-17', 'Absent', ''),
-(14, 1, 2001215679, '2024-09-17', 'Present', ''),
-(15, 1, 2001216780, '2024-09-17', 'Absent', ''),
-(16, 1, 2001217891, '2024-09-17', 'Present', ''),
-(17, 1, 2001218902, '2024-09-17', 'Present', ''),
-(18, 1, 2001219013, '2024-09-17', 'Absent', ''),
-(19, 1, 2001223456, '2024-09-17', 'Present', ''),
-(20, 1, 2001224567, '2024-09-17', 'Absent', ''),
-(21, 1, 2001225678, '2024-09-17', 'Present', ''),
-(22, 1, 2001226789, '2024-09-17', 'Present', ''),
-(23, 1, 2001227890, '2024-09-17', 'Absent', ''),
-(24, 1, 2001228901, '2024-09-17', 'Present', ''),
-(25, 1, 2001229012, '2024-09-17', 'Present', ''),
-(26, 1, 2001230123, '2024-09-17', 'Absent', ''),
-(27, 1, 2001231234, '2024-09-17', 'Present', ''),
-(28, 2, 2001216114, '2024-09-17', 'Present', ''),
-(29, 2, 2001210224, '2024-09-17', 'Absent', ''),
-(30, 2, 2001211785, '2024-09-17', 'Present', ''),
-(31, 2, 2001215678, '2024-09-17', 'Present', ''),
-(32, 2, 2001216789, '2024-09-17', 'Absent', ''),
-(33, 2, 2001217890, '2024-09-17', 'Present', ''),
-(34, 2, 2001218901, '2024-09-17', 'Present', ''),
-(35, 2, 2001219012, '2024-09-17', 'Absent', ''),
-(36, 2, 2001210123, '2024-09-17', 'Present', ''),
-(37, 2, 2001211234, '2024-09-17', 'Absent', ''),
-(38, 2, 2001212346, '2024-09-17', 'Present', ''),
-(39, 2, 2001213457, '2024-09-17', 'Present', ''),
-(40, 2, 2001214568, '2024-09-17', 'Absent', ''),
-(41, 2, 2001215679, '2024-09-17', 'Present', ''),
-(42, 2, 2001216780, '2024-09-17', 'Absent', ''),
-(43, 2, 2001217891, '2024-09-17', 'Present', ''),
-(44, 2, 2001218902, '2024-09-17', 'Present', ''),
-(45, 2, 2001219013, '2024-09-17', 'Absent', ''),
-(46, 2, 2001223456, '2024-09-17', 'Present', ''),
-(47, 2, 2001224567, '2024-09-17', 'Absent', ''),
-(48, 2, 2001225678, '2024-09-17', 'Present', ''),
-(49, 2, 2001226789, '2024-09-17', 'Present', ''),
-(50, 2, 2001227890, '2024-09-17', 'Absent', ''),
-(51, 2, 2001228901, '2024-09-17', 'Present', ''),
-(52, 2, 2001229012, '2024-09-17', 'Present', ''),
-(53, 2, 2001230123, '2024-09-17', 'Absent', ''),
-(54, 2, 2001231234, '2024-09-17', 'Present', ''),
-(55, 3, 2001216114, '2024-09-17', 'Present', ''),
-(56, 3, 2001210224, '2024-09-17', 'Absent', ''),
-(57, 3, 2001211785, '2024-09-17', 'Present', ''),
-(58, 3, 2001215678, '2024-09-17', 'Present', ''),
-(59, 3, 2001216789, '2024-09-17', 'Absent', ''),
-(60, 3, 2001217890, '2024-09-17', 'Present', ''),
-(61, 3, 2001218901, '2024-09-17', 'Present', ''),
-(62, 3, 2001219012, '2024-09-17', 'Absent', ''),
-(63, 3, 2001210123, '2024-09-17', 'Present', ''),
-(64, 3, 2001211234, '2024-09-17', 'Absent', ''),
-(65, 3, 2001212346, '2024-09-17', 'Present', ''),
-(66, 3, 2001213457, '2024-09-17', 'Present', ''),
-(67, 3, 2001214568, '2024-09-17', 'Absent', ''),
-(68, 3, 2001215679, '2024-09-17', 'Present', ''),
-(69, 3, 2001216780, '2024-09-17', 'Absent', ''),
-(70, 3, 2001217891, '2024-09-17', 'Present', ''),
-(71, 3, 2001218902, '2024-09-17', 'Present', ''),
-(72, 3, 2001219013, '2024-09-17', 'Absent', ''),
-(73, 3, 2001223456, '2024-09-17', 'Present', ''),
-(74, 3, 2001224567, '2024-09-17', 'Absent', ''),
-(75, 3, 2001225678, '2024-09-17', 'Present', ''),
-(76, 3, 2001226789, '2024-09-17', 'Present', ''),
-(77, 3, 2001227890, '2024-09-17', 'Absent', ''),
-(78, 3, 2001228901, '2024-09-17', 'Present', ''),
-(79, 3, 2001229012, '2024-09-17', 'Present', ''),
-(80, 3, 2001230123, '2024-09-17', 'Absent', ''),
-(81, 3, 2001231234, '2024-09-17', 'Present', ''),
-(82, 4, 2001216114, '2024-09-17', 'Present', ''),
-(83, 4, 2001210224, '2024-09-17', 'Absent', ''),
-(84, 4, 2001211785, '2024-09-17', 'Present', ''),
-(85, 4, 2001215678, '2024-09-17', 'Present', ''),
-(86, 4, 2001216789, '2024-09-17', 'Absent', ''),
-(87, 4, 2001217890, '2024-09-17', 'Present', ''),
-(88, 4, 2001218901, '2024-09-17', 'Present', ''),
-(89, 4, 2001219012, '2024-09-17', 'Absent', ''),
-(90, 4, 2001210123, '2024-09-17', 'Present', ''),
-(91, 4, 2001211234, '2024-09-17', 'Absent', ''),
-(92, 4, 2001212346, '2024-09-17', 'Present', ''),
-(93, 4, 2001213457, '2024-09-17', 'Present', ''),
-(94, 4, 2001214568, '2024-09-17', 'Absent', ''),
-(95, 4, 2001215679, '2024-09-17', 'Present', ''),
-(96, 4, 2001216780, '2024-09-17', 'Absent', ''),
-(97, 4, 2001217891, '2024-09-17', 'Present', ''),
-(98, 4, 2001218902, '2024-09-17', 'Present', ''),
-(99, 4, 2001219013, '2024-09-17', 'Absent', ''),
-(100, 4, 2001223456, '2024-09-17', 'Present', ''),
-(101, 4, 2001224567, '2024-09-17', 'Absent', ''),
-(102, 4, 2001225678, '2024-09-17', 'Present', ''),
-(103, 4, 2001226789, '2024-09-17', 'Present', ''),
-(104, 4, 2001227890, '2024-09-17', 'Absent', ''),
-(105, 4, 2001228901, '2024-09-17', 'Present', ''),
-(106, 4, 2001229012, '2024-09-17', 'Present', ''),
-(107, 4, 2001230123, '2024-09-17', 'Absent', ''),
-(108, 4, 2001231234, '2024-09-17', 'Present', ''),
-(109, 5, 2001216114, '2024-09-17', 'Late', 'trễ 5p'),
-(110, 5, 2001210224, '2024-09-17', 'Late', 'trễ 1 tiếng'),
-(111, 5, 2001211785, '2024-09-17', 'Late', 'trễ 30p'),
-(112, 5, 2001215678, '2024-09-17', 'Present', ''),
-(113, 5, 2001216789, '2024-09-17', 'Absent', ''),
-(114, 5, 2001217890, '2024-09-17', 'Present', ''),
-(115, 5, 2001218901, '2024-09-17', 'Present', ''),
-(116, 5, 2001219012, '2024-09-17', 'Absent', ''),
-(117, 5, 2001210123, '2024-09-17', 'Late', 'trễ 10p'),
-(118, 5, 2001211234, '2024-09-17', 'Absent', ''),
-(119, 5, 2001212346, '2024-09-17', 'Present', ''),
-(120, 5, 2001213457, '2024-09-17', 'Present', ''),
-(121, 5, 2001214568, '2024-09-17', 'Absent', ''),
-(122, 5, 2001215679, '2024-09-17', 'Present', ''),
-(123, 5, 2001216780, '2024-09-17', 'Absent', ''),
-(124, 5, 2001217891, '2024-09-17', 'Present', ''),
-(125, 5, 2001218902, '2024-09-17', 'Present', ''),
-(126, 5, 2001219013, '2024-09-17', 'Absent', ''),
-(127, 5, 2001223456, '2024-09-17', 'Present', ''),
-(128, 5, 2001224567, '2024-09-17', 'Absent', ''),
-(129, 5, 2001225678, '2024-09-17', 'Present', ''),
-(130, 5, 2001226789, '2024-09-17', 'Present', ''),
-(131, 5, 2001227890, '2024-09-17', 'Absent', ''),
-(132, 5, 2001228901, '2024-09-17', 'Present', ''),
-(133, 5, 2001229012, '2024-09-17', 'Present', ''),
-(134, 5, 2001230123, '2024-09-17', 'Absent', ''),
-(135, 5, 2001231234, '2024-09-17', 'Present', ''),
-(136, 1, 2001216114, '2024-09-18', 'Present', ''),
-(137, 1, 2001210224, '2024-09-18', 'Absent', ''),
-(138, 1, 2001211785, '2024-09-18', 'Present', ''),
-(139, 1, 2001215678, '2024-09-18', 'Present', ''),
-(140, 1, 2001216789, '2024-09-18', 'Absent', ''),
-(141, 1, 2001217890, '2024-09-18', 'Present', ''),
-(142, 1, 2001218901, '2024-09-18', 'Present', ''),
-(143, 1, 2001219012, '2024-09-18', 'Absent', ''),
-(144, 1, 2001210123, '2024-09-18', 'Present', ''),
-(145, 1, 2001211234, '2024-09-18', 'Absent', ''),
-(146, 1, 2001212346, '2024-09-18', 'Present', ''),
-(147, 1, 2001213457, '2024-09-18', 'Present', ''),
-(148, 1, 2001214568, '2024-09-18', 'Absent', ''),
-(149, 1, 2001215679, '2024-09-18', 'Present', ''),
-(150, 1, 2001216780, '2024-09-18', 'Absent', ''),
-(151, 1, 2001217891, '2024-09-18', 'Present', ''),
-(152, 1, 2001218902, '2024-09-18', 'Present', ''),
-(153, 1, 2001219013, '2024-09-18', 'Absent', ''),
-(154, 1, 2001223456, '2024-09-18', 'Present', ''),
-(155, 1, 2001224567, '2024-09-18', 'Absent', ''),
-(156, 1, 2001225678, '2024-09-18', 'Present', ''),
-(157, 1, 2001226789, '2024-09-18', 'Present', ''),
-(158, 1, 2001227890, '2024-09-18', 'Absent', ''),
-(159, 1, 2001228901, '2024-09-18', 'Present', ''),
-(160, 1, 2001229012, '2024-09-18', 'Present', ''),
-(161, 1, 2001230123, '2024-09-18', 'Absent', ''),
-(162, 1, 2001231234, '2024-09-18', 'Present', ''),
-(163, 2, 2001216114, '2024-09-18', 'Present', ''),
-(164, 2, 2001210224, '2024-09-18', 'Absent', ''),
-(165, 2, 2001211785, '2024-09-18', 'Present', ''),
-(166, 2, 2001215678, '2024-09-18', 'Present', ''),
-(167, 2, 2001216789, '2024-09-18', 'Absent', ''),
-(168, 2, 2001217890, '2024-09-18', 'Present', ''),
-(169, 2, 2001218901, '2024-09-18', 'Present', ''),
-(170, 2, 2001219012, '2024-09-18', 'Absent', ''),
-(171, 2, 2001210123, '2024-09-18', 'Present', ''),
-(172, 2, 2001211234, '2024-09-18', 'Absent', ''),
-(173, 2, 2001212346, '2024-09-18', 'Present', ''),
-(174, 2, 2001213457, '2024-09-18', 'Present', ''),
-(175, 2, 2001214568, '2024-09-18', 'Absent', ''),
-(176, 2, 2001215679, '2024-09-18', 'Present', ''),
-(177, 2, 2001216780, '2024-09-18', 'Absent', ''),
-(178, 2, 2001217891, '2024-09-18', 'Present', ''),
-(179, 2, 2001218902, '2024-09-18', 'Present', ''),
-(180, 2, 2001219013, '2024-09-18', 'Absent', ''),
-(181, 2, 2001223456, '2024-09-18', 'Present', ''),
-(182, 2, 2001224567, '2024-09-18', 'Absent', ''),
-(183, 2, 2001225678, '2024-09-18', 'Present', ''),
-(184, 2, 2001226789, '2024-09-18', 'Present', ''),
-(185, 2, 2001227890, '2024-09-18', 'Absent', ''),
-(186, 2, 2001228901, '2024-09-18', 'Present', ''),
-(187, 2, 2001229012, '2024-09-18', 'Present', ''),
-(188, 2, 2001230123, '2024-09-18', 'Absent', ''),
-(189, 2, 2001231234, '2024-09-18', 'Present', ''),
-(190, 3, 2001216114, '2024-09-18', 'Present', ''),
-(191, 3, 2001210224, '2024-09-18', 'Absent', ''),
-(192, 3, 2001211785, '2024-09-18', 'Present', ''),
-(193, 3, 2001215678, '2024-09-18', 'Present', ''),
-(194, 3, 2001216789, '2024-09-18', 'Absent', ''),
-(195, 3, 2001217890, '2024-09-18', 'Present', ''),
-(196, 3, 2001218901, '2024-09-18', 'Present', ''),
-(197, 3, 2001219012, '2024-09-18', 'Absent', ''),
-(198, 3, 2001210123, '2024-09-18', 'Present', ''),
-(199, 3, 2001211234, '2024-09-18', 'Absent', ''),
-(200, 3, 2001212346, '2024-09-18', 'Present', ''),
-(201, 3, 2001213457, '2024-09-18', 'Present', ''),
-(202, 3, 2001214568, '2024-09-18', 'Absent', ''),
-(203, 3, 2001215679, '2024-09-18', 'Present', ''),
-(204, 3, 2001216780, '2024-09-18', 'Absent', ''),
-(205, 3, 2001217891, '2024-09-18', 'Present', ''),
-(206, 3, 2001218902, '2024-09-18', 'Present', ''),
-(207, 3, 2001219013, '2024-09-18', 'Absent', ''),
-(208, 3, 2001223456, '2024-09-18', 'Present', ''),
-(209, 3, 2001224567, '2024-09-18', 'Absent', ''),
-(210, 3, 2001225678, '2024-09-18', 'Present', ''),
-(211, 3, 2001226789, '2024-09-18', 'Present', ''),
-(212, 3, 2001227890, '2024-09-18', 'Absent', ''),
-(213, 3, 2001228901, '2024-09-18', 'Present', ''),
-(214, 3, 2001229012, '2024-09-18', 'Present', ''),
-(215, 3, 2001230123, '2024-09-18', 'Absent', ''),
-(216, 3, 2001231234, '2024-09-18', 'Present', ''),
-(217, 4, 2001216114, '2024-09-18', 'Present', ''),
-(218, 4, 2001210224, '2024-09-18', 'Absent', ''),
-(219, 4, 2001211785, '2024-09-18', 'Present', ''),
-(220, 4, 2001215678, '2024-09-18', 'Present', ''),
-(221, 4, 2001216789, '2024-09-18', 'Absent', ''),
-(222, 4, 2001217890, '2024-09-18', 'Present', ''),
-(223, 4, 2001218901, '2024-09-18', 'Present', ''),
-(224, 4, 2001219012, '2024-09-18', 'Absent', ''),
-(225, 4, 2001210123, '2024-09-18', 'Present', ''),
-(226, 4, 2001211234, '2024-09-18', 'Absent', ''),
-(227, 4, 2001212346, '2024-09-18', 'Present', ''),
-(228, 4, 2001213457, '2024-09-18', 'Present', ''),
-(229, 4, 2001214568, '2024-09-18', 'Absent', ''),
-(230, 4, 2001215679, '2024-09-18', 'Present', ''),
-(231, 4, 2001216780, '2024-09-18', 'Absent', ''),
-(232, 4, 2001217891, '2024-09-18', 'Present', ''),
-(233, 4, 2001218902, '2024-09-18', 'Present', ''),
-(234, 4, 2001219013, '2024-09-18', 'Absent', ''),
-(235, 4, 2001223456, '2024-09-18', 'Present', ''),
-(236, 4, 2001224567, '2024-09-18', 'Absent', ''),
-(237, 4, 2001225678, '2024-09-18', 'Present', ''),
-(238, 4, 2001226789, '2024-09-18', 'Present', ''),
-(239, 4, 2001227890, '2024-09-18', 'Absent', ''),
-(240, 4, 2001228901, '2024-09-18', 'Present', ''),
-(241, 4, 2001229012, '2024-09-18', 'Present', ''),
-(242, 4, 2001230123, '2024-09-18', 'Absent', ''),
-(243, 4, 2001231234, '2024-09-18', 'Present', ''),
-(244, 5, 2001216114, '2024-09-18', 'Present', ''),
-(245, 5, 2001210224, '2024-09-18', 'Absent', ''),
-(246, 5, 2001211785, '2024-09-18', 'Present', ''),
-(247, 5, 2001215678, '2024-09-18', 'Present', ''),
-(248, 5, 2001216789, '2024-09-18', 'Absent', ''),
-(249, 5, 2001217890, '2024-09-18', 'Present', ''),
-(250, 5, 2001218901, '2024-09-18', 'Present', ''),
-(251, 5, 2001219012, '2024-09-18', 'Absent', ''),
-(252, 5, 2001210123, '2024-09-18', 'Present', ''),
-(253, 5, 2001211234, '2024-09-18', 'Absent', ''),
-(254, 5, 2001212346, '2024-09-18', 'Present', ''),
-(255, 5, 2001213457, '2024-09-18', 'Present', ''),
-(256, 5, 2001214568, '2024-09-18', 'Absent', ''),
-(257, 5, 2001215679, '2024-09-18', 'Present', ''),
-(258, 5, 2001216780, '2024-09-18', 'Absent', ''),
-(259, 5, 2001217891, '2024-09-18', 'Present', ''),
-(260, 5, 2001218902, '2024-09-18', 'Present', ''),
-(261, 5, 2001219013, '2024-09-18', 'Absent', ''),
-(262, 5, 2001223456, '2024-09-18', 'Present', ''),
-(263, 5, 2001224567, '2024-09-18', 'Absent', ''),
-(264, 5, 2001225678, '2024-09-18', 'Present', ''),
-(265, 5, 2001226789, '2024-09-18', 'Present', ''),
-(266, 5, 2001227890, '2024-09-18', 'Absent', ''),
-(267, 5, 2001228901, '2024-09-18', 'Present', ''),
-(268, 5, 2001229012, '2024-09-18', 'Present', ''),
-(269, 5, 2001230123, '2024-09-18', 'Absent', ''),
-(270, 5, 2001231234, '2024-09-18', 'Present', ''),
-(273, 5, 2001210123, '2024-09-25', 'Absent', NULL),
-(274, 5, 2001210224, '2024-09-25', 'Absent', NULL),
-(275, 5, 2001211234, '2024-09-25', 'Absent', NULL),
-(276, 5, 2001211785, '2024-09-25', 'Absent', NULL),
-(277, 5, 2001212346, '2024-09-25', 'Absent', NULL),
-(278, 5, 2001213457, '2024-09-25', 'Absent', NULL),
-(279, 5, 2001214568, '2024-09-25', 'Absent', NULL),
-(280, 5, 2001215678, '2024-09-25', 'Absent', NULL),
-(281, 5, 2001215679, '2024-09-25', 'Absent', NULL),
-(282, 5, 2001216114, '2024-09-25', 'Absent', NULL),
-(283, 5, 2001216780, '2024-09-25', 'Absent', NULL),
-(284, 5, 2001216789, '2024-09-25', 'Absent', NULL),
-(285, 5, 2001217890, '2024-09-25', 'Absent', NULL),
-(286, 5, 2001217891, '2024-09-25', 'Absent', NULL),
-(287, 5, 2001218901, '2024-09-25', 'Absent', NULL),
-(288, 5, 2001218902, '2024-09-25', 'Absent', NULL),
-(289, 5, 2001219012, '2024-09-25', 'Absent', NULL),
-(290, 5, 2001219013, '2024-09-25', 'Absent', NULL),
-(291, 5, 2001223456, '2024-09-25', 'Absent', NULL),
-(292, 5, 2001224567, '2024-09-25', 'Absent', NULL),
-(293, 5, 2001225678, '2024-09-25', 'Absent', NULL),
-(294, 5, 2001226789, '2024-09-25', 'Absent', NULL),
-(295, 5, 2001227890, '2024-09-25', 'Absent', NULL),
-(296, 5, 2001228901, '2024-09-25', 'Absent', NULL),
-(297, 5, 2001229012, '2024-09-25', 'Absent', NULL),
-(298, 5, 2001230123, '2024-09-25', 'Absent', NULL),
-(299, 5, 2001231234, '2024-09-25', 'Absent', NULL),
-(300, 5, 2001210123, '2024-09-19', 'Absent', NULL),
-(301, 5, 2001210224, '2024-09-19', 'Absent', NULL),
-(302, 5, 2001211234, '2024-09-19', 'Absent', NULL),
-(303, 5, 2001211785, '2024-09-19', 'Absent', NULL),
-(304, 5, 2001212346, '2024-09-19', 'Absent', NULL),
-(305, 5, 2001213457, '2024-09-19', 'Absent', NULL),
-(306, 5, 2001214568, '2024-09-19', 'Absent', NULL),
-(307, 5, 2001215678, '2024-09-19', 'Absent', NULL),
-(308, 5, 2001215679, '2024-09-19', 'Absent', NULL),
-(309, 5, 2001216114, '2024-09-19', 'Absent', NULL),
-(310, 5, 2001216780, '2024-09-19', 'Absent', NULL),
-(311, 5, 2001216789, '2024-09-19', 'Absent', NULL),
-(312, 5, 2001217890, '2024-09-19', 'Absent', NULL),
-(313, 5, 2001217891, '2024-09-19', 'Absent', NULL),
-(314, 5, 2001218901, '2024-09-19', 'Absent', NULL),
-(315, 5, 2001218902, '2024-09-19', 'Absent', NULL),
-(316, 5, 2001219012, '2024-09-19', 'Absent', NULL),
-(317, 5, 2001219013, '2024-09-19', 'Absent', NULL),
-(318, 5, 2001223456, '2024-09-19', 'Absent', NULL),
-(319, 5, 2001224567, '2024-09-19', 'Absent', NULL),
-(320, 5, 2001225678, '2024-09-19', 'Absent', NULL),
-(321, 5, 2001226789, '2024-09-19', 'Absent', NULL),
-(322, 5, 2001227890, '2024-09-19', 'Absent', NULL),
-(323, 5, 2001228901, '2024-09-19', 'Absent', NULL),
-(324, 5, 2001229012, '2024-09-19', 'Absent', NULL),
-(325, 5, 2001230123, '2024-09-19', 'Absent', NULL),
-(326, 5, 2001231234, '2024-09-19', 'Absent', NULL),
-(327, 1, 2001210123, '2024-09-20', 'Absent', NULL),
-(328, 1, 2001210224, '2024-09-20', 'Absent', NULL),
-(329, 1, 2001211234, '2024-09-20', 'Absent', NULL),
-(330, 1, 2001211785, '2024-09-20', 'Absent', NULL),
-(331, 1, 2001212346, '2024-09-20', 'Absent', NULL),
-(332, 1, 2001213457, '2024-09-20', 'Absent', NULL),
-(333, 1, 2001214568, '2024-09-20', 'Absent', NULL),
-(334, 1, 2001215678, '2024-09-20', 'Absent', NULL),
-(335, 1, 2001215679, '2024-09-20', 'Absent', NULL),
-(336, 1, 2001216114, '2024-09-20', 'Absent', NULL),
-(337, 1, 2001216780, '2024-09-20', 'Absent', NULL),
-(338, 1, 2001216789, '2024-09-20', 'Absent', NULL),
-(339, 1, 2001217890, '2024-09-20', 'Absent', NULL),
-(340, 1, 2001217891, '2024-09-20', 'Absent', NULL),
-(341, 1, 2001218901, '2024-09-20', 'Absent', NULL),
-(342, 1, 2001218902, '2024-09-20', 'Absent', NULL),
-(343, 1, 2001219012, '2024-09-20', 'Absent', NULL),
-(344, 1, 2001219013, '2024-09-20', 'Absent', NULL),
-(345, 1, 2001223456, '2024-09-20', 'Absent', NULL),
-(346, 1, 2001224567, '2024-09-20', 'Absent', NULL),
-(347, 1, 2001225678, '2024-09-20', 'Absent', NULL),
-(348, 1, 2001226789, '2024-09-20', 'Absent', NULL),
-(349, 1, 2001227890, '2024-09-20', 'Absent', NULL),
-(350, 1, 2001228901, '2024-09-20', 'Absent', NULL),
-(351, 1, 2001229012, '2024-09-20', 'Absent', NULL),
-(352, 1, 2001230123, '2024-09-20', 'Absent', NULL),
-(353, 1, 2001231234, '2024-09-20', 'Absent', NULL);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `classes`
+-- Cấu trúc bảng cho bảng `classes`
 --
 
 CREATE TABLE `classes` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `class_id` char(36) NOT NULL DEFAULT uuid(),
+  `class_name` varchar(255) NOT NULL,
   `course_id` int(11) DEFAULT NULL,
-  `teacher_id` int(11) DEFAULT NULL,
-  `semester_id` int(11) DEFAULT NULL
+  `semester_id` int(11) DEFAULT NULL,
+  `teacher_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `classes`
+-- Đang đổ dữ liệu cho bảng `classes`
 --
 
-INSERT INTO `classes` (`id`, `name`, `course_id`, `teacher_id`, `semester_id`) VALUES
-(1, 'A404', 24, 1000001234, 8),
-(2, 'A205', 25, 1000001234, 8),
-(3, 'A102', 24, 1000001234, 8),
-(4, 'A303', 25, 1000001234, 8),
-(5, 'A103', 28, 1000001234, 9),
-(6, 'A101', 28, 1000001234, 9),
-(7, 'A304', 27, 1000001234, 9),
-(8, 'A503', 33, 1000001234, 9),
-(9, 'A503', 24, 1000001234, 9);
+INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `teacher_id`) VALUES
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 'CSDL VanAnh', 25, 2, 1000001234);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `class_students`
+-- Cấu trúc bảng cho bảng `class_students`
 --
 
 CREATE TABLE `class_students` (
-  `class_id` int(11) NOT NULL,
+  `stt` int(5) NOT NULL,
+  `class_id` char(36) NOT NULL,
   `student_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `class_students`
+-- Đang đổ dữ liệu cho bảng `class_students`
 --
 
-INSERT INTO `class_students` (`class_id`, `student_id`) VALUES
-(1, 2001210123),
-(1, 2001210224),
-(1, 2001211234),
-(1, 2001211785),
-(1, 2001212346),
-(1, 2001213457),
-(1, 2001214568),
-(1, 2001215678),
-(1, 2001215679),
-(1, 2001216114),
-(1, 2001216780),
-(1, 2001216789),
-(1, 2001217890),
-(1, 2001217891),
-(1, 2001218901),
-(1, 2001218902),
-(1, 2001219012),
-(1, 2001219013),
-(1, 2001223456),
-(1, 2001224567),
-(1, 2001225678),
-(1, 2001226789),
-(1, 2001227890),
-(1, 2001228901),
-(1, 2001229012),
-(1, 2001230123),
-(1, 2001231234),
-(2, 2001210123),
-(2, 2001210224),
-(2, 2001211234),
-(2, 2001211785),
-(2, 2001212346),
-(2, 2001213457),
-(2, 2001214568),
-(2, 2001215678),
-(2, 2001215679),
-(2, 2001216114),
-(2, 2001216780),
-(2, 2001216789),
-(2, 2001217890),
-(2, 2001217891),
-(2, 2001218901),
-(2, 2001218902),
-(2, 2001219012),
-(2, 2001219013),
-(2, 2001223456),
-(2, 2001224567),
-(2, 2001225678),
-(2, 2001226789),
-(2, 2001227890),
-(2, 2001228901),
-(2, 2001229012),
-(2, 2001230123),
-(2, 2001231234),
-(3, 2001210123),
-(3, 2001210224),
-(3, 2001211234),
-(3, 2001211785),
-(3, 2001212346),
-(3, 2001213457),
-(3, 2001214568),
-(3, 2001215678),
-(3, 2001215679),
-(3, 2001216114),
-(3, 2001216780),
-(3, 2001216789),
-(3, 2001217890),
-(3, 2001217891),
-(3, 2001218901),
-(3, 2001218902),
-(3, 2001219012),
-(3, 2001219013),
-(3, 2001223456),
-(3, 2001224567),
-(3, 2001225678),
-(3, 2001226789),
-(3, 2001227890),
-(3, 2001228901),
-(3, 2001229012),
-(3, 2001230123),
-(3, 2001231234),
-(4, 2001210123),
-(4, 2001210224),
-(4, 2001211234),
-(4, 2001211785),
-(4, 2001212346),
-(4, 2001213457),
-(4, 2001214568),
-(4, 2001215678),
-(4, 2001215679),
-(4, 2001216114),
-(4, 2001216780),
-(4, 2001216789),
-(4, 2001217890),
-(4, 2001217891),
-(4, 2001218901),
-(4, 2001218902),
-(4, 2001219012),
-(4, 2001219013),
-(4, 2001223456),
-(4, 2001224567),
-(4, 2001225678),
-(4, 2001226789),
-(4, 2001227890),
-(4, 2001228901),
-(4, 2001229012),
-(4, 2001230123),
-(4, 2001231234),
-(5, 2001210123),
-(5, 2001210224),
-(5, 2001211234),
-(5, 2001211785),
-(5, 2001212346),
-(5, 2001213457),
-(5, 2001214568),
-(5, 2001215678),
-(5, 2001215679),
-(5, 2001216114),
-(5, 2001216780),
-(5, 2001216789),
-(5, 2001217890),
-(5, 2001217891),
-(5, 2001218901),
-(5, 2001218902),
-(5, 2001219012),
-(5, 2001219013),
-(5, 2001223456),
-(5, 2001224567),
-(5, 2001225678),
-(5, 2001226789),
-(5, 2001227890),
-(5, 2001228901),
-(5, 2001229012),
-(5, 2001230123),
-(5, 2001231234);
+INSERT INTO `class_students` (`stt`, `class_id`, `student_id`) VALUES
+(2, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001210224),
+(3, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001211785),
+(4, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001212345),
+(5, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001213456),
+(6, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001214567),
+(7, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001215678),
+(1, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001216114),
+(8, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001217890);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `courses`
+-- Cấu trúc bảng cho bảng `courses`
 --
 
 CREATE TABLE `courses` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `credits` int(11) NOT NULL,
-  `theory_hours` int(11) NOT NULL,
-  `practice_hours` int(11) NOT NULL
+  `course_id` int(11) NOT NULL,
+  `course_name` varchar(255) NOT NULL,
+  `course_type_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `courses`
+-- Đang đổ dữ liệu cho bảng `courses`
 --
 
-INSERT INTO `courses` (`id`, `name`, `credits`, `theory_hours`, `practice_hours`) VALUES
-(1, 'Nhập môn lập trình', 3, 45, 0),
-(2, 'Thực hành nhập môn lập trình', 2, 0, 60),
-(3, 'Kỹ năng ứng dụng Công nghệ Thông tin', 2, 0, 75),
-(4, 'Giải tích', 3, 45, 0),
-(5, 'Hệ điều hành', 3, 45, 0),
-(6, 'Thực hành Hệ điều hành', 1, 0, 30),
-(7, 'Kiến trúc máy tính', 3, 45, 0),
-(8, 'Kỹ thuật lập trình', 2, 30, 0),
-(9, 'Thực hành kỹ thuật lập trình', 1, 0, 30),
-(10, 'Đại số tuyến tính', 2, 30, 0),
-(11, 'Anh Văn 1', 3, 45, 0),
-(12, 'Anh Văn 2', 3, 45, 0),
-(13, 'Cấu trúc dữ liệu và giải thuật', 3, 45, 0),
-(14, 'Mạng máy tính', 3, 45, 0),
-(15, 'Thực hành cấu trúc dữ liệu và giải thuật', 1, 0, 60),
-(16, 'Thực hành mạng máy tính', 1, 0, 30),
-(17, 'Cấu trúc rời rạc', 3, 45, 0),
-(18, 'Thực hành Cấu trúc rời rạc', 1, 0, 30),
-(19, 'Phương pháp nghiên cứu khoa học', 2, 30, 0),
-(20, 'Phân tích thiết kế thuật toán', 2, 30, 0),
-(21, 'Thiết kế web', 3, 15, 60),
-(22, 'Lập trình hướng đối tượng', 3, 45, 0),
-(23, 'Thực hành lập trình hướng đối tượng', 1, 0, 30),
-(24, 'Cơ sở dữ liệu', 3, 45, 0),
-(25, 'Thực hành cơ sở dữ liệu', 1, 0, 30),
-(26, 'Anh văn 3', 3, 45, 0),
-(27, 'Hệ quản trị cơ sở dữ liệu', 3, 45, 0),
-(28, 'Thực hành hệ quản trị cơ sở dữ liệu', 1, 0, 30),
-(29, 'Lập trình Web', 3, 15, 60),
-(30, 'Trí tuệ nhân tạo', 3, 45, 0),
-(31, 'Thực hành trí tuệ nhân tạo', 1, 0, 30),
-(32, 'Công Nghệ Java', 3, 15, 60),
-(33, 'Phân tích thiết kế hệ thống thông tin', 3, 45, 0),
-(34, 'Thực hành phân tích thiết kế hệ thống thông tin', 1, 0, 30),
-(35, 'Lập trình mã nguồn mở', 3, 15, 60),
-(36, 'Phát triển ứng dụng di động', 3, 15, 60),
-(37, 'Ảo hóa và điện toán đám mây', 2, 30, 0),
-(38, 'Công nghệ phần mềm nâng cao', 3, 45, 0),
-(39, 'Kiểm định phần mềm', 2, 30, 0),
-(40, 'Thực hành kiểm định phần mềm', 1, 0, 30),
-(41, 'Phát triển phần mềm ứng dụng thông minh', 3, 15, 60);
+INSERT INTO `courses` (`course_id`, `course_name`, `course_type_id`) VALUES
+(1, 'Nhập môn lập trình', 3),
+(2, 'Thực hành nhập môn lập trình', 5),
+(3, 'Kỹ năng ứng dụng Công nghệ Thông tin', 5),
+(4, 'Giải tích', 3),
+(5, 'Hệ điều hành', 3),
+(6, 'Thực hành Hệ điều hành', 4),
+(7, 'Kiến trúc máy tính', 3),
+(8, 'Kỹ thuật lập trình', 3),
+(9, 'Thực hành kỹ thuật lập trình', 4),
+(10, 'Đại số tuyến tính', 3),
+(11, 'Anh Văn 1', 3),
+(12, 'Anh Văn 2', 3),
+(13, 'Cấu trúc dữ liệu và giải thuật', 3),
+(14, 'Mạng máy tính', 3),
+(15, 'Thực hành cấu trúc dữ liệu và giải thuật', 4),
+(16, 'Thực hành mạng máy tính', 4),
+(17, 'Cấu trúc rời rạc', 3),
+(18, 'Thực hành Cấu trúc rời rạc', 4),
+(19, 'Phương pháp nghiên cứu khoa học', 3),
+(20, 'Phân tích thiết kế thuật toán', 3),
+(21, 'Thiết kế web', 6),
+(22, 'Lập trình hướng đối tượng', 3),
+(23, 'Thực hành lập trình hướng đối tượng', 4),
+(24, 'Cơ sở dữ liệu', 3),
+(25, 'Thực hành cơ sở dữ liệu', 4),
+(26, 'Anh văn 3', 3),
+(27, 'Hệ quản trị cơ sở dữ liệu', 3),
+(28, 'Thực hành hệ quản trị cơ sở dữ liệu', 4),
+(29, 'Lập trình Web', 6),
+(30, 'Trí tuệ nhân tạo', 3),
+(31, 'Thực hành trí tuệ nhân tạo', 4),
+(32, 'Công Nghệ Java', 6),
+(33, 'Phân tích thiết kế hệ thống thông tin', 3),
+(34, 'Thực hành phân tích thiết kế hệ thống thông tin', 4),
+(35, 'Lập trình mã nguồn mở', 6),
+(36, 'Phát triển ứng dụng di động', 6),
+(37, 'Ảo hóa và điện toán đám mây', 3),
+(38, 'Công nghệ phần mềm nâng cao', 3),
+(39, 'Kiểm định phần mềm', 3),
+(40, 'Thực hành kiểm định phần mềm', 4),
+(41, 'Phát triển phần mềm ứng dụng thông minh', 6);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `semesters`
+-- Cấu trúc bảng cho bảng `course_types`
+--
+
+CREATE TABLE `course_types` (
+  `course_type_id` int(11) NOT NULL,
+  `course_type_name` varchar(255) NOT NULL,
+  `credits` int(11) NOT NULL,
+  `theory_periods` int(11) NOT NULL,
+  `practice_periods` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `course_types`
+--
+
+INSERT INTO `course_types` (`course_type_id`, `course_type_name`, `credits`, `theory_periods`, `practice_periods`) VALUES
+(1, 'Lý thuyết', 1, 15, 0),
+(2, 'Lý thuyết', 2, 30, 0),
+(3, 'Lý thuyết', 3, 45, 0),
+(4, 'Thực Hành', 1, 0, 30),
+(5, 'Thực Hành', 2, 0, 60),
+(6, 'Lý thuyết và Thực hành', 3, 15, 60);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `roles`
+--
+
+CREATE TABLE `roles` (
+  `role_id` int(11) NOT NULL,
+  `role_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `roles`
+--
+
+INSERT INTO `roles` (`role_id`, `role_name`) VALUES
+(1, 'admin'),
+(3, 'student'),
+(2, 'teacher');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `schedules`
+--
+
+CREATE TABLE `schedules` (
+  `schedule_id` int(11) NOT NULL,
+  `class_id` char(36) NOT NULL,
+  `date` date NOT NULL,
+  `start_time` int(11) NOT NULL,
+  `end_time` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `schedules`
+--
+
+INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_time`) VALUES
+(1, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-10-07', 1, 3),
+(2, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-10-14', 4, 6);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `semesters`
 --
 
 CREATE TABLE `semesters` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
+  `semester_id` int(11) NOT NULL,
+  `semester_name` varchar(50) NOT NULL,
   `is_active` int(2) DEFAULT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `semesters`
+-- Đang đổ dữ liệu cho bảng `semesters`
 --
 
-INSERT INTO `semesters` (`id`, `name`, `is_active`, `start_date`, `end_date`) VALUES
-(1, 'HK1 (2021 - 2022)', 0, '2021-03-10', '2022-01-18'),
-(2, 'HK2 (2021 - 2022)', 0, '2022-03-04', '2022-05-11'),
-(3, 'HK1 (2022 - 2023)', 0, '2022-09-10', '2022-12-30'),
-(4, 'HK2 (2022 - 2023)', 0, '2026-02-08', '2023-06-05'),
-(5, 'HK3 (Hè 2022 - 2023)', 0, '2023-07-03', '2023-07-14'),
-(6, 'HK1 (2023 - 2024)', 0, '2023-10-30', '2023-12-15'),
-(7, 'HK2 (2023 - 2024)', 0, '2024-01-17', '2025-04-26'),
-(8, 'HK3 (Hè 2023 - 2024)', 0, '2024-07-10', '2024-08-07'),
-(9, 'HK1 (2024 - 2025)', 1, '2024-08-15', '2025-12-17');
+INSERT INTO `semesters` (`semester_id`, `semester_name`, `is_active`, `start_date`, `end_date`) VALUES
+(1, 'HK3 (Hè 2023 - 2024)', 0, '2024-07-10', '2024-08-07'),
+(2, 'HK1 (2024 - 2025)', 1, '2024-08-15', '2025-12-17');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `students`
+-- Cấu trúc bảng cho bảng `students`
 --
 
 CREATE TABLE `students` (
-  `id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
   `lastname` varchar(50) DEFAULT NULL,
   `firstname` varchar(50) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
   `class` varchar(50) DEFAULT NULL,
   `birthday` date NOT NULL,
-  `gender` enum('Nam','Nữ','Khác') DEFAULT NULL
+  `gender` enum('Nam','Nữ') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `students`
+-- Đang đổ dữ liệu cho bảng `students`
 --
 
-INSERT INTO `students` (`id`, `lastname`, `firstname`, `email`, `phone`, `class`, `birthday`, `gender`) VALUES
+INSERT INTO `students` (`student_id`, `lastname`, `firstname`, `email`, `phone`, `class`, `birthday`, `gender`) VALUES
 (2001210123, 'Trần Văn', 'Tùng', 'tranvantung@gmail.com', '0911234567', '12DHTH11', '2003-03-01', 'Nam'),
 (2001210224, 'Nguyễn Hữu', 'Thông', 'huuthong@gmail.com', '0901234567', '12DHTH14', '2003-03-15', 'Nam'),
 (2001211234, 'Phạm Thị', 'Vân', 'phamthivan@gmail.com', '0912345678', '14DHTH12', '2005-10-17', 'Nữ'),
@@ -705,287 +297,294 @@ INSERT INTO `students` (`id`, `lastname`, `firstname`, `email`, `phone`, `class`
 (2001217891, 'Vũ Thị', 'Hạnh', 'vuthihanh@gmail.com', '0918901234', '13DHTH18', '2004-05-17', 'Nữ'),
 (2001218901, 'Đặng Văn', 'Quân', 'dangvanquan@gmail.com', '0909012345', '11DHTH09', '2002-05-30', 'Nam'),
 (2001218902, 'Đặng Thị', 'Thu', 'dangthithu@gmail.com', '0920123456', '13DHTH19', '2004-11-12', 'Nữ'),
-(2001219012, 'Lương Thị', 'Ngân', 'luongthingan@gmail.com', '0910123456', '12DHTH10', '2003-11-16', 'Nữ'),
-(2001219013, 'Lương Văn', 'Tâm', 'luongvantam@gmail.com', '0921234567', '14DHTH20', '2004-01-01', 'Nam'),
-(2001223456, 'Nguyễn Văn', 'Duy', 'nguyenduy@gmail.com', '0912345678', '12DHTH01', '2003-02-20', 'Nam'),
-(2001224567, 'Lê Thị', 'Mai', 'lethimai@gmail.com', '0913456789', '12DHTH02', '2003-03-25', 'Nữ'),
-(2001225678, 'Trần Văn', 'Khải', 'tranvankhai@gmail.com', '0914567890', '12DHTH03', '2003-04-15', 'Nam'),
-(2001226789, 'Nguyễn Thị', 'Thu', 'nguyenhuu@gmail.com', '0915678901', '12DHTH04', '2003-05-22', 'Nữ'),
-(2001227890, 'Bùi Văn', 'Thắng', 'buivanthang@gmail.com', '0916789012', '12DHTH05', '2003-06-30', 'Nam'),
-(2001228901, 'Phạm Thị', 'Như', 'phamthinh@gmail.com', '0917890123', '12DHTH06', '2003-07-10', 'Nữ'),
-(2001229012, 'Lương Thị', 'Vân', 'luongthivan@gmail.com', '0920123456', '12DHTH07', '2003-08-18', 'Nữ'),
-(2001230123, 'Trần Văn', 'Đạt', 'tranvandat@gmail.com', '0921234567', '12DHTH08', '2003-09-25', 'Nam'),
-(2001231234, 'Nguyễn Văn', 'Sơn', 'nguyenvanson@gmail.com', '0922345678', '12DHTH09', '2003-10-05', 'Nam'),
-(2001232345, 'Lê Thị', 'Lan', 'lethilan@gmail.com', '0923456789', '12DHTH10', '2003-11-12', 'Nữ'),
-(2001233456, 'Bùi Văn', 'Hoàng', 'buivanhoang@gmail.com', '0924567890', '12DHTH11', '2003-12-20', 'Nam'),
-(2001234567, 'Trần Thị', 'Thu', 'tranthithu@gmail.com', '0925678901', '13DHTH01', '2004-01-30', 'Nữ'),
-(2001235678, 'Nguyễn Thị', 'Hoa', 'nguyenthihua@gmail.com', '0926789012', '13DHTH02', '2004-02-15', 'Nữ'),
-(2001236789, 'Lương Văn', 'Hùng', 'luongvanhung@gmail.com', '0927890123', '13DHTH03', '2004-03-22', 'Nam'),
-(2001237890, 'Bùi Thị', 'Ngân', 'buithingan@gmail.com', '0928901234', '13DHTH04', '2004-04-28', 'Nữ'),
-(2001238901, 'Nguyễn Văn', 'Hòa', 'nguyenvanhoag@gmail.com', '0930123456', '13DHTH05', '2004-05-30', 'Nam'),
-(2001239012, 'Trần Thị', 'Vân', 'tranthivang@gmail.com', '0931234567', '13DHTH06', '2004-06-10', 'Nữ'),
-(2001240123, 'Lê Văn', 'Cường', 'levancuong@gmail.com', '0932345678', '13DHTH07', '2004-07-15', 'Nam'),
-(2001241234, 'Nguyễn Thị', 'Thúy', 'nguyenthithuy@gmail.com', '0933456789', '13DHTH08', '2004-08-20', 'Nữ'),
-(2001242345, 'Bùi Văn', 'Tùng', 'buivantung@gmail.com', '0934567890', '13DHTH09', '2004-09-30', 'Nam'),
-(2001243456, 'Lương Thị', 'Tâm', 'luongthitam@gmail.com', '0935678901', '13DHTH10', '2004-10-10', 'Nữ'),
-(2001244567, 'Nguyễn Văn', 'Long', 'nguyenvanlong@gmail.com', '0936789012', '13DHTH11', '2004-11-15', 'Nam'),
-(2001245678, 'Trần Thị', 'Duyên', 'tranthiduyen@gmail.com', '0937890123', '14DHTH01', '2005-01-20', 'Nữ'),
-(2001246789, 'Lê Thị', 'Như', 'lethinh@gmail.com', '0938901234', '14DHTH02', '2005-02-25', 'Nữ'),
-(2001247890, 'Bùi Văn', 'Hòa', 'buivanhola@gmail.com', '0939012345', '14DHTH03', '2005-03-15', 'Nam'),
-(2001248901, 'Nguyễn Thị', 'Hương', 'nguyenthihuong@gmail.com', '0940123456', '14DHTH04', '2005-04-20', 'Nữ'),
-(2001249012, 'Lương Văn', 'Khải', 'luongvankhai@gmail.com', '0941234567', '14DHTH05', '2005-05-10', 'Nam'),
-(2001250123, 'Bùi Thị', 'Thu', 'buithithu@gmail.com', '0942345678', '14DHTH06', '2005-06-30', 'Nữ'),
-(2001251234, 'Nguyễn Văn', 'Vũ', 'nguyenvanvu@gmail.com', '0943456789', '14DHTH07', '2005-07-25', 'Nam'),
-(2001252345, 'Lê Thị', 'Hạnh', 'lethihanh@gmail.com', '0944567890', '14DHTH08', '2005-08-15', 'Nữ'),
-(2001253456, 'Trần Văn', 'Thịnh', 'tranvanthinh@gmail.com', '0945678901', '14DHTH09', '2005-09-10', 'Nam'),
-(2001254567, 'Bùi Văn', 'Dũng', 'buivandung@gmail.com', '0946789012', '14DHTH10', '2005-10-25', 'Nam');
+(2001219012, 'Lương Thị', 'Ngân', 'luongthingan@gmail.com', '0910123456', '12DHTH10', '2003-11-16', 'Nữ');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `teachers`
+-- Cấu trúc bảng cho bảng `teachers`
 --
 
 CREATE TABLE `teachers` (
-  `id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
   `lastname` varchar(50) DEFAULT NULL,
   `firstname` varchar(50) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
   `birthday` date NOT NULL,
-  `gender` enum('Nam','Nữ','Other') DEFAULT NULL
+  `gender` enum('Nam','Nữ') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `teachers`
+-- Đang đổ dữ liệu cho bảng `teachers`
 --
 
-INSERT INTO `teachers` (`id`, `lastname`, `firstname`, `email`, `phone`, `birthday`, `gender`) VALUES
+INSERT INTO `teachers` (`teacher_id`, `lastname`, `firstname`, `email`, `phone`, `birthday`, `gender`) VALUES
 (1000001234, 'Trần Thị Vân', 'Anh', 'vanAnh123@example.com', '0903456789', '1995-01-01', 'Nữ'),
 (1000001235, 'Trần Văn', 'Hùng', 'HungTV@example.com', '0903456790', '1990-01-01', 'Nam'),
-(1000001236, 'Nguyễn Văn', 'Tùng', 'NguyenVT@example.com', '0904567890', '1992-01-01', 'Nam'),
-(1000001237, 'Nguyễn Thị', 'Mai', 'nguyenmai123@example.com', '0905678901', '1985-02-14', 'Nữ'),
-(1000001238, 'Lê Văn Sĩ', 'Bình', 'lebinh456@example.com', '0906789012', '1988-03-21', 'Nam'),
-(1000001239, 'Phạm Thị Thu', 'Hương', 'phamhuong789@example.com', '0907890123', '1990-04-15', 'Nữ'),
-(1000001240, 'Đặng Văn', 'Cường', 'dangcuong101@example.com', '0908901234', '1987-05-30', 'Nam'),
-(1000001241, 'Bùi Thị', 'Linh', 'builinh202@example.com', '0909012345', '1991-06-25', 'Nữ'),
-(1000001242, 'Trương Văn', 'Hải', 'truonghai303@example.com', '0910123456', '1986-07-10', 'Nam'),
-(1000001243, 'Vũ Thị', 'Lan', 'vulan404@example.com', '0911234567', '1989-08-22', 'Nữ'),
-(1000001244, 'Lê Thị Quỳnh', 'Mai', 'lemai505@example.com', '0912345678', '1993-09-18', 'Nữ'),
-(1000001245, 'Nguyễn Hữu', 'Tâm', 'nguyentam606@example.com', '0913456789', '1994-10-12', 'Nam'),
-(1000001246, 'Hoàng Thị', 'Ngọc', 'hoangngoc707@example.com', '0914567890', '1984-11-05', 'Nữ');
+(1000001236, 'Nguyễn Văn', 'Tùng', 'NguyenVT@example.com', '0904567890', '1992-01-01', 'Nam');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Cấu trúc bảng cho bảng `users`
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` enum('student','teacher','admin') DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `users`
+-- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `role`, `created_at`, `updated_at`) VALUES
-(1000001234, 'vanAnh123', 'password123', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001235, 'HungTV', 'password456', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001236, 'NguyenVT', 'password789', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001237, 'nguyenMai123', 'password101', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001238, 'leBinh456', 'password202', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001239, 'phamHuong789', 'password303', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001240, 'dangCuong101', 'password404', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001241, 'buiLinh202', 'password505', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001242, 'truongHai303', 'password606', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001243, 'vulan404', 'password707', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001244, 'leMai505', 'password808', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001245, 'nguyenTam606', 'password909', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(1000001246, 'hoangNgoc707', 'password010', 'teacher', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001210123, '2001210123', 'password909', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001210224, '2001210224', 'password', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001211234, '2001211234', 'password010', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001211785, '2001211785', 'password', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001212345, '2001212345', 'password101', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001212346, '2001212346', 'password121', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001213456, '2001213456', 'password202', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001213457, '2001213457', 'password232', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001214567, '2001214567', 'password303', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001214568, '2001214568', 'password343', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001215678, '2001215678', 'password404', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001215679, '2001215679', 'password454', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001216114, '2001216114', 'password', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001216780, '2001216780', 'password565', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001216789, '2001216789', 'password505', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001217890, '2001217890', 'password606', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001217891, '2001217891', 'password676', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001218901, '2001218901', 'password707', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001218902, '2001218902', 'password787', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001219012, '2001219012', 'password808', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001219013, '2001219013', 'password898', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001223456, '2001223456', 'password909', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001224567, '2001224567', 'password010', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001225678, '2001225678', 'password121', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001226789, '2001226789', 'password232', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001227890, '2001227890', 'password343', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001228901, '2001228901', 'password454', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001229012, '2001229012', 'password565', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001230123, '2001230123', 'password676', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001231234, '2001231234', 'password787', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001232345, '2001232345', 'password898', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001233456, '2001233456', 'password909', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001234567, '2001234567', 'password010', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001235678, '2001235678', 'password121', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001236789, '2001236789', 'password232', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001237890, '2001237890', 'password343', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001238901, '2001238901', 'password454', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001239012, '2001239012', 'password565', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001240123, '2001240123', 'password676', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001241234, '2001241234', 'password787', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001242345, '2001242345', 'password898', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001243456, '2001243456', 'password909', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001244567, '2001244567', 'password010', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001245678, '2001245678', 'password121', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001246789, '2001246789', 'password232', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001247890, '2001247890', 'password343', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001248901, '2001248901', 'password454', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001249012, '2001249012', 'password565', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001250123, '2001250123', 'password676', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001251234, '2001251234', 'password787', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001252345, '2001252345', 'password898', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001253456, '2001253456', 'password909', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43'),
-(2001254567, '2001254567', 'password010', 'student', '2024-09-16 16:41:43', '2024-09-16 16:41:43');
+INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
+(1000001234, 'vanAnh123', '$2y$10$WZZ9ziqz02krLQJsSW8lruYX4WDRU2QzGsZ0Le0ZS//gCh021cGvW'),
+(1000001235, '1000001235', '$2y$10$PBpe4kyIqX.RX4f/KslZYeKxOOr0Hlck4of6Z6oJLia0R1AWTEHC.'),
+(1000001236, '1000001236', '$2y$10$MMAunS7wvIsZ2UHe19Xr6OVzGFuQyLy6Xsi/rsLvSdfERNQIKpM0u'),
+(2001210123, '2001210123', '$2y$10$z1syiVxj4fFVzEJ/HGaIP.u3Op7M7plk9KaAmdodnOTx8F4cc5vxW'),
+(2001210224, '2001210224', '$2y$10$6hYJciz1kxXo7NiVTuQmGOA4/IBmFwdUy4u5xOpwLp8x3lo4gSUFm'),
+(2001211234, '2001211234', '$2y$10$yfLCOYrdMrZDw2aAWvLs/u9v1PMrZaiaOiBceEKjdPDgXeMLy/h4W'),
+(2001211785, '2001211785', '$2y$10$bQOsHOYsBLEbA1Xlo.wSdO/.4cYEFVewdCBpIixKnSSqQHHdqnqk.'),
+(2001212345, '2001212345', '$2y$10$CIWBBd2tVfVu67PWFtniFuEl7IFDO3MDjAezgoN.EtAdEK8wxDq3i'),
+(2001212346, '2001212346', '$2y$10$VGVqgwg6a8iQhkkahX.ekusagyb3w3wWuZ6b1PRYEhA4F6BhqvKyK'),
+(2001213456, '2001213456', '$2y$10$b.ahnojABn3xmEfT41E5Y./L7XsiW.XMSxy2xVOu0Gm6LuKiXE6IO'),
+(2001213457, '2001213457', '$2y$10$PR.VkWql0Rqk1Ec/rCjPwORXpXunZ03nN2QPXrzF0BAnBD5XuoJh.'),
+(2001214567, '2001214567', '$2y$10$MYQUxdzoBgzhNCvEV5sQGOIfwSLxrSIY9qTyW0F8KgFSETZDHVV46'),
+(2001214568, '2001214568', '$2y$10$UnfrYs4jMy9Q8r67BAEVvuDHQO7/yhq13I77EmMdxW1O3mBVt9wo.'),
+(2001215678, '2001215678', '$2y$10$1fhFReDh3YI/Y.gU/5qzuOxizPZ.ZZFu1nEnCeotDsasLTExSe/9O'),
+(2001215679, '2001215679', '$2y$10$PDMEa.qk0VBGWmGv1wSSiu4iu/ZODjaCfc7c0nMna6XoX//emIl2q'),
+(2001216114, '2001216114', '$2y$10$AbbaW861JhICgXOEpG0iE.SIquT3hSQK9E9iCfMpDsI8b0mDq/n8K'),
+(2001216780, '2001216780', '$2y$10$XQUAcWPeht0yDlDbu/zLgOEjiPGVuHygw2T9zDO1RX6ei4BxM0Sn2'),
+(2001216789, '2001216789', '$2y$10$UywktTRVWKEfzkb8MoLMZe8Osb1Re1lEU0UoHMu8HLhyyOTWIdgCS'),
+(2001217890, '2001217890', '$2y$10$bv7ceSD5oZdukkXKjI0qmeasYZFCJIXsW91ynKjaZj/VaN789svwu'),
+(2001217891, '2001217891', '$2y$10$IYGbs8ePv72iI6dfxQ8w4u7uU6uvTYcL2fHQzyBPhm.nx3V9zOlpe'),
+(2001218901, '2001218901', '$2y$10$1ZuRSmbmqF0WdIUtQOfTfu/L8fq1f9usIEmZ0oYTO6nT8O5ZpyN7a'),
+(2001218902, '2001218902', '$2y$10$iXCJ7dsX8Z8Uy3YVpgxem.8a7yr5Ef9r7kAA5ays0XckYVjmIeqby'),
+(2001219012, '2001219012', '$2y$10$AIZ6OefoLjlsCGAp9hCxY.pFJn.E5PCcfg1GjtRXUCRe6RSrvQ.hm');
+
+-- --------------------------------------------------------
 
 --
--- Indexes for dumped tables
+-- Cấu trúc bảng cho bảng `user_roles`
+--
+
+CREATE TABLE `user_roles` (
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `user_roles`
+--
+
+INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
+(1000001234, 2),
+(1000001235, 2),
+(1000001236, 2),
+(2001210123, 3),
+(2001210224, 3),
+(2001211234, 3),
+(2001211785, 3),
+(2001212345, 3),
+(2001212346, 3),
+(2001213456, 3),
+(2001213457, 3),
+(2001214567, 3),
+(2001214568, 3),
+(2001215678, 3),
+(2001215679, 3),
+(2001216114, 3),
+(2001216780, 3),
+(2001216789, 3),
+(2001217890, 3),
+(2001217891, 3),
+(2001218901, 3),
+(2001218902, 3),
+(2001219012, 3);
+
+--
+-- Chỉ mục cho các bảng đã đổ
 --
 
 --
--- Indexes for table `attendances`
---
-ALTER TABLE `attendances`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_attendance` (`class_id`,`student_id`,`attendance_date`),
-  ADD KEY `fk_student_id` (`student_id`);
-
---
--- Indexes for table `classes`
+-- Chỉ mục cho bảng `classes`
 --
 ALTER TABLE `classes`
-  ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`class_id`),
   ADD KEY `fk_course_id` (`course_id`),
   ADD KEY `fk_teacher_id` (`teacher_id`),
   ADD KEY `fk_semester_id` (`semester_id`);
 
 --
--- Indexes for table `class_students`
+-- Chỉ mục cho bảng `class_students`
 --
 ALTER TABLE `class_students`
   ADD PRIMARY KEY (`class_id`,`student_id`),
   ADD KEY `fk_class_student_student_id` (`student_id`);
 
 --
--- Indexes for table `courses`
+-- Chỉ mục cho bảng `courses`
 --
 ALTER TABLE `courses`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`course_id`),
+  ADD KEY `course_type_id` (`course_type_id`);
 
 --
--- Indexes for table `semesters`
+-- Chỉ mục cho bảng `course_types`
+--
+ALTER TABLE `course_types`
+  ADD PRIMARY KEY (`course_type_id`);
+
+--
+-- Chỉ mục cho bảng `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`role_id`),
+  ADD UNIQUE KEY `role_name` (`role_name`);
+
+--
+-- Chỉ mục cho bảng `schedules`
+--
+ALTER TABLE `schedules`
+  ADD PRIMARY KEY (`schedule_id`),
+  ADD KEY `class_id` (`class_id`);
+
+--
+-- Chỉ mục cho bảng `semesters`
 --
 ALTER TABLE `semesters`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`semester_id`);
 
 --
--- Indexes for table `students`
+-- Chỉ mục cho bảng `students`
 --
 ALTER TABLE `students`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`student_id`);
 
 --
--- Indexes for table `teachers`
+-- Chỉ mục cho bảng `teachers`
 --
 ALTER TABLE `teachers`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`teacher_id`);
 
 --
--- Indexes for table `users`
+-- Chỉ mục cho bảng `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `username` (`username`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- Chỉ mục cho bảng `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD PRIMARY KEY (`user_id`,`role_id`),
+  ADD KEY `role_id` (`role_id`);
+
+--
+-- AUTO_INCREMENT cho các bảng đã đổ
 --
 
 --
--- AUTO_INCREMENT for table `attendances`
---
-ALTER TABLE `attendances`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=354;
-
---
--- AUTO_INCREMENT for table `classes`
---
-ALTER TABLE `classes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `courses`
+-- AUTO_INCREMENT cho bảng `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
--- AUTO_INCREMENT for table `semesters`
+-- AUTO_INCREMENT cho bảng `course_types`
+--
+ALTER TABLE `course_types`
+  MODIFY `course_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT cho bảng `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT cho bảng `schedules`
+--
+ALTER TABLE `schedules`
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT cho bảng `semesters`
 --
 ALTER TABLE `semesters`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- Constraints for dumped tables
---
-
---
--- Constraints for table `attendances`
---
-ALTER TABLE `attendances`
-  ADD CONSTRAINT `fk_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`),
-  ADD CONSTRAINT `fk_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`);
-
---
--- Constraints for table `classes`
---
-ALTER TABLE `classes`
-  ADD CONSTRAINT `fk_course_id` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`),
-  ADD CONSTRAINT `fk_semester_id` FOREIGN KEY (`semester_id`) REFERENCES `semesters` (`id`),
-  ADD CONSTRAINT `fk_teacher_id` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`);
-
---
--- Constraints for table `class_students`
---
-ALTER TABLE `class_students`
-  ADD CONSTRAINT `fk_class_student_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`),
-  ADD CONSTRAINT `fk_class_student_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`);
-
---
--- Constraints for table `students`
+-- AUTO_INCREMENT cho bảng `students`
 --
 ALTER TABLE `students`
-  ADD CONSTRAINT `students_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2001219013;
 
 --
--- Constraints for table `teachers`
+-- AUTO_INCREMENT cho bảng `teachers`
 --
 ALTER TABLE `teachers`
-  ADD CONSTRAINT `teachers_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000001237;
+
+--
+-- AUTO_INCREMENT cho bảng `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2001219013;
+
+--
+-- Các ràng buộc cho các bảng đã đổ
+--
+
+--
+-- Các ràng buộc cho bảng `classes`
+--
+ALTER TABLE `classes`
+  ADD CONSTRAINT `fk_course_id` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`),
+  ADD CONSTRAINT `fk_semester_id` FOREIGN KEY (`semester_id`) REFERENCES `semesters` (`semester_id`),
+  ADD CONSTRAINT `fk_teacher_id` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`);
+
+--
+-- Các ràng buộc cho bảng `class_students`
+--
+ALTER TABLE `class_students`
+  ADD CONSTRAINT `fk_class_student_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`),
+  ADD CONSTRAINT `fk_class_student_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`);
+
+--
+-- Các ràng buộc cho bảng `courses`
+--
+ALTER TABLE `courses`
+  ADD CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`course_type_id`) REFERENCES `course_types` (`course_type_id`) ON DELETE SET NULL;
+
+--
+-- Các ràng buộc cho bảng `schedules`
+--
+ALTER TABLE `schedules`
+  ADD CONSTRAINT `schedules_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`);
+
+--
+-- Các ràng buộc cho bảng `students`
+--
+ALTER TABLE `students`
+  ADD CONSTRAINT `students_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `teachers`
+--
+ALTER TABLE `teachers`
+  ADD CONSTRAINT `teachers_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `user_roles_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

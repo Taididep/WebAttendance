@@ -1,17 +1,18 @@
 
 Các nghiệp vụ, chức năng cần làm:
-1. Đăng Nhập (users,roles,user_roles)
+1. Đăng Nhập (users,roles,user_roles)----------Done
 2. Đăng ký tài khoản
 3. Cập nhật thông tin cá nhân (students,teachers)
-4. Tab không lưu kết nối trước đó, Đăng xuất khi tắt tab(đăng xuất rồi mà vẫn vào dc link cũ là sai)
+4. Tab không lưu kết nối trước đó, Đăng xuất khi tắt tab(đăng xuất rồi mà vẫn vào dc link cũ là sai)---------Done
 
 
-5. Hiển thị học kỳ(combobox) -> chọn học kỳ -> Hiển thị các lớp (giao diện trang chủ)
+5. Hiển thị học kỳ(combobox) -> chọn học kỳ -> Hiển thị các lớp (giao diện trang chủ) ---------Done
+
 6. Khi nhấn vào lớp thì sẽ qua trang danh sách điểm danh
-
 
 7. Thêm(tạo), xóa, sửa(cập nhật) - Lớp học
 8. Thêm, xóa sinh viên trong bảng class_students(danh sách sinh viên trong cái lớp đó)
+
 
 9. Trang điểm danh lấy các cột (STT,MSSV, Họ Đệm, Tên, Ngày Sinh, Lớp học, Ngày diểm danh 1, Ngày điểm danh 2...)
 + ví dụ trong \Database\diemDanh.xlsm

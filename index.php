@@ -7,7 +7,7 @@
         <title>Đăng nhập</title>
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
+        <link rel="stylesheet" href="../Css/style.css">
         <style>
             body {
                 background-color: #f8f9fa;
@@ -37,7 +37,7 @@
                                     <?php echo htmlspecialchars(string: $_GET['error']); ?>
                                 </div>
                             <?php } ?>
-                            <form id="loginForm" action="login.php" method="post">
+                            <form id="loginForm" action="Account\login.php" method="post">
                                 <div class="form-group">
                                     <label for="username">Username:</label>
                                     <input type="text" class="form-control" name="username" id="username" required>
