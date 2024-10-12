@@ -10,22 +10,22 @@ if (!isset($_SESSION['user_id'])) {
 // Lấy thông tin người dùng từ phiên
 $user_id = $_SESSION['user_id'];
 
-// Kết nối đến cơ sở dữ liệu để lấy thông tin chi tiết về giáo viên
+// Kết nối đến cơ sở dữ liệu để lấy thông tin chi tiết về sinh viên
 include '../Connect/connect.php';
 
-// Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
-$sql = "SELECT * FROM teachers WHERE teacher_id = ?";
+// Chuẩn bị câu lệnh SQL để lấy thông tin sinh viên
+$sql = "SELECT * FROM students WHERE student_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$user_id]);
 
-// Lấy kết quả thông tin giáo viên
-$teacherData = $stmt->fetchObject();
+// Lấy kết quả thông tin sinh viên
+$studentData = $stmt->fetchObject();
 $stmt->closeCursor();  // Đóng kết quả của truy vấn trước
 
-if ($teacherData) {
-    $greeting = htmlspecialchars($teacherData->lastname) . " " . htmlspecialchars($teacherData->firstname);
+if ($studentData) {
+    $greeting = htmlspecialchars($studentData->lastname) . " " . htmlspecialchars($studentData->firstname);
 } else {
-    $greeting = "Thông tin giáo viên không tìm thấy.";
+    $greeting = "Thông tin sinh viên không tìm thấy.";
 }
 
 // Truy vấn danh sách học kỳ bằng thủ tục lưu trữ
@@ -41,7 +41,7 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang giáo viên</title>
+    <title>Trang sinh viên</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -49,7 +49,7 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
     <!-- Thanh điều hướng (Navbar) -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Trang giáo viên</a>
+            <a class="navbar-brand" href="#">Trang sinh viên</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -91,7 +91,7 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
 
         <!-- Bảng lớp học -->
         <div id="classList" class="mt-4">
-            <!-- Danh sách lớp sẽ được tải ở đây -->
+            <!-- Danh sách lớp -->
         </div>
     </div>
 
@@ -104,34 +104,38 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST" action="update_teacher.php">
-                        <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherData->teacher_id); ?>">
+                    <form id="editForm" method="POST" action="update_student.php">
+                        <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($studentData->student_id); ?>">
+                        <div class="mb-3">
+                            <label for="student_code" class="form-label">Mã số sinh viên</label>
+                            <input type="text" class="form-control" id="student_code" name="student_code" value="<?php echo htmlspecialchars($user_id); ?>" readonly>
+                        </div>
                         <div class="mb-3">
                             <label for="lastname" class="form-label">Họ</label>
-                            <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($teacherData->lastname); ?>" required>
+                            <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($studentData->lastname); ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="firstname" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($teacherData->firstname); ?>" required>
+                            <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($studentData->firstname); ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="birthday" class="form-label">Ngày sinh</label>
-                            <input type="date" class="form-control" id="birthday" name="birthday" value="<?php echo htmlspecialchars($teacherData->birthday); ?>" required>
+                            <input type="date" class="form-control" id="birthday" name="birthday" value="<?php echo htmlspecialchars($studentData->birthday); ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="gender" class="form-label">Giới tính</label>
                             <select class="form-select" id="gender" name="gender" required>
-                                <option value="Nam" <?php echo ($teacherData->gender == 'Nam') ? 'selected' : ''; ?>>Nam</option>
-                                <option value="Nữ" <?php echo ($teacherData->gender == 'Nữ') ? 'selected' : ''; ?>>Nữ</option>
+                                <option value="Nam" <?php echo $studentData->gender == 'Nam' ? 'selected' : ''; ?>>Nam</option>
+                                <option value="Nữ" <?php echo $studentData->gender == 'Nữ' ? 'selected' : ''; ?>>Nữ</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($teacherData->email); ?>" required>
+                            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($studentData->email); ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Điện thoại</label>
-                            <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($teacherData->phone); ?>" required>
+                            <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($studentData->phone); ?>" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Cập nhật</button>
                     </form>
@@ -153,8 +157,9 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
                         success: function(data) {
                             $('#classList').html(data); // Hiển thị danh sách lớp học
                         },
-                        error: function() {
-                            $('#classList').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải dữ liệu.</div>');
+                        error: function(xhr, status, error) {
+                            console.error(xhr.responseText); // Ghi lại lỗi trong console
+                            $('#classList').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải dữ liệu: ' + error + '</div>');
                         }
                     });
                 } else {

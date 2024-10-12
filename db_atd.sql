@@ -1,17 +1,39 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Oct 12, 2024 at 06:18 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
 --
--- Cơ sở dữ liệu: `db_atd`
+-- Database: `db_atd`
 --
 
 DELIMITER $$
 --
--- Thủ tục
+-- Procedures
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
     SELECT semester_id, semester_name FROM semesters;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceList` (IN `classId` INT, IN `semesterId` INT)   BEGIN
+    SELECT a.*, s.firstname, s.lastname
+    FROM attendance a
+    JOIN students s ON a.student_id = s.student_id
+    WHERE a.class_id = classId AND a.semester_id = semesterId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemester` (IN `semester_id` INT)   BEGIN
@@ -29,6 +51,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemester` (IN `semester
     WHERE c.semester_id = semester_id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentInfo` (IN `userId` INT)   BEGIN
+    SELECT s.*
+    FROM students s
+    JOIN users u ON s.student_id = u.username -- Giả sử username là student_id
+    WHERE u.user_id = userId;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_param` INT)   BEGIN
     SELECT lastname, firstname 
     FROM teachers 
@@ -43,12 +72,29 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_u
     WHERE u.username = input_username;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `MarkAttendance` (IN `studentId` INT, IN `classId` INT, IN `semesterId` INT)   BEGIN
+    INSERT INTO attendance (student_id, class_id, semester_id, attendance_date)
+    VALUES (studentId, classId, semesterId, CURDATE());
+END$$
+
 DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `classes`
+-- Table structure for table `attendance_details`
+--
+
+CREATE TABLE `attendance_details` (
+  `id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `attendance_date` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `classes`
 --
 
 CREATE TABLE `classes` (
@@ -60,7 +106,7 @@ CREATE TABLE `classes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `classes`
+-- Dumping data for table `classes`
 --
 
 INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `teacher_id`) VALUES
@@ -69,7 +115,7 @@ INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `te
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `class_students`
+-- Table structure for table `class_students`
 --
 
 CREATE TABLE `class_students` (
@@ -79,7 +125,7 @@ CREATE TABLE `class_students` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `class_students`
+-- Dumping data for table `class_students`
 --
 
 INSERT INTO `class_students` (`stt`, `class_id`, `student_id`) VALUES
@@ -95,7 +141,7 @@ INSERT INTO `class_students` (`stt`, `class_id`, `student_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `courses`
+-- Table structure for table `courses`
 --
 
 CREATE TABLE `courses` (
@@ -105,7 +151,7 @@ CREATE TABLE `courses` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `courses`
+-- Dumping data for table `courses`
 --
 
 INSERT INTO `courses` (`course_id`, `course_name`, `course_type_id`) VALUES
@@ -154,7 +200,7 @@ INSERT INTO `courses` (`course_id`, `course_name`, `course_type_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `course_types`
+-- Table structure for table `course_types`
 --
 
 CREATE TABLE `course_types` (
@@ -166,7 +212,7 @@ CREATE TABLE `course_types` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `course_types`
+-- Dumping data for table `course_types`
 --
 
 INSERT INTO `course_types` (`course_type_id`, `course_type_name`, `credits`, `theory_periods`, `practice_periods`) VALUES
@@ -180,7 +226,7 @@ INSERT INTO `course_types` (`course_type_id`, `course_type_name`, `credits`, `th
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `roles`
+-- Table structure for table `roles`
 --
 
 CREATE TABLE `roles` (
@@ -189,7 +235,7 @@ CREATE TABLE `roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `roles`
+-- Dumping data for table `roles`
 --
 
 INSERT INTO `roles` (`role_id`, `role_name`) VALUES
@@ -200,7 +246,7 @@ INSERT INTO `roles` (`role_id`, `role_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `schedules`
+-- Table structure for table `schedules`
 --
 
 CREATE TABLE `schedules` (
@@ -212,7 +258,7 @@ CREATE TABLE `schedules` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `schedules`
+-- Dumping data for table `schedules`
 --
 
 INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_time`) VALUES
@@ -222,7 +268,7 @@ INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_t
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `semesters`
+-- Table structure for table `semesters`
 --
 
 CREATE TABLE `semesters` (
@@ -234,7 +280,7 @@ CREATE TABLE `semesters` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `semesters`
+-- Dumping data for table `semesters`
 --
 
 INSERT INTO `semesters` (`semester_id`, `semester_name`, `is_active`, `start_date`, `end_date`) VALUES
@@ -244,7 +290,7 @@ INSERT INTO `semesters` (`semester_id`, `semester_name`, `is_active`, `start_dat
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `students`
+-- Table structure for table `students`
 --
 
 CREATE TABLE `students` (
@@ -259,7 +305,7 @@ CREATE TABLE `students` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `students`
+-- Dumping data for table `students`
 --
 
 INSERT INTO `students` (`student_id`, `lastname`, `firstname`, `email`, `phone`, `class`, `birthday`, `gender`) VALUES
@@ -282,12 +328,13 @@ INSERT INTO `students` (`student_id`, `lastname`, `firstname`, `email`, `phone`,
 (2001217891, 'Vũ Thị', 'Hạnh', 'vuthihanh@gmail.com', '0918901234', '13DHTH18', '2004-05-17', 'Nữ'),
 (2001218901, 'Đặng Văn', 'Quân', 'dangvanquan@gmail.com', '0909012345', '11DHTH09', '2002-05-30', 'Nam'),
 (2001218902, 'Đặng Thị', 'Thu', 'dangthithu@gmail.com', '0920123456', '13DHTH19', '2004-11-12', 'Nữ'),
-(2001219012, 'Lương Thị', 'Ngân', 'luongthingan@gmail.com', '0910123456', '12DHTH10', '2003-11-16', 'Nữ');
+(2001219012, 'Lương Thị', 'Ngân', 'luongthingan@gmail.com', '0910123456', '12DHTH10', '2003-11-16', 'Nữ'),
+(2001219017, 'Lý Minh', 'Anh', 'phungvinhluan2003@gmail.com', '0944939018', '12DHTH07', '2003-11-08', 'Nữ');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `teachers`
+-- Table structure for table `teachers`
 --
 
 CREATE TABLE `teachers` (
@@ -301,7 +348,7 @@ CREATE TABLE `teachers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `teachers`
+-- Dumping data for table `teachers`
 --
 
 INSERT INTO `teachers` (`teacher_id`, `lastname`, `firstname`, `email`, `phone`, `birthday`, `gender`) VALUES
@@ -312,7 +359,7 @@ INSERT INTO `teachers` (`teacher_id`, `lastname`, `firstname`, `email`, `phone`,
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -322,7 +369,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
@@ -348,12 +395,13 @@ INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
 (2001217891, '2001217891', '$2y$10$IYGbs8ePv72iI6dfxQ8w4u7uU6uvTYcL2fHQzyBPhm.nx3V9zOlpe'),
 (2001218901, '2001218901', '$2y$10$1ZuRSmbmqF0WdIUtQOfTfu/L8fq1f9usIEmZ0oYTO6nT8O5ZpyN7a'),
 (2001218902, '2001218902', '$2y$10$iXCJ7dsX8Z8Uy3YVpgxem.8a7yr5Ef9r7kAA5ays0XckYVjmIeqby'),
-(2001219012, '2001219012', '$2y$10$AIZ6OefoLjlsCGAp9hCxY.pFJn.E5PCcfg1GjtRXUCRe6RSrvQ.hm');
+(2001219012, '2001219012', '$2y$10$AIZ6OefoLjlsCGAp9hCxY.pFJn.E5PCcfg1GjtRXUCRe6RSrvQ.hm'),
+(2001219017, 'thankiemsama', '$2y$10$reeSO8C5/V.TfvSDhl1wgeFi8PAHUcVHWAOoeSsxmZBB.3Q/Rxfnu');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `user_roles`
+-- Table structure for table `user_roles`
 --
 
 CREATE TABLE `user_roles` (
@@ -362,7 +410,7 @@ CREATE TABLE `user_roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `user_roles`
+-- Dumping data for table `user_roles`
 --
 
 INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
@@ -388,14 +436,22 @@ INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 (2001217891, 3),
 (2001218901, 3),
 (2001218902, 3),
-(2001219012, 3);
+(2001219012, 3),
+(2001219017, 3);
 
 --
--- Chỉ mục cho các bảng đã đổ
+-- Indexes for dumped tables
 --
 
 --
--- Chỉ mục cho bảng `classes`
+-- Indexes for table `attendance_details`
+--
+ALTER TABLE `attendance_details`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `student_id` (`student_id`);
+
+--
+-- Indexes for table `classes`
 --
 ALTER TABLE `classes`
   ADD PRIMARY KEY (`class_id`),
@@ -404,129 +460,141 @@ ALTER TABLE `classes`
   ADD KEY `fk_semester_id` (`semester_id`);
 
 --
--- Chỉ mục cho bảng `class_students`
+-- Indexes for table `class_students`
 --
 ALTER TABLE `class_students`
   ADD PRIMARY KEY (`class_id`,`student_id`),
   ADD KEY `fk_class_student_student_id` (`student_id`);
 
 --
--- Chỉ mục cho bảng `courses`
+-- Indexes for table `courses`
 --
 ALTER TABLE `courses`
   ADD PRIMARY KEY (`course_id`),
   ADD KEY `course_type_id` (`course_type_id`);
 
 --
--- Chỉ mục cho bảng `course_types`
+-- Indexes for table `course_types`
 --
 ALTER TABLE `course_types`
   ADD PRIMARY KEY (`course_type_id`);
 
 --
--- Chỉ mục cho bảng `roles`
+-- Indexes for table `roles`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`role_id`),
   ADD UNIQUE KEY `role_name` (`role_name`);
 
 --
--- Chỉ mục cho bảng `schedules`
+-- Indexes for table `schedules`
 --
 ALTER TABLE `schedules`
   ADD PRIMARY KEY (`schedule_id`),
   ADD KEY `class_id` (`class_id`);
 
 --
--- Chỉ mục cho bảng `semesters`
+-- Indexes for table `semesters`
 --
 ALTER TABLE `semesters`
   ADD PRIMARY KEY (`semester_id`);
 
 --
--- Chỉ mục cho bảng `students`
+-- Indexes for table `students`
 --
 ALTER TABLE `students`
   ADD PRIMARY KEY (`student_id`);
 
 --
--- Chỉ mục cho bảng `teachers`
+-- Indexes for table `teachers`
 --
 ALTER TABLE `teachers`
   ADD PRIMARY KEY (`teacher_id`);
 
 --
--- Chỉ mục cho bảng `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `username` (`username`);
 
 --
--- Chỉ mục cho bảng `user_roles`
+-- Indexes for table `user_roles`
 --
 ALTER TABLE `user_roles`
   ADD PRIMARY KEY (`user_id`,`role_id`),
   ADD KEY `role_id` (`role_id`);
 
 --
--- AUTO_INCREMENT cho các bảng đã đổ
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT cho bảng `courses`
+-- AUTO_INCREMENT for table `attendance_details`
+--
+ALTER TABLE `attendance_details`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
   MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
--- AUTO_INCREMENT cho bảng `course_types`
+-- AUTO_INCREMENT for table `course_types`
 --
 ALTER TABLE `course_types`
   MODIFY `course_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT cho bảng `roles`
+-- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
   MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT cho bảng `schedules`
+-- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT cho bảng `semesters`
+-- AUTO_INCREMENT for table `semesters`
 --
 ALTER TABLE `semesters`
   MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT cho bảng `students`
+-- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2001219013;
+  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2001219018;
 
 --
--- AUTO_INCREMENT cho bảng `teachers`
+-- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
   MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000001237;
 
 --
--- AUTO_INCREMENT cho bảng `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2001219013;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2001219018;
 
 --
--- Các ràng buộc cho các bảng đã đổ
+-- Constraints for dumped tables
 --
 
 --
--- Các ràng buộc cho bảng `classes`
+-- Constraints for table `attendance_details`
+--
+ALTER TABLE `attendance_details`
+  ADD CONSTRAINT `attendance_details_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`);
+
+--
+-- Constraints for table `classes`
 --
 ALTER TABLE `classes`
   ADD CONSTRAINT `fk_course_id` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`),
@@ -534,40 +602,44 @@ ALTER TABLE `classes`
   ADD CONSTRAINT `fk_teacher_id` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`);
 
 --
--- Các ràng buộc cho bảng `class_students`
+-- Constraints for table `class_students`
 --
 ALTER TABLE `class_students`
   ADD CONSTRAINT `fk_class_student_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`),
   ADD CONSTRAINT `fk_class_student_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`);
 
 --
--- Các ràng buộc cho bảng `courses`
+-- Constraints for table `courses`
 --
 ALTER TABLE `courses`
   ADD CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`course_type_id`) REFERENCES `course_types` (`course_type_id`) ON DELETE SET NULL;
 
 --
--- Các ràng buộc cho bảng `schedules`
+-- Constraints for table `schedules`
 --
 ALTER TABLE `schedules`
   ADD CONSTRAINT `schedules_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`);
 
 --
--- Các ràng buộc cho bảng `students`
+-- Constraints for table `students`
 --
 ALTER TABLE `students`
   ADD CONSTRAINT `students_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- Các ràng buộc cho bảng `teachers`
+-- Constraints for table `teachers`
 --
 ALTER TABLE `teachers`
   ADD CONSTRAINT `teachers_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- Các ràng buộc cho bảng `user_roles`
+-- Constraints for table `user_roles`
 --
 ALTER TABLE `user_roles`
   ADD CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `user_roles_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE;
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
