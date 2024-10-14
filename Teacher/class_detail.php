@@ -1,11 +1,5 @@
 <?php
-<<<<<<< HEAD
-session_start();
-include '../LayoutPages/navbar.php'; // Gọi file navbar.php để hiển thị thanh điều hướng
-=======
     session_start();
->>>>>>> 1b5dfd851e8579d766e8e34a698bba29fda3925d
-
     // Kiểm tra xem người dùng đã đăng nhập chưa
     if (!isset($_SESSION['user_id'])) {
         echo 'Unauthorized access.';

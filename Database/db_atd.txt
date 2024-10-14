@@ -304,10 +304,12 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE GetAllSemesters()
 BEGIN
-    SELECT semester_id, semester_name FROM semesters;
+    SELECT semester_id, semester_name 
+    FROM semesters
+    ORDER BY semester_id DESC; -- Sắp xếp theo semester_id giảm dần
 END //
-
 DELIMITER ;
+
 
 -- Thủ tục lấy danh sach lớp theo học kỳ trong teacher.php(get_classes.php)
 DELIMITER //
@@ -325,14 +327,24 @@ END //
 
 -- Thủ tục lấy thông tin lớp (detail_class.php)
 DELIMITER //
-
-CREATE PROCEDURE GetClassDetailsById(IN input_class_id CHAR(36))
+CREATE PROCEDURE GetClassDetailsById(IN classId CHAR(36))
 BEGIN
-    SELECT class_id, class_name, course_id, semester_id, teacher_id 
-    FROM classes
-    WHERE class_id = input_class_id;
+    SELECT 
+        c.class_id,
+        c.class_name,
+        s.semester_name,
+        co.course_name,
+        CONCAT(t.lastname, ' ', t.firstname) AS teacher_fullname
+    FROM 
+        classes c
+    JOIN 
+        semesters s ON c.semester_id = s.semester_id
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    JOIN 
+        teachers t ON c.teacher_id = t.teacher_id
+    WHERE 
+        c.class_id = classId;
 END //
-
-DELIMITER ;
 
 
