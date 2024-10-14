@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_student->execute();
 
         $_SESSION['success_message'] = "Chúc mừng bạn đã đăng ký thành công!"; // Gán thông báo thành công
-        header("Location: ../index.php"); // Chuyển hướng về trang index
+        header("Location: ../login_view.php"); // Chuyển hướng về trang index
         exit();
     } catch (PDOException $e) {
         echo "Lỗi: " . $e->getMessage();

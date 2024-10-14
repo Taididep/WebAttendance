@@ -9,13 +9,13 @@ $password = $_POST['password'] ?? '';
 // Kiểm tra nếu người dùng nhập đầy đủ thông tin
 if (empty($username) || empty($password)) {
     $error = "Vui lòng nhập đầy đủ thông tin!";
-    header("Location: ../index.php?error=" . urlencode($error));
+    header("Location: ../login_view.php?error=" . urlencode($error));
     exit;
 }
 
 // Tạo biến để lưu thông tin người dùng
 $userData = null;
-$pageRedirect = '../index.php'; // Trang index
+$pageRedirect = '../login_view.php'; // Trang index
 
 // Gọi thủ tục lưu trữ để lấy thông tin người dùng
 $sql = "CALL GetUserInfoByUsername(?)";
@@ -31,7 +31,7 @@ $userData = $stmt->fetchObject();
 if ($userData === false) {
     // Trường hợp không tìm thấy người dùng
     $error = "Đăng nhập thất bại";
-    header("Location: ../index.php?error=" . urlencode($error));
+    header("Location: ../login_view.php?error=" . urlencode($error));
     exit;
 } else {
     // Kiểm tra mật khẩu bằng password_verify() (giả sử bạn đã lưu mật khẩu dưới dạng hash)
@@ -45,7 +45,7 @@ if ($userData === false) {
         if ($userData->role_name == 'admin') {
             $pageRedirect = '../Admin/admin.php';
         } elseif ($userData->role_name == 'teacher') {
-            $pageRedirect = '../Teacher/teacher.php';
+            $pageRedirect = '../Teacher/index.php';
         } elseif ($userData->role_name == 'student') {
             $pageRedirect = '../Student/student.php';
         }
@@ -55,7 +55,7 @@ if ($userData === false) {
     } else {
         // Trường hợp mật khẩu sai
         $error = "Sai mật khẩu";
-        header("Location: ../index.php?error=" . urlencode($error));
+        header("Location: ../login_view.php?error=" . urlencode($error));
         exit;
     }
 }

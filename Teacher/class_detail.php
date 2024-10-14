@@ -1,5 +1,6 @@
 <?php
 session_start();
+include '../LayoutPages/navbar.php'; // Gọi file navbar.php để hiển thị thanh điều hướng
 
 // Kiểm tra xem người dùng đã đăng nhập chưa
 if (!isset($_SESSION['user_id'])) {
