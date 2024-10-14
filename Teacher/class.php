@@ -39,9 +39,18 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
             </div>
         </form>
 
+        <!-- Nút Thêm, Xóa, Chỉnh sửa lớp học -->
+        <div class="mb-3">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addClassModal">Thêm lớp học</button>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteClassModal">Xóa lớp học</button>
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editClassModal">Chỉnh sửa lớp học</button>
+        </div>
+
         <!-- Bảng lớp học -->
         <div id="classList" class="mt-4">
-            <!-- Danh sách lớp sẽ được tải ở đây -->
+            <ul class="list-group">
+                <!-- Danh sách lớp sẽ được tải ở đây -->
+            </ul>
         </div>
     </div>
 
@@ -90,6 +99,81 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
         </div>
     </div>
 
+    <!-- Modal Thêm Lớp Học -->
+    <div class="modal fade" id="addClassModal" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addClassModalLabel">Thêm Lớp Học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addClassForm" method="POST" action="add_class.php">
+                        <div class="mb-3">
+                            <label for="semester_id" class="form-label">Chọn học kỳ</label>
+                            <select class="form-select" id="semester_id" name="semester_id" required>
+                                <option value="" disabled selected>-- Chọn học kỳ --</option>
+                                <?php foreach ($semesters as $semester): ?>
+                                    <option value="<?php echo $semester['semester_id']; ?>">
+                                        <?php echo htmlspecialchars($semester['semester_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="course_code" class="form-label">Mã khóa học</label>
+                            <input type="text" class="form-control" id="course_code" name="course_code" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="course_name" class="form-label">Tên khóa học</label>
+                            <input type="text" class="form-control" id="course_name" name="course_name" required readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="class_name" class="form-label">Tên lớp học</label>
+                            <input type="text" class="form-control" id="class_name" name="class_name" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Thêm Lớp Học</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Xóa Lớp Học -->
+    <div class="modal fade" id="deleteClassModal" tabindex="-1" aria-labelledby="deleteClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteClassModalLabel">Xóa Lớp Học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deleteClassForm">
+                        <div class="mb-3">
+                            <label for="delete_semester_id" class="form-label">Chọn học kỳ</label>
+                            <select class="form-select" id="delete_semester_id" name="semester_id" required>
+                                <option value="" disabled selected>-- Chọn học kỳ --</option>
+                                <?php foreach ($semesters as $semester): ?>
+                                    <option value="<?php echo $semester['semester_id']; ?>">
+                                        <?php echo htmlspecialchars($semester['semester_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="delete_class_id" class="form-label">Chọn lớp học</label>
+                            <select class="form-select" id="delete_class_id" name="class_id" required>
+                                <option value="" disabled selected>-- Chọn lớp học --</option>
+                            </select>
+                        </div>
+                        <button type="button" id="submitDelete" class="btn btn-danger">Xóa Lớp Học</button>
+                    </form>
+                    <div id="deleteMessage" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -111,6 +195,151 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
                     $('#classList').empty(); // Xóa danh sách lớp học nếu không có học kỳ được chọn
                 }
             });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Khi người dùng nhập mã khóa học
+            $('#course_code').on('input', function() {
+                var courseCode = $(this).val();
+                if (courseCode) {
+                    $.ajax({
+                        url: 'get_course_name.php',
+                        type: 'POST',
+                        data: { course_code: courseCode },
+                        success: function(data) {
+                            $('#course_name').val(data);
+                        },
+                        error: function() {
+                            $('#course_name').val('');
+                        }
+                    });
+                } else {
+                    $('#course_name').val('');
+                }
+            });
+
+            // Xử lý khi form thêm lớp học được gửi
+            $('#addClassForm').on('submit', function(e) {
+                e.preventDefault(); // Ngăn chặn hành vi gửi form mặc định
+                $.ajax({
+                    url: $(this).attr('action'), // URL đến file xử lý
+                    type: $(this).attr('method'), // Phương thức gửi
+                    data: $(this).serialize(), // Dữ liệu form
+                    success: function(response) {
+                        var data = JSON.parse(response);
+                        alert(data.message); // Hiển thị thông báo
+                        $('#addClassModal').modal('hide'); // Đóng modal
+
+                        // Cập nhật danh sách lớp học
+                        loadClasses($('#semester').val()); // Gọi hàm cập nhật danh sách
+                    },
+                    error: function() {
+                        alert('Có lỗi xảy ra khi thêm lớp học.');
+                    }
+                });
+            });
+
+            // Khi người dùng chọn học kỳ
+            $('#semester').change(function() {
+                loadClasses($(this).val()); // Gọi hàm cập nhật danh sách
+            });
+
+            // Hàm tải danh sách lớp học
+            function loadClasses(semesterId) {
+                if (semesterId) {
+                    $.ajax({
+                        url: 'get_classes.php',
+                        type: 'POST',
+                        data: { semester_id: semesterId },
+                        success: function(data) {
+                            $('#classList').html(data); // Cập nhật danh sách lớp học
+                        },
+                        error: function() {
+                            $('#classList').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải dữ liệu.</div>');
+                        }
+                    });
+                } else {
+                    $('#classList').empty(); // Xóa danh sách nếu không có học kỳ được chọn
+                }
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Khi người dùng chọn học kỳ
+            $('#delete_semester_id').change(function() {
+                var semesterId = $(this).val();
+                if (semesterId) {
+                    $.ajax({
+                        url: 'get_classes_by_semester.php',
+                        type: 'POST',
+                        data: { semester_id: semesterId },
+                        success: function(data) {
+                            var classes = JSON.parse(data);
+                            var classSelect = $('#delete_class_id');
+                            classSelect.empty().append('<option value="" disabled selected>-- Chọn lớp học --</option>');
+                            $.each(classes, function(index, classItem) {
+                                classSelect.append('<option value="' + classItem.class_id + '">' + classItem.class_name + ' - ' + classItem.course_name + '</option>');
+                            });
+                        },
+                        error: function() {
+                            alert('Có lỗi xảy ra khi tải danh sách lớp học.');
+                        }
+                    });
+                } else {
+                    $('#delete_class_id').empty().append('<option value="" disabled selected>-- Chọn lớp học --</option>');
+                }
+            });
+
+            $('#submitDelete').click(function() {
+                var classId = $('#delete_class_id').val();
+                if (classId) {
+                    $.ajax({
+                        url: 'delete_class.php',
+                        type: 'POST',
+                        data: { class_id: classId },
+                        success: function(response) {
+                            var result = JSON.parse(response);
+                            $('#deleteMessage').text(result.message).addClass('alert alert-success').fadeIn(); // Hiện thông báo
+
+                            // Cập nhật danh sách lớp học sau khi xóa thành công
+                            loadClasses($('#delete_semester_id').val());
+                            
+                            // Đóng modal sau khi xóa
+                            $('#deleteClassModal').modal('hide');
+                        },
+                        error: function() {
+                            $('#deleteMessage').text('Có lỗi xảy ra khi xóa lớp học.').addClass('alert alert-danger').fadeIn();
+                        }
+                    });
+                } else {
+                    alert('Vui lòng chọn lớp học để xóa.');
+                }
+            });
+
+            // Hàm tải danh sách lớp học
+            function loadClasses(semesterId) {
+                if (semesterId) {
+                    $.ajax({
+                        url: 'get_classes_by_semester.php',
+                        type: 'POST',
+                        data: { semester_id: semesterId },
+                        success: function(data) {
+                            var classes = JSON.parse(data);
+                            $('#classList').empty(); // Xóa danh sách hiện tại
+                            $.each(classes, function(index, classItem) {
+                                $('#classList').append('<div>' + classItem.class_name + ' - ' + classItem.course_name + '</div>');
+                            });
+                        },
+                        error: function() {
+                            $('#classList').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải dữ liệu.</div>');
+                        }
+                    });
+                } else {
+                    $('#classList').empty(); // Xóa danh sách nếu không có học kỳ được chọn
+                }
+            }
         });
     </script>
 </body>

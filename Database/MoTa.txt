@@ -1,8 +1,8 @@
 
 Các nghiệp vụ, chức năng cần làm:
 1. Đăng Nhập (users,roles,user_roles)----------Done
-2. Đăng ký tài khoản----------Done
-3. Cập nhật thông tin cá nhân (students,teachers) ------Done
+2. Đăng ký tài khoản----------DONE
+3. Cập nhật thông tin cá nhân (students,teachers) ------DONE
 4. Tab không lưu kết nối trước đó, Đăng xuất khi tắt tab(đăng xuất rồi mà vẫn vào dc link cũ là sai)---------Done
 
 
@@ -11,10 +11,10 @@ Các nghiệp vụ, chức năng cần làm:
 6. Khi nhấn vào lớp thì sẽ qua trang danh sách điểm danh --- DONE
 
 7. Thêm(tạo), xóa, sửa(cập nhật) - Lớp học
-8. Thêm, xóa sinh viên trong bảng class_students(danh sách sinh viên trong cái lớp đó)
+8. Thêm, xóa sinh viên trong bảng class_students(danh sách sinh viên trong cái lớp đó) ----DONE
 
 
-9. Trang điểm danh lấy các cột (STT,MSSV, Họ Đệm, Tên, Ngày Sinh, Lớp học, Ngày diểm danh 1, Ngày điểm danh 2...)
+9. Trang điểm danh lấy các cột (STT,MSSV, Họ Đệm, Tên, Ngày Sinh, Lớp học, Ngày diểm danh 1, Ngày điểm danh 2...) -----DONE
 + ví dụ trong \Database\diemDanh.xlsm
 + lưu ý ngày điểm danh lấy từ bảng schedules
 

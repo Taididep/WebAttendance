@@ -2766,16 +2766,16 @@
 		quid       	"6701599E0324"
 		exportControl 	"Public"
 		logical_models 	(list unit_reference_list
-		    (object Class "He thong"
+		    (object Class "he thong"
 			quid       	"67015C760165"
 			stereotype 	"Business Entity")
-		    (object Class "Tai khoan"
+		    (object Class "tai khoan"
 			quid       	"67015CBA00E7"
 			stereotype 	"Business Entity")
-		    (object Class "He thong "
+		    (object Class "he thong "
 			quid       	"67015CEE0348"
 			stereotype 	"Business Worker")
-		    (object Class "Lop diem danh"
+		    (object Class "lop diem danh"
 			quid       	"67015D63038F"
 			stereotype 	"Business Entity")
 		    (object Mechanism @126
@@ -2788,7 +2788,7 @@
 					supplier   	"$UNNAMED$108"
 					quidu      	"67015D03032C"
 					messages   	(list Messages
-					    (object Message "Dang nhap he thong"
+					    (object Message "dang nhap he thong"
 						quid       	"67015DE70234"
 						frequency  	"Aperiodic"
 						synchronization 	"Simple"
@@ -2797,7 +2797,7 @@
 						ordinal    	0
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "[Khong hop le] Tu choi"
+					    (object Message "[khong hop le] tu choi"
 						quid       	"67015E170016"
 						frequency  	"Aperiodic"
 						synchronization 	"Return"
@@ -2806,7 +2806,7 @@
 						ordinal    	3
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Hien thi danh sach lop"
+					    (object Message "hien thi danh sach lop"
 						quid       	"67015F4B02CB"
 						frequency  	"Aperiodic"
 						synchronization 	"Return"
@@ -2815,7 +2815,7 @@
 						ordinal    	6
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Chon lop"
+					    (object Message "chon lop"
 						quid       	"67015FE8008E"
 						frequency  	"Aperiodic"
 						synchronization 	"Simple"
@@ -2824,7 +2824,7 @@
 						ordinal    	7
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Hien danh sach diem danh"
+					    (object Message "hien danh sach diem danh"
 						quid       	"67015FFA0262"
 						frequency  	"Aperiodic"
 						synchronization 	"Return"
@@ -2833,7 +2833,7 @@
 						ordinal    	8
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Tao lop diem danh"
+					    (object Message "tao lop diem danh"
 						quid       	"670160A10190"
 						frequency  	"Aperiodic"
 						synchronization 	"Simple"
@@ -2842,7 +2842,7 @@
 						ordinal    	9
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Xuat ma QR"
+					    (object Message "xuat ma QR"
 						quid       	"670161C60232"
 						frequency  	"Aperiodic"
 						synchronization 	"Return"
@@ -2858,7 +2858,7 @@
 				multi      	FALSE)
 			    (object Object "$UNNAMED$109"
 				quid       	"67015C7800EE"
-				class      	"Use Case View::SequenDiemDanh::Tai khoan"
+				class      	"Use Case View::SequenDiemDanh::tai khoan"
 				quidu      	"67015CBA00E7"
 				persistence 	"Transient"
 				creationObj 	TRUE
@@ -2871,7 +2871,7 @@
 					supplier   	"$UNNAMED$109"
 					quidu      	"67015C7800EE"
 					messages   	(list Messages
-					    (object Message "Kiem tra tai khoan"
+					    (object Message "kiem tra tai khoan"
 						quid       	"67015DF502DB"
 						frequency  	"Aperiodic"
 						synchronization 	"Simple"
@@ -2885,7 +2885,7 @@
 					supplier   	"$UNNAMED$108"
 					quidu      	"67015D03032C"
 					messages   	(list Messages
-					    (object Message "Kiem tra thong tin nhap"
+					    (object Message "kiem tra thong tin nhap"
 						quid       	"67015E0C0203"
 						frequency  	"Aperiodic"
 						synchronization 	"Simple"
@@ -2894,7 +2894,7 @@
 						ordinal    	2
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Tao ma QR"
+					    (object Message "tao ma QR"
 						quid       	"670161A3014C"
 						frequency  	"Aperiodic"
 						synchronization 	"Simple"
@@ -2908,7 +2908,7 @@
 					supplier   	"$UNNAMED$110"
 					quidu      	"67015D570336"
 					messages   	(list Messages
-					    (object Message "[Hop le] Lay thong tin lop"
+					    (object Message "[hop le] lay thong tin lop"
 						quid       	"67015E3C0245"
 						frequency  	"Aperiodic"
 						synchronization 	"Simple"
@@ -2917,7 +2917,7 @@
 						ordinal    	4
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Xuat thong tin lop"
+					    (object Message "xuat thong tin lop"
 						quid       	"67015E5502BE"
 						frequency  	"Aperiodic"
 						synchronization 	"Return"
@@ -2926,7 +2926,7 @@
 						ordinal    	5
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Tao danh sach lop diem danh"
+					    (object Message "tao danh sach lop diem danh"
 						quid       	"67016149013C"
 						frequency  	"Aperiodic"
 						synchronization 	"Simple"
@@ -2935,7 +2935,7 @@
 						ordinal    	10
 						quidu      	"000000000000"
 						creation   	FALSE)
-					    (object Message "Tao thanh cong"
+					    (object Message "tao thanh cong"
 						quid       	"67016163025F"
 						frequency  	"Aperiodic"
 						synchronization 	"Return"
@@ -2944,14 +2944,14 @@
 						ordinal    	11
 						quidu      	"000000000000"
 						creation   	FALSE))))
-				class      	"Use Case View::SequenDiemDanh::He thong "
+				class      	"Use Case View::SequenDiemDanh::he thong "
 				quidu      	"67015CEE0348"
 				persistence 	"Transient"
 				creationObj 	TRUE
 				multi      	FALSE)
 			    (object Object "$UNNAMED$110"
 				quid       	"67015D570336"
-				class      	"Use Case View::SequenDiemDanh::Lop diem danh"
+				class      	"Use Case View::SequenDiemDanh::lop diem danh"
 				quidu      	"67015D63038F"
 				persistence 	"Transient"
 				creationObj 	TRUE
@@ -3055,7 +3055,7 @@
 				    location   	(1104, 404)
 				    anchor_loc 	1
 				    nlines     	2
-				    max_width  	206
+				    max_width  	873
 				    justify    	0
 				    label      	"")
 				icon       	"Business Worker"
@@ -3169,7 +3169,7 @@
 				    location   	(1941, 346)
 				    anchor_loc 	1
 				    nlines     	2
-				    max_width  	200
+				    max_width  	786
 				    justify    	0
 				    label      	"")
 				icon       	"Business Entity"
@@ -3213,7 +3213,7 @@
 				    location   	(2718, 363)
 				    anchor_loc 	1
 				    nlines     	2
-				    max_width  	291
+				    max_width  	786
 				    justify    	0
 				    label      	"")
 				icon       	"Business Entity"
@@ -3221,7 +3221,7 @@
 				line_color 	3342489
 				fill_color 	13434879
 				quidu      	"67015D570336"
-				width      	302
+				width      	262
 				height     	1796
 				icon_height 	190
 				icon_width 	262
@@ -3262,7 +3262,7 @@
 				    height     	90
 				    y_coord    	0
 				    Nested     	FALSE))
-			    (object InterMessView "Dang nhap he thong" @156
+			    (object InterMessView "dang nhap he thong" @156
 				location   	(0, 466)
 				font       	(object Font
 				    size       	10
@@ -3288,9 +3288,9 @@
 				    quidu      	"67015DE70234"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	400
+				    max_width  	398
 				    justify    	0
-				    label      	"Dang nhap he thong"
+				    label      	"dang nhap he thong"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	0)
@@ -3302,7 +3302,7 @@
 				origin     	(421, 466)
 				terminus   	(1088, 466)
 				ordinal    	0)
-			    (object InterMessView "Kiem tra tai khoan" @158
+			    (object InterMessView "kiem tra tai khoan" @158
 				location   	(0, 571)
 				font       	(object Font
 				    size       	10
@@ -3328,9 +3328,9 @@
 				    quidu      	"67015DF502DB"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	366
+				    max_width  	359
 				    justify    	0
-				    label      	"Kiem tra tai khoan"
+				    label      	"kiem tra tai khoan"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	0)
@@ -3342,7 +3342,7 @@
 				origin     	(1119, 571)
 				terminus   	(1925, 571)
 				ordinal    	1)
-			    (object SelfMessView "Kiem tra thong tin nhap" @160
+			    (object SelfMessView "kiem tra thong tin nhap" @160
 				location   	(0, 676)
 				font       	(object Font
 				    size       	10
@@ -3368,9 +3368,9 @@
 				    quidu      	"67015E0C0203"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	463
+				    max_width  	450
 				    justify    	0
-				    label      	"Kiem tra thong tin nhap"
+				    label      	"kiem tra thong tin nhap"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	0)
@@ -3382,7 +3382,7 @@
 				origin     	(1120, 676)
 				terminus   	(1270, 676)
 				ordinal    	2)
-			    (object InterMessView "[Khong hop le] Tu choi" @162
+			    (object InterMessView "[khong hop le] tu choi" @162
 				location   	(0, 806)
 				font       	(object Font
 				    size       	10
@@ -3408,9 +3408,9 @@
 				    quidu      	"67015E170016"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	445
+				    max_width  	429
 				    justify    	0
-				    label      	"[Khong hop le] Tu choi"
+				    label      	"[khong hop le] tu choi"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	1)
@@ -3422,7 +3422,7 @@
 				origin     	(1088, 806)
 				terminus   	(422, 806)
 				ordinal    	3)
-			    (object InterMessView "[Hop le] Lay thong tin lop" @164
+			    (object InterMessView "[hop le] lay thong tin lop" @164
 				location   	(0, 911)
 				font       	(object Font
 				    size       	10
@@ -3448,9 +3448,9 @@
 				    quidu      	"67015E3C0245"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	491
+				    max_width  	473
 				    justify    	0
-				    label      	"[Hop le] Lay thong tin lop"
+				    label      	"[hop le] lay thong tin lop"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	0)
@@ -3462,7 +3462,7 @@
 				origin     	(1119, 911)
 				terminus   	(2702, 911)
 				ordinal    	4)
-			    (object InterMessView "Xuat thong tin lop" @166
+			    (object InterMessView "xuat thong tin lop" @166
 				location   	(0, 1028)
 				font       	(object Font
 				    size       	10
@@ -3488,9 +3488,9 @@
 				    quidu      	"67015E5502BE"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	354
+				    max_width  	344
 				    justify    	0
-				    label      	"Xuat thong tin lop"
+				    label      	"xuat thong tin lop"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	1)
@@ -3502,7 +3502,7 @@
 				origin     	(2702, 1028)
 				terminus   	(1120, 1028)
 				ordinal    	5)
-			    (object InterMessView "Hien thi danh sach lop" @168
+			    (object InterMessView "hien thi danh sach lop" @168
 				location   	(0, 1133)
 				font       	(object Font
 				    size       	10
@@ -3528,9 +3528,9 @@
 				    quidu      	"67015F4B02CB"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	445
+				    max_width  	425
 				    justify    	0
-				    label      	"Hien thi danh sach lop"
+				    label      	"hien thi danh sach lop"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	1)
@@ -3547,7 +3547,7 @@
 				location   	(1941, 721)
 				line_color 	3342489
 				fill_color 	13434879)
-			    (object InterMessView "Chon lop" @171
+			    (object InterMessView "chon lop" @171
 				location   	(0, 1238)
 				font       	(object Font
 				    size       	10
@@ -3573,9 +3573,9 @@
 				    quidu      	"67015FE8008E"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	210
+				    max_width  	201
 				    justify    	0
-				    label      	"Chon lop"
+				    label      	"chon lop"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	0)
@@ -3587,7 +3587,7 @@
 				origin     	(421, 1238)
 				terminus   	(1088, 1238)
 				ordinal    	7)
-			    (object InterMessView "Hien danh sach diem danh" @173
+			    (object InterMessView "hien danh sach diem danh" @173
 				location   	(0, 1344)
 				font       	(object Font
 				    size       	10
@@ -3613,9 +3613,9 @@
 				    quidu      	"67015FFA0262"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	520
+				    max_width  	511
 				    justify    	0
-				    label      	"Hien danh sach diem danh"
+				    label      	"hien danh sach diem danh"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	1)
@@ -3627,7 +3627,7 @@
 				origin     	(1088, 1344)
 				terminus   	(422, 1344)
 				ordinal    	8)
-			    (object InterMessView "Tao lop diem danh" @175
+			    (object InterMessView "tao lop diem danh" @175
 				location   	(0, 1469)
 				font       	(object Font
 				    size       	10
@@ -3653,9 +3653,9 @@
 				    quidu      	"670160A10190"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	391
+				    max_width  	375
 				    justify    	0
-				    label      	"Tao lop diem danh"
+				    label      	"tao lop diem danh"
 				    pctDist    	0.500750
 				    height     	45
 				    orientation 	0)
@@ -3667,7 +3667,7 @@
 				origin     	(421, 1469)
 				terminus   	(1088, 1469)
 				ordinal    	9)
-			    (object InterMessView "Tao danh sach lop diem danh" @177
+			    (object InterMessView "tao danh sach lop diem danh" @177
 				location   	(0, 1574)
 				font       	(object Font
 				    size       	10
@@ -3693,9 +3693,9 @@
 				    quidu      	"67016149013C"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	582
+				    max_width  	566
 				    justify    	0
-				    label      	"Tao danh sach lop diem danh"
+				    label      	"tao danh sach lop diem danh"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	0)
@@ -3707,7 +3707,7 @@
 				origin     	(1119, 1574)
 				terminus   	(2702, 1574)
 				ordinal    	10)
-			    (object InterMessView "Tao thanh cong" @179
+			    (object InterMessView "tao thanh cong" @179
 				location   	(0, 1719)
 				font       	(object Font
 				    size       	10
@@ -3733,9 +3733,9 @@
 				    quidu      	"67016163025F"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	341
+				    max_width  	325
 				    justify    	0
-				    label      	"Tao thanh cong"
+				    label      	"tao thanh cong"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	1)
@@ -3747,7 +3747,7 @@
 				origin     	(2702, 1719)
 				terminus   	(1120, 1719)
 				ordinal    	11)
-			    (object SelfMessView "Tao ma QR" @181
+			    (object SelfMessView "tao ma QR" @181
 				location   	(0, 1824)
 				font       	(object Font
 				    size       	10
@@ -3773,9 +3773,9 @@
 				    quidu      	"670161A3014C"
 				    anchor_loc 	1
 				    nlines     	1
-				    max_width  	273
+				    max_width  	269
 				    justify    	0
-				    label      	"Tao ma QR"
+				    label      	"tao ma QR"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	0)
@@ -3787,7 +3787,7 @@
 				origin     	(1120, 1824)
 				terminus   	(1270, 1824)
 				ordinal    	12)
-			    (object InterMessView "Xuat ma QR" @183
+			    (object InterMessView "xuat ma QR" @183
 				location   	(0, 1954)
 				font       	(object Font
 				    size       	10
@@ -3815,7 +3815,7 @@
 				    nlines     	1
 				    max_width  	288
 				    justify    	0
-				    label      	"Xuat ma QR"
+				    label      	"xuat ma QR"
 				    pctDist    	0.500000
 				    height     	45
 				    orientation 	1)
@@ -3861,7 +3861,7 @@
 		    objects    	(list Objects
 			(object Object "$UNNAMED$114"
 			    quid       	"670162B502C1"
-			    class      	"Use Case View::SequenDiemDanh::Tai khoan"
+			    class      	"Use Case View::SequenDiemDanh::tai khoan"
 			    quidu      	"67015CBA00E7"
 			    persistence 	"Transient"
 			    creationObj 	FALSE
@@ -4317,7 +4317,7 @@
 					location   	(2241, 524)
 					anchor_loc 	1
 					nlines     	2
-					max_width  	808
+					max_width  	805
 					justify    	0
 					label      	"")
 				    icon       	"Business Entity"
@@ -4385,7 +4385,7 @@
 				multi      	FALSE)
 			    (object Object "$UNNAMED$116"
 				quid       	"670168A20124"
-				class      	"Use Case View::SequenDiemDanh::He thong "
+				class      	"Use Case View::SequenDiemDanh::he thong "
 				quidu      	"67015CEE0348"
 				persistence 	"Transient"
 				creationObj 	TRUE
@@ -4461,7 +4461,7 @@
 				    location   	(1336, 394)
 				    anchor_loc 	1
 				    nlines     	2
-				    max_width  	837
+				    max_width  	873
 				    justify    	0
 				    label      	"")
 				icon       	"Business Worker"
