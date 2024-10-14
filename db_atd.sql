@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 12, 2024 at 06:18 AM
+-- Generation Time: Oct 14, 2024 at 02:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -110,6 +110,7 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `teacher_id`) VALUES
+('670cb3ea259008.77375751', 'AV2 Luan', 12, 2, 1000001234),
 ('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 'CSDL VanAnh', 25, 2, 1000001234);
 
 -- --------------------------------------------------------
