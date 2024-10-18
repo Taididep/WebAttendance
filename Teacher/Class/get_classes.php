@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Kết nối đến cơ sở dữ liệu
-include '../../Connect/connect.php';
+include __DIR__ . '/../../Connect/connect.php';
 
 // Kiểm tra xem có gửi semester_id không
 if (isset($_POST['semester_id'])) {
@@ -33,17 +33,17 @@ if (isset($_POST['semester_id'])) {
         $counter = 1;
         foreach ($classes as $class) {
             echo '<tr>';
-            echo '<td onclick="window.location.href=\'detail_class.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
-            echo '<td onclick="window.location.href=\'detail_class.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
-            echo '<td onclick="window.location.href=\'detail_class.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
+            echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
+            echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
+            echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
             echo '<td>';
             echo '<div class="dropdown">';
-            echo '<button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton' . $counter . '" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">';
+            echo '<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $counter . '" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">';
             echo '<i class="bi bi-three-dots-vertical"></i>'; // Biểu tượng 3 chấm màu đen
             echo '</button>';
             echo '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $counter . '">';
-            echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy lớp học này không?\')">Xóa</a></li>';
-            echo '<li><a class="dropdown-item" href="edit_class.php?class_id=' . htmlspecialchars($class['class_id']) . '">Sửa</a></li>';
+            echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy lớp học này không?\')">Hủy lớp</a></li>';
+            echo '<li><a class="dropdown-item" href="edit_class.php?class_id=' . htmlspecialchars($class['class_id']) . '">Cập nhật lớp</a></li>';
             echo '</ul>';
             echo '</div>';
             echo '</td>';

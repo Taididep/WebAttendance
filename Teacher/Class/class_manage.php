@@ -1,10 +1,11 @@
 <?php
 session_start();
-include '../LayoutPages/navbar.php'; // Gọi file navbar.php để hiển thị thanh điều hướng
-include __DIR__ . '../Account/islogin.php';
 
-// Truy vấn danh sách học kỳ bằng thủ tục lưu trữ
-include '../Connect/connect.php';  // Đảm bảo kết nối cơ sở dữ liệu vẫn có sẵn
+$basePath = '../'; // Đường dẫn gốc
+include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../LayoutPages/navbar.php';
+include __DIR__ . '/../../Account/islogin.php';
+
 
 $sql_semesters = "CALL GetAllSemesters()"; // Gọi thủ tục
 $stmt_semesters = $conn->prepare($sql_semesters);
@@ -28,12 +29,13 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
 </head>
 <body>
 
-    <!-- Nội dung trang -->
     <div class="container mt-4">
-        <!-- Form chọn học kỳ -->
+        <!-- Tiêu đề -->
         <h2 class="mb-4 text-center">Quản lý danh sách lớp học</h2>
-        <form id="semesterForm">
-            <div class="mb-3">
+
+        <!-- Form chọn học kỳ -->
+        <form id="semesterForm" class="d-flex justify-content-between align-items-center mb-3">
+            <div class="mb-0 me-2" style="flex: 1;">
                 <select class="form-select" id="semester" name="semester_id" required>
                     <option value="" disabled selected>Chọn học kỳ</option>
                     <?php foreach ($semesters as $semester): ?>
@@ -42,13 +44,17 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                         </option>
                     <?php endforeach; ?>
                 </select>
-            </div>
+            </div> 
+            <a href="<?php echo $basePath; ?>Semester/semester_create.php" class="btn btn-success d-flex align-items-center" style="height: 100%;">
+                <i class="bi bi-plus-lg fs-5" ></i>
+            </a>
         </form>
+
 
         <!-- Bảng lớp học -->
         <div id="classList" class="mt-4">
             <!-- Danh sách lớp sẽ được tải ở đây -->
-        </div>
+        </div> 
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -58,7 +64,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
             var semesterId = $('#semester').val() || "<?php echo $defaultSemesterId; ?>"; // Lấy semester_id đã chọn hoặc mặc định
             if (semesterId) {
                 $.ajax({
-                    url: 'Class/get_classes.php', // URL đến file xử lý AJAX
+                    url: 'get_classes.php', // URL đến file xử lý AJAX
                     type: 'POST',
                     data: { semester_id: semesterId },
                     success: function(data) {
@@ -75,7 +81,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                 var semesterId = $(this).val();
                 if (semesterId) {
                     $.ajax({
-                        url: 'Class/get_classes.php', // URL đến file xử lý AJAX
+                        url: 'get_classes.php', // URL đến file xử lý AJAX
                         type: 'POST',
                         data: { semester_id: semesterId },
                         success: function(data) {

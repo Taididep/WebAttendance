@@ -1,7 +1,11 @@
 <?php
 session_start();
-include '../LayoutPages/navbar.php'; // Gọi file navbar.php để hiển thị thanh điều hướng
-include __DIR__ . '../Account/islogin.php';
+$basePath = ''; // Đường dẫn gốc từ index.php đến thư mục gốc
+include __DIR__ . '/../Connect/connect.php';
+include __DIR__ . '/../LayoutPages/navbar.php'; // Gọi file navbar.php để hiển thị thanh điều hướng
+include __DIR__ . '/../Account/islogin.php';
+
+
 ?>
 
 <!DOCTYPE html>
@@ -30,13 +34,12 @@ include __DIR__ . '../Account/islogin.php';
 </style>
 </head>
 <body>
-
-<div class="container mt-5">
-    <div class="hero">
-        <h1>Welcome</h1>
-        <img src="../Image/pngtree-school-cartoon-classroom-background-image_907637.png" alt="Hình ảnh cho trang chủ" class="img-fluid">
+    <div class="container mt-5">
+        <div class="hero">
+            <h1>Welcome</h1>
+            <img src="../Image/pngtree-school-cartoon-classroom-background-image_907637.png" alt="Hình ảnh cho trang chủ" class="img-fluid">
+        </div>
     </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

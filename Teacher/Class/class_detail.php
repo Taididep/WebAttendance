@@ -1,15 +1,15 @@
 <?php
 session_start();
-include '../LayoutPages/navbar.php'; // Gọi file navbar
+$basePath = '../'; // Đường dẫn gốc
+include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../LayoutPages/navbar.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem class_id có được gửi qua URL hay không
 if (!isset($_GET['class_id'])) {
     echo 'Không tìm thấy thông tin lớp học.';
     exit;
 }
-
-// Kết nối đến cơ sở dữ liệu
-include '../Connect/connect.php';
 
 // Lấy class_id từ URL
 $class_id = $_GET['class_id'];
@@ -61,17 +61,28 @@ if (!$classData) {
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <!-- Card hiển thị thông tin lớp học -->
-        <div class="card classroom-card shadow-lg">
-            <div class="card-text">
-                <h2 data-bs-toggle="modal" data-bs-target="#classModal"><?php echo htmlspecialchars($classData['class_name']); ?></h2>
-                <hr></hr>
-                <h5 class=""><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
-                <h5 class=""><?php echo htmlspecialchars($classData['course_name']); ?></h5>
+<div class="container mt-5">
+    <!-- Card hiển thị thông tin lớp học -->
+    <div class="card classroom-card shadow-lg">
+        <div class="card-body">
+            <h2 data-bs-toggle="modal" data-bs-target="#classModal"><?php echo htmlspecialchars($classData['class_name']); ?></h2>
+            <hr>
+            <div class="d-flex justify-content-between align-items-end">
+                <div>
+                    <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
+                    <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
+                </div>
+                <a href="<?php echo $basePath; ?>Attendance/attendance.php?class_id=<?php echo $classData['class_id']; ?>" class="btn btn-secondary">
+                    Điểm danh
+                </a>
             </div>
         </div>
     </div>
+</div>
+
+
+
+
 
     <!-- Modal -->
     <div class="modal fade" id="classModal" tabindex="-1" aria-labelledby="classModalLabel" aria-hidden="true">
