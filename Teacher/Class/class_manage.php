@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../LayoutPages/navbar.php'; // Gọi file navbar.php để hiển thị thanh điều hướng
+include __DIR__ . '../Account/islogin.php';
 
 // Truy vấn danh sách học kỳ bằng thủ tục lưu trữ
 include '../Connect/connect.php';  // Đảm bảo kết nối cơ sở dữ liệu vẫn có sẵn

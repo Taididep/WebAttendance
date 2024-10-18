@@ -35,7 +35,7 @@ $stmt->closeCursor();
 <body>
 <div class="container mt-5">
     <h2>Chỉnh sửa thông tin cá nhân</h2>
-    <form id="editForm" method="POST" action="update_teacher.php">
+    <form id="editForm" method="POST" action="update_information.php">
         <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherData->teacher_id); ?>">
         <div class="mb-3">
             <label for="lastname" class="form-label">Họ</label>

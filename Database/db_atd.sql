@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 09, 2024 lúc 11:03 AM
+-- Thời gian đã tạo: Th10 18, 2024 lúc 01:20 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -26,7 +26,28 @@ DELIMITER $$
 -- Thủ tục
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
-    SELECT semester_id, semester_name FROM semesters;
+    SELECT semester_id, semester_name 
+    FROM semesters
+    ORDER BY semester_id DESC; -- Sắp xếp theo semester_id giảm dần
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassDetailsById` (IN `classId` CHAR(36))   BEGIN
+    SELECT 
+        c.class_id,
+        c.class_name,
+        s.semester_name,
+        co.course_name,
+        CONCAT(t.lastname, ' ', t.firstname) AS teacher_fullname
+    FROM 
+        classes c
+    JOIN 
+        semesters s ON c.semester_id = s.semester_id
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    JOIN 
+        teachers t ON c.teacher_id = t.teacher_id
+    WHERE 
+        c.class_id = classId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemester` (IN `semester_id` INT)   BEGIN
@@ -59,6 +80,35 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_u
 END$$
 
 DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `attendances`
+--
+
+CREATE TABLE `attendances` (
+  `attendance_id` int(11) NOT NULL,
+  `schedule_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `status` enum('Present','Absent','Late') NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `attendance_reports`
+--
+
+CREATE TABLE `attendance_reports` (
+  `report_id` int(11) NOT NULL,
+  `class_id` char(36) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `total_present` int(11) DEFAULT 0,
+  `total_absent` int(11) DEFAULT 0,
+  `total_late` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -410,6 +460,22 @@ INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 --
 
 --
+-- Chỉ mục cho bảng `attendances`
+--
+ALTER TABLE `attendances`
+  ADD PRIMARY KEY (`attendance_id`),
+  ADD UNIQUE KEY `unique_attendance` (`schedule_id`,`student_id`),
+  ADD KEY `fk_student_id` (`student_id`);
+
+--
+-- Chỉ mục cho bảng `attendance_reports`
+--
+ALTER TABLE `attendance_reports`
+  ADD PRIMARY KEY (`report_id`),
+  ADD KEY `fk_attendance_report_class_id` (`class_id`),
+  ADD KEY `fk_attendance_report_student_id` (`student_id`);
+
+--
 -- Chỉ mục cho bảng `classes`
 --
 ALTER TABLE `classes`
@@ -489,6 +555,18 @@ ALTER TABLE `user_roles`
 --
 
 --
+-- AUTO_INCREMENT cho bảng `attendances`
+--
+ALTER TABLE `attendances`
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `attendance_reports`
+--
+ALTER TABLE `attendance_reports`
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT cho bảng `courses`
 --
 ALTER TABLE `courses`
@@ -539,6 +617,20 @@ ALTER TABLE `users`
 --
 -- Các ràng buộc cho các bảng đã đổ
 --
+
+--
+-- Các ràng buộc cho bảng `attendances`
+--
+ALTER TABLE `attendances`
+  ADD CONSTRAINT `fk_schedule_id` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`schedule_id`),
+  ADD CONSTRAINT `fk_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`);
+
+--
+-- Các ràng buộc cho bảng `attendance_reports`
+--
+ALTER TABLE `attendance_reports`
+  ADD CONSTRAINT `fk_attendance_report_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`),
+  ADD CONSTRAINT `fk_attendance_report_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`);
 
 --
 -- Các ràng buộc cho bảng `classes`
