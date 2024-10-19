@@ -72,7 +72,7 @@ if (!$classData) {
                     <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
                     <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
                 </div>
-                <a href="<?php echo $basePath; ?>Attendance/attendance.php?class_id=<?php echo $classData['class_id']; ?>" class="btn btn-secondary">
+                <a href="<?php echo $basePath; ?>Attendance/attendance_view.php?class_id=<?php echo $classData['class_id']; ?>" class="btn btn-secondary">
                     Điểm danh
                 </a>
             </div>
