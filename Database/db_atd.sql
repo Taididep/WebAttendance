@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 18, 2024 lúc 01:20 PM
+-- Thời gian đã tạo: Th10 19, 2024 lúc 08:16 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -29,6 +29,19 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
     SELECT semester_id, semester_name 
     FROM semesters
     ORDER BY semester_id DESC; -- Sắp xếp theo semester_id giảm dần
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByClassId` (IN `class_id` INT)   BEGIN
+    SELECT sch.date, a.student_id, a.status 
+    FROM schedules sch
+    LEFT JOIN attendances a ON sch.schedule_id = a.schedule_id
+    WHERE sch.class_id = class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByScheduleId` (IN `scheduleId` INT)   BEGIN
+    SELECT student_id, status
+    FROM attendances
+    WHERE schedule_id = scheduleId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassDetailsById` (IN `classId` CHAR(36))   BEGIN
@@ -65,6 +78,22 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemester` (IN `semester
     WHERE c.semester_id = semester_id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetDistinctDatesByClassId` (IN `class_id` INT)   BEGIN
+    SELECT DISTINCT date FROM schedules WHERE class_id = class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesByClassId` (IN `class_id` INT)   BEGIN
+    SELECT schedule_id, date FROM schedules WHERE class_id = class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassId` (IN `class_id` INT)   BEGIN
+    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday, c.class_name 
+    FROM students s
+    JOIN class_students cs ON s.student_id = cs.student_id
+    JOIN classes c ON cs.class_id = c.class_id
+    WHERE c.class_id = class_id;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_param` INT)   BEGIN
     SELECT lastname, firstname 
     FROM teachers 
@@ -91,9 +120,95 @@ CREATE TABLE `attendances` (
   `attendance_id` int(11) NOT NULL,
   `schedule_id` int(11) NOT NULL,
   `student_id` int(11) NOT NULL,
-  `status` enum('Present','Absent','Late') NOT NULL,
+  `status` tinyint(1) NOT NULL COMMENT '0: Absent, 1: Present, 2: Late',
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `attendances`
+--
+
+INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status`, `updated_at`) VALUES
+(1, 1, 2001210224, 1, '2024-10-19 16:51:51'),
+(2, 2, 2001210224, 0, '2024-10-19 16:44:17'),
+(3, 3, 2001210224, 0, '2024-10-19 13:49:04'),
+(4, 4, 2001210224, 0, '2024-10-19 13:49:04'),
+(5, 5, 2001210224, 0, '2024-10-19 13:49:04'),
+(6, 6, 2001210224, 0, '2024-10-19 13:49:04'),
+(7, 7, 2001210224, 0, '2024-10-19 13:49:04'),
+(8, 8, 2001210224, 0, '2024-10-19 13:49:04'),
+(9, 9, 2001210224, 0, '2024-10-19 13:49:04'),
+(10, 10, 2001210224, 0, '2024-10-19 13:49:04'),
+(11, 1, 2001211785, 1, '2024-10-19 16:51:51'),
+(12, 2, 2001211785, 0, '2024-10-19 16:44:17'),
+(13, 3, 2001211785, 0, '2024-10-19 13:49:04'),
+(14, 4, 2001211785, 0, '2024-10-19 13:49:04'),
+(15, 5, 2001211785, 0, '2024-10-19 13:49:04'),
+(16, 6, 2001211785, 0, '2024-10-19 13:49:04'),
+(17, 7, 2001211785, 0, '2024-10-19 13:49:04'),
+(18, 8, 2001211785, 0, '2024-10-19 13:49:04'),
+(19, 9, 2001211785, 0, '2024-10-19 13:49:04'),
+(20, 10, 2001211785, 0, '2024-10-19 13:49:04'),
+(21, 1, 2001212345, 1, '2024-10-19 17:06:06'),
+(22, 2, 2001212345, 0, '2024-10-19 16:44:17'),
+(23, 3, 2001212345, 0, '2024-10-19 13:49:04'),
+(24, 4, 2001212345, 0, '2024-10-19 13:49:04'),
+(25, 5, 2001212345, 0, '2024-10-19 13:49:04'),
+(26, 6, 2001212345, 0, '2024-10-19 13:49:04'),
+(27, 7, 2001212345, 0, '2024-10-19 13:49:04'),
+(28, 8, 2001212345, 0, '2024-10-19 13:49:04'),
+(29, 9, 2001212345, 0, '2024-10-19 13:49:05'),
+(30, 10, 2001212345, 0, '2024-10-19 13:49:05'),
+(31, 1, 2001213456, 0, '2024-10-19 16:44:17'),
+(32, 2, 2001213456, 0, '2024-10-19 16:44:17'),
+(33, 3, 2001213456, 0, '2024-10-19 13:49:05'),
+(34, 4, 2001213456, 0, '2024-10-19 13:49:05'),
+(35, 5, 2001213456, 0, '2024-10-19 13:49:05'),
+(36, 6, 2001213456, 0, '2024-10-19 13:49:05'),
+(37, 7, 2001213456, 0, '2024-10-19 13:49:05'),
+(38, 8, 2001213456, 0, '2024-10-19 13:49:05'),
+(39, 9, 2001213456, 0, '2024-10-19 13:49:05'),
+(40, 10, 2001213456, 0, '2024-10-19 13:49:05'),
+(41, 1, 2001214567, 0, '2024-10-19 16:44:17'),
+(42, 2, 2001214567, 0, '2024-10-19 16:44:17'),
+(43, 3, 2001214567, 0, '2024-10-19 13:49:05'),
+(44, 4, 2001214567, 0, '2024-10-19 13:49:05'),
+(45, 5, 2001214567, 0, '2024-10-19 13:49:05'),
+(46, 6, 2001214567, 0, '2024-10-19 13:49:05'),
+(47, 7, 2001214567, 0, '2024-10-19 13:49:05'),
+(48, 8, 2001214567, 0, '2024-10-19 13:49:05'),
+(49, 9, 2001214567, 0, '2024-10-19 13:49:05'),
+(50, 10, 2001214567, 0, '2024-10-19 13:49:05'),
+(51, 1, 2001215678, 0, '2024-10-19 16:44:17'),
+(52, 2, 2001215678, 0, '2024-10-19 16:44:18'),
+(53, 3, 2001215678, 0, '2024-10-19 13:49:05'),
+(54, 4, 2001215678, 0, '2024-10-19 13:49:05'),
+(55, 5, 2001215678, 0, '2024-10-19 13:49:05'),
+(56, 6, 2001215678, 0, '2024-10-19 13:49:05'),
+(57, 7, 2001215678, 0, '2024-10-19 13:49:05'),
+(58, 8, 2001215678, 0, '2024-10-19 13:49:05'),
+(59, 9, 2001215678, 0, '2024-10-19 13:49:05'),
+(60, 10, 2001215678, 0, '2024-10-19 13:49:05'),
+(61, 1, 2001216114, 0, '2024-10-19 16:44:18'),
+(62, 2, 2001216114, 0, '2024-10-19 16:44:18'),
+(63, 3, 2001216114, 0, '2024-10-19 13:49:05'),
+(64, 4, 2001216114, 0, '2024-10-19 13:49:05'),
+(65, 5, 2001216114, 0, '2024-10-19 13:49:05'),
+(66, 6, 2001216114, 0, '2024-10-19 13:49:05'),
+(67, 7, 2001216114, 0, '2024-10-19 13:49:06'),
+(68, 8, 2001216114, 0, '2024-10-19 13:49:06'),
+(69, 9, 2001216114, 0, '2024-10-19 13:49:06'),
+(70, 10, 2001216114, 0, '2024-10-19 13:49:06'),
+(71, 1, 2001217890, 0, '2024-10-19 16:44:18'),
+(72, 2, 2001217890, 0, '2024-10-19 16:44:18'),
+(73, 3, 2001217890, 0, '2024-10-19 13:49:06'),
+(74, 4, 2001217890, 0, '2024-10-19 13:49:06'),
+(75, 5, 2001217890, 0, '2024-10-19 13:49:06'),
+(76, 6, 2001217890, 0, '2024-10-19 13:49:06'),
+(77, 7, 2001217890, 0, '2024-10-19 13:49:06'),
+(78, 8, 2001217890, 0, '2024-10-19 13:49:06'),
+(79, 9, 2001217890, 0, '2024-10-19 13:49:06'),
+(80, 10, 2001217890, 0, '2024-10-19 13:49:06');
 
 -- --------------------------------------------------------
 
@@ -138,7 +253,6 @@ INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `te
 --
 
 CREATE TABLE `class_students` (
-  `stt` int(5) NOT NULL,
   `class_id` char(36) NOT NULL,
   `student_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -147,15 +261,15 @@ CREATE TABLE `class_students` (
 -- Đang đổ dữ liệu cho bảng `class_students`
 --
 
-INSERT INTO `class_students` (`stt`, `class_id`, `student_id`) VALUES
-(2, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001210224),
-(3, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001211785),
-(4, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001212345),
-(5, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001213456),
-(6, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001214567),
-(7, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001215678),
-(1, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001216114),
-(8, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001217890);
+INSERT INTO `class_students` (`class_id`, `student_id`) VALUES
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001210224),
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001211785),
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001212345),
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001213456),
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001214567),
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001215678),
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001216114),
+('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001217890);
 
 -- --------------------------------------------------------
 
@@ -282,7 +396,15 @@ CREATE TABLE `schedules` (
 
 INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_time`) VALUES
 (1, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-10-07', 1, 3),
-(2, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-10-14', 4, 6);
+(2, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-10-14', 1, 3),
+(3, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-10-21', 1, 3),
+(4, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-10-28', 1, 3),
+(5, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-11-04', 1, 3),
+(6, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-11-11', 1, 3),
+(7, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-11-18', 1, 3),
+(8, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-11-25', 1, 3),
+(9, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-12-02', 1, 3),
+(10, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-12-09', 1, 3);
 
 -- --------------------------------------------------------
 
@@ -558,7 +680,7 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT cho bảng `attendance_reports`
@@ -588,7 +710,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT cho bảng `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT cho bảng `semesters`
