@@ -41,6 +41,9 @@ if (!isset($_SESSION['user_id'])) {
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo $basePath; ?>Class/class_manage.php">Lớp Học</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?php echo $basePath; ?>Class/class_manage.php">Lịch học</a>
+                </li>
             </ul>
 
             <ul class="navbar-nav ms-auto">
