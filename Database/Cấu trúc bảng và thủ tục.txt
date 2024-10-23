@@ -298,13 +298,13 @@ END //
 DELIMITER ;
 
 -- Thủ tục lấy tên giảng viên trong teacher.php
-DELIMITER
+DELIMITER //
 CREATE PROCEDURE GetTeacherInfo(IN teacher_id_param INT)
 BEGIN
     SELECT lastname, firstname 
     FROM teachers 
     WHERE teacher_id = teacher_id_param;
-END
+END //
 DELIMITER ;
 
 -- Thủ tục lấy tất cả học kỳ trong teacher.php
@@ -324,11 +324,13 @@ CREATE PROCEDURE GetClassesBySemester(IN semester_id INT)
 BEGIN
     SELECT 
         c.class_id, 
-        c.class_name, 
+        c.class_name
+    FROM classes c
     JOIN semesters s ON c.semester_id = s.semester_id
     JOIN teachers t ON c.teacher_id = t.teacher_id
     WHERE c.semester_id = semester_id;
 END //
+DELIMITER ;
 
 
 
@@ -359,63 +361,111 @@ END //
 -- Thủ Tục Lấy Thông Tin Sinh Viên Trong Lớp -- (attendance_view.php)
 DELIMITER //
 
-CREATE PROCEDURE GetStudentsByClassId(IN class_id INT)
+CREATE PROCEDURE GetStudentsByClassId(IN classId CHAR(36))
 BEGIN
-    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday, c.class_name 
+    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday, c.class_name
     FROM students s
     JOIN class_students cs ON s.student_id = cs.student_id
     JOIN classes c ON cs.class_id = c.class_id
-    WHERE c.class_id = class_id;
+    WHERE cs.class_id = classId;
 END //
 
 DELIMITER ;
+
+
 
 
 -- Thủ Tục Lấy Thông Tin Điểm Danh (attendance_view.php)
-DELIMITER //
+DELIMITER $$
 
-CREATE PROCEDURE GetAttendanceByClassId(IN class_id INT)
+CREATE PROCEDURE GetAttendanceByClassId(IN classId CHAR(36))
 BEGIN
     SELECT sch.date, a.student_id, a.status 
     FROM schedules sch
-    LEFT JOIN attendances a ON sch.schedule_id = a.schedule_id
-    WHERE sch.class_id = class_id;
-END //
+    LEFT JOIN attendances a ON sch.schedule_id = a.schedule_id 
+        AND a.student_id IN (SELECT student_id FROM class_students WHERE class_id = classId)
+    WHERE sch.class_id = classId;
+END $$
 
 DELIMITER ;
+
 
 -- Thủ Tục Lấy Danh Sách Ngày Điểm Danh
 DELIMITER //
 
-CREATE PROCEDURE GetDistinctDatesByClassId(IN class_id INT)
+CREATE PROCEDURE GetDistinctDatesByClassId(IN classId CHAR(36))
 BEGIN
-    SELECT DISTINCT date FROM schedules WHERE class_id = class_id;
+    SELECT DISTINCT date
+    FROM schedules
+    WHERE class_id = classId;
 END //
 
 DELIMITER ;
+
 
 
 -- Thủ Tục Lấy Thông Tin Lịch Học
 DELIMITER //
 
-CREATE PROCEDURE GetSchedulesByClassId(IN class_id INT)
+CREATE PROCEDURE GetSchedulesByClassId(IN classId VARCHAR(36))
 BEGIN
-    SELECT schedule_id, date FROM schedules WHERE class_id = class_id;
+    SELECT schedule_id, date 
+    FROM schedules 
+    WHERE class_id = class_id;  
 END //
 
 DELIMITER ;
 
 
+
+
+
 -- Thủ Tục Lấy Thông Tin Điểm Danh
 DELIMITER $$
 
-CREATE PROCEDURE GetAttendanceByScheduleId(IN scheduleId INT)
+CREATE PROCEDURE GetAttendanceByScheduleId(IN scheduleId INT, IN class_id CHAR(36))
 BEGIN
-    SELECT student_id, status
-    FROM attendances
-    WHERE schedule_id = scheduleId;
+    SELECT a.student_id, a.status
+    FROM attendances a
+    JOIN schedules s ON a.schedule_id = s.schedule_id
+    WHERE a.schedule_id = scheduleId AND s.class_id = class_id;
 END $$
 
 DELIMITER ;
+
+
+
+
+-- Thủ tục cập nhật hoặc thêm mới điểm danh(process_attendance)
+DELIMITER $$
+
+CREATE PROCEDURE UpdateOrInsertAttendance(
+    IN p_schedule_id INT,
+    IN p_student_id INT,
+    IN p_status INT
+)
+BEGIN
+    DECLARE attendanceExists INT;
+    
+    -- Kiểm tra xem điểm danh đã tồn tại hay chưa
+    SELECT COUNT(*) INTO attendanceExists
+    FROM attendances
+    WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+    
+    IF attendanceExists > 0 THEN
+        -- Nếu đã tồn tại, cập nhật trạng thái
+        UPDATE attendances
+        SET status = p_status
+        WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+    ELSE
+        -- Nếu chưa tồn tại, thêm mới
+        INSERT INTO attendances (schedule_id, student_id, status)
+        VALUES (p_schedule_id, p_student_id, p_status);
+    END IF;
+END$$
+
+DELIMITER ;
+
+
 
 

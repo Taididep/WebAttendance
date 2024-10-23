@@ -14,7 +14,7 @@ if (!isset($_GET['class_id'])) {
 // Lấy class_id từ URL
 $class_id = $_GET['class_id'];
 
-// Lấy thông tin sinh viên trong lớp
+// Lấy thông tin sinh viên trong lớp theo class_id
 $sqlStudents = "CALL GetStudentsByClassId(?)";
 $stmtStudents = $conn->prepare($sqlStudents);
 $stmtStudents->execute([$class_id]);
@@ -27,6 +27,13 @@ $stmtAttendance = $conn->prepare($sqlAttendance);
 $stmtAttendance->execute([$class_id]);
 $attendanceData = $stmtAttendance->fetchAll(PDO::FETCH_ASSOC);
 $stmtAttendance->closeCursor(); // Đóng con trỏ
+
+
+// // In ra các lịch học để kiểm tra
+// print_r($attendanceData);
+// // Kiểm tra giá trị của class_id
+// echo "Class ID: " . htmlspecialchars($class_id);
+
 
 // Chuyển đổi dữ liệu điểm danh thành mảng để dễ truy xuất
 $attendanceMap = [];
@@ -55,12 +62,15 @@ $stmtDates->closeCursor(); // Đóng con trỏ
 </head>
 <style>
     .table td {
-        height: 60px; /* Thay đổi chiều rộng theo nhu cầu */
+        height: 60px;
+        vertical-align: middle;
+        /* text-align: center; */
     }
 </style>
 <body>
 <div class="container-fluid mt-5">
-    <h2>Điểm danh lớp: <?php echo htmlspecialchars($students[0]['class_name']); ?></h2>
+    <h2 class="text-center">Danh sách điểm danh: <?php echo htmlspecialchars($students[0]['class_name']); ?></h2>
+    <hr>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -70,8 +80,10 @@ $stmtDates->closeCursor(); // Đóng con trỏ
                 <th>Tên</th>
                 <th>Lớp</th>
                 <th>Ngày sinh</th>
-                <?php foreach ($dates as $date): ?>
-                    <th><?php echo date('d/m', strtotime($date)); ?></th>
+                <?php foreach ($dates as $index => $date): ?>
+                    <th data-bs-toggle="tooltip" title="<?php echo date('d/m/Y', strtotime($date)); ?>">
+                        <?php echo 'Buổi ' . ($index + 1); ?>
+                    </th>
                 <?php endforeach; ?>
             </tr>
         </thead>
@@ -85,7 +97,7 @@ $stmtDates->closeCursor(); // Đóng con trỏ
                     <td><?php echo htmlspecialchars($student['class']); ?></td> <!-- Hiển thị lớp -->
                     <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
                     <?php foreach ($dates as $date): ?>
-                        <td style="width: 80px; ">
+                        <td style="width: 80px; padding-left: 21px; padding-bottom: 10px;">
                             <?php
                             // Hiển thị trạng thái điểm danh (1: Có mặt, 0: Vắng)
                             if (isset($attendanceMap[$student['student_id']][$date])) {
@@ -111,5 +123,12 @@ $stmtDates->closeCursor(); // Đóng con trỏ
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Khởi tạo tooltip
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
 </body>
 </html>

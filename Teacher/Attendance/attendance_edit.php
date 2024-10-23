@@ -28,6 +28,14 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
 
+
+
+// // In ra các lịch học để kiểm tra
+// print_r($schedules);
+// // Kiểm tra giá trị của class_id
+// echo "Class ID: " . htmlspecialchars($class_id);
+
+
 // Lấy thông tin điểm danh
 $attendanceMap = [];
 foreach ($schedules as $schedule) {
@@ -35,10 +43,9 @@ foreach ($schedules as $schedule) {
     $date = $schedule['date'];
 
     // Lấy trạng thái điểm danh cho lịch học
-    $sqlAttendance = "CALL GetAttendanceByScheduleId(?)";
-    // $sqlAttendance = "SELECT student_id, status FROM attendances WHERE schedule_id = ?";
+    $sqlAttendance = "CALL GetAttendanceByScheduleId(?, ?)";
     $stmtAttendance = $conn->prepare($sqlAttendance);
-    $stmtAttendance->execute([$schedule_id]);
+    $stmtAttendance->execute([$schedule_id, $class_id]); // Cung cấp cả hai tham số
     $attendanceData = $stmtAttendance->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($attendanceData as $record) {
@@ -61,12 +68,16 @@ foreach ($schedules as $schedule) {
 </head>
 <style>
     .table td {
-        height: 60px; /* Thay đổi chiều rộng theo nhu cầu */
+        height: 60px;
+        vertical-align: middle;
+        /* text-align: center; */
     }
 </style>
 <body>
 <div class="container-fluid mt-5">
-    <h2>Chỉnh sửa điểm danh lớp: <?php echo htmlspecialchars($students[0]['class']); ?></h2>
+    <h2 class="text-center">Danh sách điểm danh: <?php echo htmlspecialchars($students[0]['class_name']); ?></h2>
+
+    <hr>
     <form method="POST" action="process_attendance.php">
         <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
         <table class="table table-striped">
@@ -78,8 +89,10 @@ foreach ($schedules as $schedule) {
                     <th>Tên</th>
                     <th>Lớp</th>
                     <th>Ngày sinh</th>
-                    <?php foreach ($schedules as $schedule): ?>
-                        <th><?php echo date('d/m', strtotime($schedule['date'])); ?></th>
+                    <?php foreach ($schedules as $index => $schedule): ?>
+                        <th data-bs-toggle="tooltip" title="<?php echo date('d/m/Y', strtotime($schedule['date'])); ?>">
+                            <?php echo 'Buổi ' . ($index + 1); ?>
+                        </th>
                     <?php endforeach; ?>
                 </tr>
             </thead>
@@ -93,7 +106,7 @@ foreach ($schedules as $schedule) {
                         <td><?php echo htmlspecialchars($student['class']); ?></td>
                         <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
                         <?php foreach ($schedules as $schedule): ?>
-                            <td style="width: 80px; ">
+                            <td style="width: 80px; text-align: center;">
                                 <input type="number" min="0" max="1" step="1"
                                     name="attendance[<?php echo htmlspecialchars($student['student_id']); ?>][<?php echo htmlspecialchars($schedule['schedule_id']); ?>]"
                                     value="<?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) ? htmlspecialchars($attendanceMap[$student['student_id']][$schedule['date']]) : 0; ?>"
@@ -113,5 +126,12 @@ foreach ($schedules as $schedule) {
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Khởi tạo tooltip
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
 </body>
 </html>

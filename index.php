@@ -15,6 +15,6 @@ include __DIR__ . '/Account/islogin.php';
 
 </head>
 <body>
-   
+        <a href="../login_view.php">Vào trang đăng nhập</a>
 </body>
 </html>

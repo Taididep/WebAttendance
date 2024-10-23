@@ -6,11 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Nhập / Đăng Ký</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../Css/style.css">
+    <style>
+        .input-group-text {
+            cursor: pointer;
+        }
+    </style>
+
 </head>
 
 <body>
-    <div class="container">
+    <div class="container" style="margin-top: 100px;">
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card">

@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($stmt->execute([$className, $courseId, $semesterId, $teacherId])) {
             $successMessage = "Tạo lớp học thành công!";
-            header("url={$basePath}Class/class_manage.php"); // Thay đổi đường dẫn trang danh sách lớp học nếu cần
+            header("Location: {$basePath}Class/class_manage.php");
             exit();
         } else {
             $errorMessage = "Có lỗi xảy ra, vui lòng thử lại.";
@@ -82,6 +82,7 @@ $semesters = $conn->query("SELECT * FROM semesters")->fetchAll(PDO::FETCH_ASSOC)
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Tạo lớp học</button>
+        <a href="<?php echo $basePath; ?>Class/class_manage.php" class="btn btn-secondary">Quay lại</a>
     </form>
 </div>
 

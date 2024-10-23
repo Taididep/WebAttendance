@@ -1,5 +1,7 @@
 <?php
 session_start();
+include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem người dùng đã đăng nhập chưa
 if (!isset($_SESSION['user_id'])) {
@@ -9,9 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 
 // Lấy thông tin người dùng từ phiên
 $user_id = $_SESSION['user_id'];
-
-// Kết nối đến cơ sở dữ liệu để lấy thông tin chi tiết về giáo viên
-include '../../Connect/connect.php';
 
 // Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
 $sql = "SELECT * FROM teachers WHERE teacher_id = ?";
@@ -29,44 +28,78 @@ $stmt->closeCursor();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh sửa thông tin cá nhân</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Thông tin cá nhân</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .card-body {
+            background: #fff;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .info-value {
+            margin-left: 10px;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">
-    <h2>Chỉnh sửa thông tin cá nhân</h2>
-    <form id="editForm" method="POST" action="update_teacher.php">
-        <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherData->teacher_id); ?>">
-        <div class="mb-3">
-            <label for="lastname" class="form-label">Họ</label>
-            <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($teacherData->lastname); ?>" required>
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-person-circle"></i> Thông tin cá nhân
         </div>
-        <div class="mb-3">
-            <label for="firstname" class="form-label">Tên</label>
-            <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($teacherData->firstname); ?>" required>
+        <div class="card-body">
+            <div class="mb-3">
+                <span class="info-label">Họ:</span>
+                <span class="info-value"><?php echo htmlspecialchars($teacherData->lastname); ?></span>
+            </div>
+            <div class="mb-3">
+                <span class="info-label">Tên:</span>
+                <span class="info-value"><?php echo htmlspecialchars($teacherData->firstname); ?></span>
+            </div>
+            <div class="mb-3">
+                <span class="info-label">Ngày sinh:</span>
+                <span class="info-value"><?php echo htmlspecialchars($teacherData->birthday); ?></span>
+            </div>
+            <div class="mb-3">
+                <span class="info-label">Giới tính:</span>
+                <span class="info-value"><?php echo htmlspecialchars($teacherData->gender); ?></span>
+            </div>
+            <div class="mb-3">
+                <span class="info-label">Email:</span>
+                <span class="info-value"><?php echo htmlspecialchars($teacherData->email); ?></span>
+            </div>
+            <div class="mb-3">
+                <span class="info-label">Điện thoại:</span>
+                <span class="info-value"><?php echo htmlspecialchars($teacherData->phone); ?></span>
+            </div>
+            <a href="information_edit.php" class="btn btn-primary">Chỉnh sửa</a>
+            <a href="../index.php" class="btn btn-primary">Quay lại</a>
         </div>
-        <div class="mb-3">
-            <label for="birthday" class="form-label">Ngày sinh</label>
-            <input type="date" class="form-control" id="birthday" name="birthday" value="<?php echo htmlspecialchars($teacherData->birthday); ?>" required>
-        </div>
-        <div class="mb-3">
-            <label for="gender" class="form-label">Giới tính</label>
-            <select class="form-select" id="gender" name="gender" required>
-                <option value="Nam" <?php echo ($teacherData->gender == 'Nam') ? 'selected' : ''; ?>>Nam</option>
-                <option value="Nữ" <?php echo ($teacherData->gender == 'Nữ') ? 'selected' : ''; ?>>Nữ</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($teacherData->email); ?>" required>
-        </div>
-        <div class="mb-3">
-            <label for="phone" class="form-label">Điện thoại</label>
-            <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($teacherData->phone); ?>" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Cập nhật</button>
-    </form>
+        
+    </div>
+
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

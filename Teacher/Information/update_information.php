@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../Connect/connect.php';
+include __DIR__ . '/../../Connect/connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $teacher_id = $_POST['teacher_id'];
@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute([$lastname, $firstname, $birthday, $gender, $email, $phone, $teacher_id]);
     
     // Chuyển hướng về trang giáo viên sau khi cập nhật
-    header("Location: teacher.php");
+    header("Location: information.php");
     exit;
 }
 ?>
