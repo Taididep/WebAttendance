@@ -6,7 +6,7 @@ include __DIR__ . '/../../LayoutPages/navbar.php';
 include __DIR__ . '/../../Account/islogin.php';
 
 // Lấy user_id (teacher_id) từ session
-$teacherId = $_SESSION['user_id']; // Giả sử bạn đã lưu user_id vào session sau khi đăng nhập
+$teacherId = $_SESSION['user_id'];
 
 // Kiểm tra nếu người dùng đã gửi form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -50,6 +50,7 @@ $semesters = $conn->query("SELECT * FROM semesters")->fetchAll(PDO::FETCH_ASSOC)
 <body>
 <div class="container mt-5">
     <h2>Tạo lớp học mới</h2>
+    <hr>
     <?php if (isset($errorMessage)): ?>
         <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
     <?php elseif (isset($successMessage)): ?>
