@@ -96,6 +96,46 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                 }
             });
         });
+
+        // Tải danh sách lớp học
+        function loadClasses(semesterId) {
+            $.ajax({
+                url: 'get_classes.php', // URL đến file xử lý AJAX
+                type: 'POST',
+                data: { semester_id: semesterId },
+                success: function(data) {
+                    $('#classList').html(data); // Hiển thị danh sách lớp học
+                },
+                error: function() {
+                    $('#classList').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải dữ liệu.</div>');
+                }
+            });
+        }
+
+        // Xử lý sự kiện nhấp vào nút "Hủy"
+        $(document).on('click', '.btn-cancel', function(e) {
+            e.preventDefault(); // Ngăn chặn hành động mặc định
+            var classId = $(this).data('class-id'); // Lấy class_id từ thuộc tính data
+            if (confirm('Bạn có chắc chắn muốn hủy lớp này không?')) {
+                $.ajax({
+                    url: 'delete_class.php', // Đường dẫn đến tệp xử lý
+                    type: 'POST',
+                    data: { class_id: classId }, // Gửi class_id
+                    success: function(response) {
+                        console.log(response); // Ghi lại phản hồi để kiểm tra
+                        if (response.success) {
+                            alert('Lớp đã được xóa thành công.');
+                            $('#semester').change(); // Gọi lại sự kiện change để tải lại lớp
+                        } else {
+                            alert('Có lỗi xảy ra: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Có lỗi xảy ra khi xóa lớp.');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
