@@ -363,10 +363,9 @@ DELIMITER //
 
 CREATE PROCEDURE GetStudentsByClassId(IN classId CHAR(36))
 BEGIN
-    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday, c.class_name
+    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday
     FROM students s
     JOIN class_students cs ON s.student_id = cs.student_id
-    JOIN classes c ON cs.class_id = c.class_id
     WHERE cs.class_id = classId;
 END //
 

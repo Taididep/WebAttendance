@@ -25,7 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($stmt->execute([$className, $courseId, $semesterId, $teacherId])) {
             $successMessage = "Tạo lớp học thành công!";
-            header("Location: {$basePath}Class/class_manage.php");
+
+            // Lấy class_id mới nhất từ bảng classes (theo thứ tự tăng dần)
+            $sqlGetLastClassId = "SELECT class_id FROM classes ORDER BY class_id ASC LIMIT 1"; // Lấy ID nhỏ nhất
+            $stmtGetClassId = $conn->prepare($sqlGetLastClassId);
+            $stmtGetClassId->execute();
+            $classId = $stmtGetClassId->fetchColumn(); // Lấy giá trị class_id
+
+            // Chuyển hướng đến trang thêm lịch học với class_id
+            header("Location: {$basePath}Class/add_schedule.php?class_id={$classId}");
             exit();
         } else {
             $errorMessage = "Có lỗi xảy ra, vui lòng thử lại.";
@@ -35,7 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Lấy danh sách khóa học và học kỳ để hiển thị trong form
 $courses = $conn->query("SELECT * FROM courses")->fetchAll(PDO::FETCH_ASSOC);
-$semesters = $conn->query("SELECT * FROM semesters")->fetchAll(PDO::FETCH_ASSOC);
+
+$sql_semesters = "CALL GetAllSemesters()";
+$stmt_semesters = $conn->prepare($sql_semesters);
+$stmt_semesters->execute();
+$semesters = $stmt_semesters->fetchAll(PDO::FETCH_ASSOC);
+$stmt_semesters->closeCursor();
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +78,7 @@ $semesters = $conn->query("SELECT * FROM semesters")->fetchAll(PDO::FETCH_ASSOC)
         <div class="mb-3">
             <label for="course_id" class="form-label">Khóa học</label>
             <select class="form-select" id="course_id" name="course_id" required>
-                <option value="">Chọn khóa học</option>
+                <option value="" disabled selected>Chọn khóa học</option>
                 <?php foreach ($courses as $course): ?>
                     <option value="<?php echo $course['course_id']; ?>">
                         <?php echo htmlspecialchars($course['course_id']) . ' - ' . htmlspecialchars($course['course_name']); ?>
@@ -76,7 +89,7 @@ $semesters = $conn->query("SELECT * FROM semesters")->fetchAll(PDO::FETCH_ASSOC)
         <div class="mb-3">
             <label for="semester_id" class="form-label">Học kỳ</label>
             <select class="form-select" id="semester_id" name="semester_id" required>
-                <option value="">Chọn học kỳ</option>
+                <option value="" disabled selected>Chọn học kỳ</option>
                 <?php foreach ($semesters as $semester): ?>
                     <option value="<?php echo $semester['semester_id']; ?>"><?php echo htmlspecialchars($semester['semester_name']); ?></option>
                 <?php endforeach; ?>

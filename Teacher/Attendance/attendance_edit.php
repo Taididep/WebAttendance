@@ -5,6 +5,7 @@ include __DIR__ . '/../../Connect/connect.php';
 include __DIR__ . '/../../LayoutPages/navbar.php';
 include __DIR__ . '/../../Account/islogin.php';
 
+
 // Kiểm tra xem class_id có được gửi qua URL hay không
 if (!isset($_GET['class_id'])) {
     echo 'Không tìm thấy thông tin lớp học.';
@@ -20,6 +21,11 @@ $stmtStudents = $conn->prepare($sqlStudents);
 $stmtStudents->execute([$class_id]);
 $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 $stmtStudents->closeCursor(); // Đóng con trỏ
+
+
+if (empty($students)) {
+    echo '<div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>';
+}
 
 // Lấy thông tin lịch học
 $sqlSchedules = "CALL GetSchedulesByClassId(?)";
@@ -75,8 +81,7 @@ foreach ($schedules as $schedule) {
 </style>
 <body>
 <div class="container-fluid mt-5">
-    <h2 class="text-center">Danh sách điểm danh: <?php echo htmlspecialchars($students[0]['class_name']); ?></h2>
-
+    <h2 class="text-center">Danh sách điểm danh</h2>
     <hr>
     <form method="POST" action="process_attendance.php">
         <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">

@@ -14,12 +14,21 @@ if (!isset($_GET['class_id'])) {
 // Lấy class_id từ URL
 $class_id = $_GET['class_id'];
 
+// Lấy thông tin lớp học để lấy class_name
+$sqlClassName = "SELECT class_name FROM classes WHERE class_id = ?";
+$stmtClassName = $conn->prepare($sqlClassName);
+$stmtClassName->execute([$class_id]);
+$class = $stmtClassName->fetch(PDO::FETCH_ASSOC);
+$stmtClassName->closeCursor(); // Đóng con trỏ
+
+
 // Lấy thông tin sinh viên trong lớp theo class_id
 $sqlStudents = "CALL GetStudentsByClassId(?)";
 $stmtStudents = $conn->prepare($sqlStudents);
 $stmtStudents->execute([$class_id]);
 $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 $stmtStudents->closeCursor(); // Đóng con trỏ
+
 
 // Lấy thông tin điểm danh
 $sqlAttendance = "CALL GetAttendanceByClassId(?)";
@@ -69,49 +78,54 @@ $stmtDates->closeCursor(); // Đóng con trỏ
 </style>
 <body>
 <div class="container-fluid mt-5">
-    <h2 class="text-center">Danh sách điểm danh: <?php echo htmlspecialchars($students[0]['class_name']); ?></h2>
+    <h2 class="text-center">Danh sách điểm danh</h2>
     <hr>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>STT</th>
-                <th>MSSV</th>
-                <th>Họ</th>
-                <th>Tên</th>
-                <th>Lớp</th>
-                <th>Ngày sinh</th>
-                <?php foreach ($dates as $index => $date): ?>
-                    <th data-bs-toggle="tooltip" title="<?php echo date('d/m/Y', strtotime($date)); ?>">
-                        <?php echo 'Buổi ' . ($index + 1); ?>
-                    </th>
-                <?php endforeach; ?>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($students as $index => $student): ?>
+    <!-- Kiểm tra xem có sinh viên nào trong lớp hay không -->
+    <?php if (empty($students)): ?>
+        <div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>
+    <?php else: ?>
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td><?php echo $index + 1; ?></td>
-                    <td><?php echo htmlspecialchars($student['student_id']); ?></td>
-                    <td><?php echo htmlspecialchars($student['lastname']); ?></td>
-                    <td><?php echo htmlspecialchars($student['firstname']); ?></td>
-                    <td><?php echo htmlspecialchars($student['class']); ?></td> <!-- Hiển thị lớp -->
-                    <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
-                    <?php foreach ($dates as $date): ?>
-                        <td style="width: 80px; padding-left: 21px; padding-bottom: 10px;">
-                            <?php
-                            // Hiển thị trạng thái điểm danh (1: Có mặt, 0: Vắng)
-                            if (isset($attendanceMap[$student['student_id']][$date])) {
-                                echo $attendanceMap[$student['student_id']][$date] === '1' ? '1' : '0';
-                            } else {
-                                echo '0'; // Nếu chưa có điểm danh thì coi là vắng
-                            }
-                            ?>
-                        </td>
+                    <th>STT</th>
+                    <th>MSSV</th>
+                    <th>Họ</th>
+                    <th>Tên</th>
+                    <th>Lớp</th>
+                    <th>Ngày sinh</th>
+                    <?php foreach ($dates as $index => $date): ?>
+                        <th data-bs-toggle="tooltip" title="<?php echo date('d/m/Y', strtotime($date)); ?>">
+                            <?php echo 'Buổi ' . ($index + 1); ?>
+                        </th>
                     <?php endforeach; ?>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($students as $index => $student): ?>
+                    <tr>
+                        <td><?php echo $index + 1; ?></td>
+                        <td><?php echo htmlspecialchars($student['student_id']); ?></td>
+                        <td><?php echo htmlspecialchars($student['lastname']); ?></td>
+                        <td><?php echo htmlspecialchars($student['firstname']); ?></td>
+                        <td><?php echo htmlspecialchars($student['class']); ?></td>
+                        <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
+                        <?php foreach ($dates as $date): ?>
+                            <td style="width: 80px; padding-left: 21px; padding-bottom: 10px;">
+                                <?php
+                                // Hiển thị trạng thái điểm danh (1: Có mặt, 0: Vắng)
+                                if (isset($attendanceMap[$student['student_id']][$date])) {
+                                    echo $attendanceMap[$student['student_id']][$date] === '1' ? '1' : '0';
+                                } else {
+                                    echo '0'; // Nếu chưa có điểm danh thì coi là vắng
+                                }
+                                ?>
+                            </td>
+                        <?php endforeach; ?>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
 
     <!-- Nút điểm danh -->
     <div class="text-end mt-3">
@@ -120,6 +134,7 @@ $stmtDates->closeCursor(); // Đóng con trỏ
         </a>
     </div>
 </div>
+
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

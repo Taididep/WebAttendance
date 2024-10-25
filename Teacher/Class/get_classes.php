@@ -1,13 +1,5 @@
 <?php
 session_start();
-
-// Kiểm tra xem người dùng đã đăng nhập chưa
-if (!isset($_SESSION['user_id'])) {
-    echo 'Unauthorized access.';
-    exit;
-}
-
-// Kết nối đến cơ sở dữ liệu
 include __DIR__ . '/../../Connect/connect.php';
 
 // Kiểm tra xem có gửi semester_id không
@@ -43,7 +35,7 @@ if (isset($_POST['semester_id'])) {
             echo '</button>';
             echo '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $counter . '">';
             echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy lớp học này không?\')">Hủy lớp</a></li>';
-            echo '<li><a class="dropdown-item" href="edit_class.php?class_id=' . htmlspecialchars($class['class_id']) . '">Cập nhật lớp</a></li>';
+            echo '<li><a class="dropdown-item" href="class_edit.php?class_id=' . htmlspecialchars($class['class_id']) . '">Cập nhật lớp</a></li>';
             echo '</ul>';
             echo '</div>';
             echo '</td>';

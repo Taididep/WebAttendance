@@ -20,11 +20,11 @@ $attendanceData = $_POST['attendance'];
 // Lặp qua từng sinh viên và trạng thái điểm danh
 foreach ($attendanceData as $student_id => $schedules) {
     foreach ($schedules as $schedule_id => $status) {
-        // Kiểm tra nếu status không phải là 0 hoặc 1 thì bỏ qua
-        if ($status != 0 && $status != 1) {
+        // Kiểm tra nếu status không phải là 0 hoặc 1 hoặc 2 thì bỏ qua
+        if ($status != 0 && $status != 1 && $status != 2) {
             continue;
         }
-
+        
         // Kiểm tra xem điểm danh đã tồn tại hay chưa
         $sqlCheck = "SELECT * FROM attendances WHERE schedule_id = ? AND student_id = ?";
         $stmtCheck = $conn->prepare($sqlCheck);
@@ -46,5 +46,5 @@ foreach ($attendanceData as $student_id => $schedules) {
 }
 
 // Chuyển hướng về trang điểm danh với thông báo thành công
-header("Location: attendance_view.php?class_id=" . urlencode($class_id) . "&message=Thay đổi đã được lưu thành công.");
+header("Location: class_detail.php?class_id=" . urlencode($class_id) . "&message=Thay đổi đã được lưu thành công.");
 exit;
