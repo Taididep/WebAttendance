@@ -5,11 +5,6 @@ include __DIR__ . '/../../Connect/connect.php';
 include __DIR__ . '/../../LayoutPages/navbar.php';
 include __DIR__ . '/../../Account/islogin.php';
 
-// Lấy năm hiện tại
-$currentYear = date("Y");
-$nextYear = $currentYear + 1;
-$semesterLabel = "{$currentYear}-{$nextYear}"; // Tạo chuỗi học kỳ
-
 // Kiểm tra nếu người dùng đã gửi form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Lấy thông tin từ form
@@ -26,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql = "INSERT INTO semesters (semester_name, start_date, end_date, is_active) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
 
-        if ($stmt->execute([$semesterLabel, $startDate, $endDate, $isActive])) {
+        if ($stmt->execute([$semesterName, $startDate, $endDate, $isActive])) {
             $successMessage = "Thêm học kỳ thành công!";
             header("Location: {$basePath}Class/class_manage.php"); // Chuyển hướng sau khi thêm thành công
             exit();
@@ -58,11 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="mb-3">
             <label for="semester_name" class="form-label">Tên học kỳ</label>
             <input type="text" class="form-control" id="semester_name" name="semester_name" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="semester_label" class="form-label">Học kỳ</label>
-            <input type="text" class="form-control" id="semester_label" value="<?php echo $semesterLabel; ?>" readonly>
         </div>
 
         <div class="mb-3">

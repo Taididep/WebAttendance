@@ -23,21 +23,22 @@
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
-                    echo json_encode(['success' => true]);
+                    header("Location: class_manage.php?message=Lớp đã được xóa thành công.");
+                    exit;
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Lớp không tồn tại hoặc đã được xóa.']);
+                    header("Location: class_manage.php?message=Lớp không tồn tại hoặc đã được xóa.");
+                    exit;
                 }
-                exit;
             } catch (Exception $e) {
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                header("Location: class_manage.php?message=" . urlencode($e->getMessage()));
                 exit;
             }
         } else {
-            echo json_encode(['success' => false, 'message' => 'ID lớp không hợp lệ.']);
+            header("Location: class_manage.php?message=ID lớp không hợp lệ.");
             exit;
         }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Yêu cầu không hợp lệ.']);
+        header("Location: class_manage.php?message=Yêu cầu không hợp lệ.");
         exit;
     }
 ?>
