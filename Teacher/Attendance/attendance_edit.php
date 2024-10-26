@@ -1,10 +1,6 @@
 <?php
-session_start();
 $basePath = '../'; // Đường dẫn gốc
 include __DIR__ . '/../../Connect/connect.php';
-include __DIR__ . '/../../LayoutPages/navbar.php';
-include __DIR__ . '/../../Account/islogin.php';
-
 
 // Kiểm tra xem class_id có được gửi qua URL hay không
 if (!isset($_GET['class_id'])) {
@@ -22,25 +18,12 @@ $stmtStudents->execute([$class_id]);
 $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 $stmtStudents->closeCursor(); // Đóng con trỏ
 
-
-if (empty($students)) {
-    echo '<div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>';
-}
-
 // Lấy thông tin lịch học
 $sqlSchedules = "CALL GetSchedulesByClassId(?)";
 $stmtSchedules = $conn->prepare($sqlSchedules);
 $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
-
-
-
-// // In ra các lịch học để kiểm tra
-// print_r($schedules);
-// // Kiểm tra giá trị của class_id
-// echo "Class ID: " . htmlspecialchars($class_id);
-
 
 // Lấy thông tin điểm danh
 $attendanceMap = [];
@@ -62,81 +45,87 @@ foreach ($schedules as $schedule) {
 
 ?>
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh sửa điểm danh</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
-</head>
-<style>
-    .table td {
-        height: 60px;
-        vertical-align: middle;
-        /* text-align: center; */
-    }
-</style>
-<body>
-<div class="container-fluid mt-5">
-    <h2 class="text-center">Danh sách điểm danh</h2>
-    <hr>
-    <form method="POST" action="process_attendance.php">
-        <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>MSSV</th>
-                    <th>Họ</th>
-                    <th>Tên</th>
-                    <th>Lớp</th>
-                    <th>Ngày sinh</th>
-                    <?php foreach ($schedules as $index => $schedule): ?>
-                        <th data-bs-toggle="tooltip" title="<?php echo date('d/m/Y', strtotime($schedule['date'])); ?>">
-                            <?php echo 'Buổi ' . ($index + 1); ?>
-                        </th>
-                    <?php endforeach; ?>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($students as $index => $student): ?>
-                    <tr>
-                        <td><?php echo $index + 1; ?></td>
-                        <td><?php echo htmlspecialchars($student['student_id']); ?></td>
-                        <td><?php echo htmlspecialchars($student['lastname']); ?></td>
-                        <td><?php echo htmlspecialchars($student['firstname']); ?></td>
-                        <td><?php echo htmlspecialchars($student['class']); ?></td>
-                        <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
-                        <?php foreach ($schedules as $schedule): ?>
-                            <td style="width: 80px; text-align: center;">
-                                <input type="number" min="0" max="1" step="1"
-                                    name="attendance[<?php echo htmlspecialchars($student['student_id']); ?>][<?php echo htmlspecialchars($schedule['schedule_id']); ?>]"
-                                    value="<?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) ? htmlspecialchars($attendanceMap[$student['student_id']][$schedule['date']]) : 0; ?>"
-                                    class="form-control" style="width: 50px;">
-                            </td>
+<div id="attendanceTable">
+    <?php if (empty($students)): ?>
+        <div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>
+    <?php else: ?>
+        <form method="POST" action="../Attendance/process_attendance.php">
+            <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+            <div class="table-responsive">
+                <table class="table table-striped" style="table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">STT</th>
+                            <th style="width: 150px;">Mã sinh viên</th>
+                            <th style="width: 200px;">Họ đệm</th>
+                            <th style="width: 150px;">Tên</th>
+                            <th style="width: 150px;">Lớp</th>
+                            <th style="width: 150px;">Ngày sinh</th>
+                            <?php foreach ($schedules as $index => $schedule): ?>
+                                <th style="width: 100px; text-align: center; cursor: pointer;" class="edit-column" data-index="<?php echo $index; ?>">
+                                    <span><?php echo 'Buổi ' . ($schedule['schedule_id']); ?></span><br>
+                                    <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
+                                </th>
+                            <?php endforeach; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($students as $index => $student): ?>
+                            <tr>
+                                <td style="padding-left: 17px;"><?php echo $index + 1; ?></td>
+                                <td><?php echo htmlspecialchars($student['student_id']); ?></td>
+                                <td><?php echo htmlspecialchars($student['lastname']); ?></td>
+                                <td><?php echo htmlspecialchars($student['firstname']); ?></td>
+                                <td><?php echo htmlspecialchars($student['class']); ?></td>
+                                <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
+                                <?php foreach ($schedules as $schedule): ?>
+                                    <td class="edit-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
+                                        <input type="number" min="0" max="2" step="1"
+                                            name="attendance[<?php echo htmlspecialchars($student['student_id']); ?>][<?php echo htmlspecialchars($schedule['schedule_id']); ?>]"
+                                            value="<?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) ? htmlspecialchars($attendanceMap[$student['student_id']][$schedule['date']]) : 0; ?>"
+                                            class="form-control" style="width: 60px; display: inline-block;">
+                                    </td>
+                                <?php endforeach; ?>
+                            </tr>
                         <?php endforeach; ?>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <div class="text-end mt-3">
-            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-        </div>
-    </form>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button id="showAllBtnEdit" class="btn btn-dark mt-3">Hiện tất cả</button>
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+            </div>
+        </form>
+    <?php endif; ?>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    // Khởi tạo tooltip
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+    // Đăng ký sự kiện cho các tiêu đề cột buổi trong bảng chỉnh sửa
+    document.querySelectorAll('#attendanceEdit .edit-column').forEach(column => {
+        column.addEventListener('click', function () {
+            const index = this.dataset.index;
+            const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${parseInt(index) + 7})`);
+
+            cells.forEach(cell => {
+                cell.style.display = cell.style.display === 'none' ? '' : 'none';
+            });
+
+            // Ẩn tiêu đề cột
+            this.style.display = this.style.display === 'none' ? '' : 'none';
+        });
+    });
+
+    // Nút hiện tất cả cho bảng chỉnh sửa
+    document.getElementById('showAllBtnEdit').addEventListener('click', function (event) {
+        event.preventDefault(); // Ngăn chặn hành vi mặc định
+        document.querySelectorAll('#attendanceEdit .edit-data').forEach(cell => {
+            cell.style.display = '';
+        });
+        document.querySelectorAll('#attendanceEdit .edit-column').forEach(column => {
+            column.style.display = '';
+        });
+    });
 </script>
-</body>
-</html>

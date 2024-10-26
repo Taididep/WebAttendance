@@ -14,9 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $className = $_POST['class_name'];
     $courseId = $_POST['course_id'];
     $semesterId = $_POST['semester_id'];
+    $startDate = $_POST['start_date']; // Lấy ngày bắt đầu học
+    $startPeriod = $_POST['start_period']; // Lấy tiết bắt đầu
+    $endPeriod = $_POST['end_period']; // Lấy tiết kết thúc
+    $createSchedule = isset($_POST['create_schedule']) ? true : false; // Check if the schedule checkbox is checked
 
     // Kiểm tra thông tin
-    if (empty($className) || empty($courseId) || empty($semesterId)) {
+    if (empty($className) || empty($courseId) || empty($semesterId) || empty($startDate) || empty($startPeriod) || empty($endPeriod)) {
         $errorMessage = "Vui lòng điền đầy đủ thông tin.";
     } else {
         // Thực hiện truy vấn để thêm lớp học
@@ -26,15 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute([$className, $courseId, $semesterId, $teacherId])) {
             $successMessage = "Tạo lớp học thành công!";
 
-            // Lấy class_id mới nhất từ bảng classes (theo thứ tự tăng dần)
-            $sqlGetLastClassId = "SELECT class_id FROM classes ORDER BY class_id ASC LIMIT 1"; // Lấy ID nhỏ nhất
-            $stmtGetClassId = $conn->prepare($sqlGetLastClassId);
-            $stmtGetClassId->execute();
+            // Lấy class_id vừa mới được thêm vào bằng cách truy vấn
+            $sqlGetClassId = "SELECT class_id FROM classes WHERE class_name = ? AND teacher_id = ? ORDER BY class_id DESC LIMIT 1";
+            $stmtGetClassId = $conn->prepare($sqlGetClassId);
+            $stmtGetClassId->execute([$className, $teacherId]);
             $classId = $stmtGetClassId->fetchColumn(); // Lấy giá trị class_id
 
-            // Chuyển hướng đến trang thêm lịch học với class_id
-            header("Location: {$basePath}Class/add_schedule.php?class_id={$classId}");
-            exit();
+            // Kiểm tra nếu muốn tạo lịch học
+            if ($createSchedule) {
+                // Chuyển hướng đến trang thêm lịch học với class_id, ngày bắt đầu, tiết bắt đầu và tiết kết thúc
+                header("Location: {$basePath}Class/add_schedule.php?class_id={$classId}&start_date={$startDate}&start_period={$startPeriod}&end_period={$endPeriod}");
+                exit();
+            }
         } else {
             $errorMessage = "Có lỗi xảy ra, vui lòng thử lại.";
         }
@@ -95,6 +102,28 @@ $stmt_semesters->closeCursor();
                 <?php endforeach; ?>
             </select>
         </div>
+
+        <div class="mb-3">
+            <label for="start_date" class="form-label">Ngày bắt đầu học</label>
+            <input type="date" class="form-control" id="start_date" name="start_date" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="start_period" class="form-label">Tiết bắt đầu</label>
+            <input type="number" class="form-control" id="start_period" name="start_period" required min="1" max="17" placeholder="Nhập tiết bắt đầu">
+        </div>
+
+        <div class="mb-3">
+            <label for="end_period" class="form-label">Tiết kết thúc</label>
+            <input type="number" class="form-control" id="end_period" name="end_period" required min="1" max="17" placeholder="Nhập tiết kết thúc">
+        </div>
+
+        <!-- Checkbox for creating a schedule -->
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="create_schedule" name="create_schedule">
+            <label class="form-check-label" for="create_schedule">Tạo lịch học ngay sau khi tạo lớp</label>
+        </div>
+
         <button type="submit" class="btn btn-primary">Tạo lớp học</button>
         <a href="<?php echo $basePath; ?>Class/class_manage.php" class="btn btn-secondary">Quay lại</a>
     </form>

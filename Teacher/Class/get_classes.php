@@ -18,14 +18,14 @@ if (isset($_POST['semester_id'])) {
         // echo '<h4>Danh sách lớp học</h4>';
         // echo '<hr></hr>';
         echo '<table class="table table-striped">';
-        echo '<thead><tr"><th>Số thứ tự</th><th>Tên lớp học</th><th>Tên môn học</th><th style="width: 1%;"></th></tr></thead>';
+        echo '<thead><tr"><th>STT</th><th>Tên lớp học</th><th>Tên môn học</th><th style="width: 1%;"></th></tr></thead>';
         echo '<tbody>';
         
         // Khởi tạo biến đếm cho số thứ tự
         $counter = 1;
         foreach ($classes as $class) {
             echo '<tr>';
-            echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
+            echo '<td style="padding-left: 17px;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
             echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
             echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
             echo '<td>';
@@ -36,6 +36,7 @@ if (isset($_POST['semester_id'])) {
             echo '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $counter . '">';
             echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy lớp học này không?\')">Hủy lớp</a></li>';
             echo '<li><a class="dropdown-item" href="class_edit.php?class_id=' . htmlspecialchars($class['class_id']) . '">Cập nhật lớp</a></li>';
+            echo '<li><a class="dropdown-item" href="class_edit.php?class_id=' . htmlspecialchars($class['class_id']) . '">Xem lịch học</a></li>';
             echo '</ul>';
             echo '</div>';
             echo '</td>';

@@ -112,12 +112,12 @@ if (!$classData) {
         </div>
         <hr>
         
-        <div id="attendanceList">
-            <?php include 'attendance_list.php'; ?> <!-- Gọi file danh sách điểm danh -->
+        <div id="attendanceList" style="display: ;">
+            <?php include '../Attendance/attendance_list.php'; ?> <!-- Gọi file danh sách điểm danh -->
         </div>
 
         <div id="attendanceEdit" style="display: none;">
-            <?php include 'attendance_edit.php'; ?> <!-- Gọi file chỉnh sửa danh sách điểm danh -->
+            <?php include '../Attendance/attendance_edit.php'; ?> <!-- Gọi file chỉnh sửa danh sách điểm danh -->
         </div>
     </div>
 
@@ -144,7 +144,6 @@ if (!$classData) {
             toggleTableBtn.style.display = isEditVisible ? 'inline-block' : 'none'; // Hiện nút ẩn danh sách khi trở về danh sách
             editModeBtn.textContent = isEditVisible ? 'Chế độ chỉnh sửa' : 'Quay lại danh sách';
         }
-
         toggleTableBtn.addEventListener('click', toggleAttendanceList);
         editModeBtn.addEventListener('click', toggleEditMode);
     </script>
