@@ -6,13 +6,13 @@ include __DIR__ . '/../../Account/islogin.php';
 // Lấy thông tin người dùng từ phiên
 $user_id = $_SESSION['user_id'];
 
-// Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
-$sql = "SELECT * FROM teachers WHERE teacher_id = ?";
+// Chuẩn bị câu lệnh SQL để lấy thông tin sinh viên
+$sql = "SELECT * FROM students WHERE student_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$user_id]);
 
-// Lấy kết quả thông tin giáo viên
-$teacherData = $stmt->fetchObject();
+// Lấy kết quả thông tin sinh viên
+$studentData = $stmt->fetchObject();
 $stmt->closeCursor();
 
 ?>
@@ -67,43 +67,43 @@ $stmt->closeCursor();
         </div>
         <div class="card-body">
             <form id="editForm" method="POST" action="update_information.php">
-                <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherData->teacher_id); ?>">
+                <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($studentData->student_id); ?>">
                 
                 <div class="mb-3">
                     <label for="lastname" class="form-label">Họ</label>
-                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($teacherData->lastname); ?>" required>
+                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($studentData->lastname); ?>" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="firstname" class="form-label">Tên</label>
-                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($teacherData->firstname); ?>" required>
+                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($studentData->firstname); ?>" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="birthday" class="form-label">Ngày sinh</label>
-                    <input type="date" class="form-control" id="birthday" name="birthday" value="<?php echo htmlspecialchars($teacherData->birthday); ?>" required>
+                    <input type="date" class="form-control" id="birthday" name="birthday" value="<?php echo htmlspecialchars($studentData->birthday); ?>" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="gender" class="form-label">Giới tính</label>
                     <select class="form-select" id="gender" name="gender" required>
-                        <option value="Nam" <?php echo ($teacherData->gender == 'Nam') ? 'selected' : ''; ?>>Nam</option>
-                        <option value="Nữ" <?php echo ($teacherData->gender == 'Nữ') ? 'selected' : ''; ?>>Nữ</option>
+                        <option value="Nam" <?php echo ($studentData->gender == 'Nam') ? 'selected' : ''; ?>>Nam</option>
+                        <option value="Nữ" <?php echo ($studentData->gender == 'Nữ') ? 'selected' : ''; ?>>Nữ</option>
                     </select>
                 </div>
                 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($teacherData->email); ?>" required>
+                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($studentData->email); ?>" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="phone" class="form-label">Điện thoại</label>
-                    <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($teacherData->phone); ?>" required>
+                    <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($studentData->phone); ?>" required>
                 </div>
                 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i>Cập nhật</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Cập nhật</button>
                     <a href="information.php" class="btn btn-primary">Quay lại</a>
                 </div>
             </form>

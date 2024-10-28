@@ -6,13 +6,13 @@ include __DIR__ . '/../../Account/islogin.php';
 // Lấy thông tin người dùng từ phiên
 $user_id = $_SESSION['user_id'];
 
-// Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
-$sql = "SELECT * FROM teachers WHERE teacher_id = ?";
+// Chuẩn bị câu lệnh SQL để lấy thông tin sinh viên
+$sql = "SELECT * FROM students WHERE student_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$user_id]);
 
-// Lấy kết quả thông tin giáo viên
-$teacherData = $stmt->fetchObject();
+// Lấy kết quả thông tin sinh viên
+$studentData = $stmt->fetchObject();
 $stmt->closeCursor();
 
 ?>
@@ -64,27 +64,27 @@ $stmt->closeCursor();
         <div class="card-body">
             <div class="mb-3">
                 <span class="info-label">Họ:</span>
-                <span class="info-value"><?php echo htmlspecialchars($teacherData->lastname); ?></span>
+                <span class="info-value"><?php echo htmlspecialchars($studentData->lastname); ?></span>
             </div>
             <div class="mb-3">
                 <span class="info-label">Tên:</span>
-                <span class="info-value"><?php echo htmlspecialchars($teacherData->firstname); ?></span>
+                <span class="info-value"><?php echo htmlspecialchars($studentData->firstname); ?></span>
             </div>
             <div class="mb-3">
                 <span class="info-label">Ngày sinh:</span>
-                <span class="info-value"><?php echo htmlspecialchars($teacherData->birthday); ?></span>
+                <span class="info-value"><?php echo htmlspecialchars($studentData->birthday); ?></span>
             </div>
             <div class="mb-3">
                 <span class="info-label">Giới tính:</span>
-                <span class="info-value"><?php echo htmlspecialchars($teacherData->gender); ?></span>
+                <span class="info-value"><?php echo htmlspecialchars($studentData->gender); ?></span>
             </div>
             <div class="mb-3">
                 <span class="info-label">Email:</span>
-                <span class="info-value"><?php echo htmlspecialchars($teacherData->email); ?></span>
+                <span class="info-value"><?php echo htmlspecialchars($studentData->email); ?></span>
             </div>
             <div class="mb-3">
                 <span class="info-label">Điện thoại:</span>
-                <span class="info-value"><?php echo htmlspecialchars($teacherData->phone); ?></span>
+                <span class="info-value"><?php echo htmlspecialchars($studentData->phone); ?></span>
             </div>
             <a href="information_edit.php" class="btn btn-primary">Chỉnh sửa</a>
             <a href="../index.php" class="btn btn-primary">Quay lại</a>

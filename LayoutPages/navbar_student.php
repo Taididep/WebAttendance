@@ -40,7 +40,7 @@ if (!isset($_SESSION['user_id'])) {
                     <a class="nav-link" href="<?php echo $basePath; ?>Class/class_manage.php">Lớp Học</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo $basePath; ?>Schedule/schedule_view.php">Lịch học</a>
+                    <a class="nav-link" href="<?php echo $basePath; ?>Schedule/schedule_view.php">Lịch Học</a>
                 </li>
             </ul>
 
