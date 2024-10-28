@@ -7,21 +7,19 @@ if (!isset($_SESSION['user_id'])) {
     // Lấy thông tin người dùng từ phiên
     $user_id = $_SESSION['user_id'];
 
-    // include __DIR__ . '/../Connect/connect.php';
-
-    // Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
-    $sql = "SELECT * FROM teachers WHERE teacher_id = ?";
+    // Chuẩn bị câu lệnh SQL để lấy thông tin sinh viên
+    $sql = "SELECT * FROM students WHERE student_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$user_id]);
 
-    // Lấy kết quả thông tin giáo viên
-    $teacherData = $stmt->fetchObject();
+    // Lấy kết quả thông tin sinh viên
+    $studentData = $stmt->fetchObject();
     $stmt->closeCursor();  // Đóng kết quả của truy vấn trước
 
-    if ($teacherData) {
-        $greeting = htmlspecialchars($teacherData->lastname) . " " . htmlspecialchars($teacherData->firstname);
+    if ($studentData) {
+        $greeting = htmlspecialchars($studentData->lastname) . " " . htmlspecialchars($studentData->firstname);
     } else {
-        $greeting = "Thông tin giáo viên không tìm thấy.";
+        $greeting = "Thông tin sinh viên không tìm thấy.";
     }
 }
 ?>
@@ -42,14 +40,14 @@ if (!isset($_SESSION['user_id'])) {
                     <a class="nav-link" href="<?php echo $basePath; ?>Class/class_manage.php">Lớp Học</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo $basePath; ?>Schedule/schedule_view.php">Lịch Dạy</a>
+                    <a class="nav-link" href="<?php echo $basePath; ?>Schedule/schedule_view.php">Lịch Học</a>
                 </li>
             </ul>
 
             <ul class="navbar-nav ms-auto">
                 <!-- Nút Thêm Lớp -->
                 <li class="nav-item">
-                    <a class="btn btn-success" href="<?php echo $basePath; ?>Class/class_create.php" style="margin-right: 10px;">Tạo lớp học</a>
+                    <a class="btn btn-success" href="<?php echo $basePath; ?>Class/class_create.php" style="margin-right: 10px;">Tham gia lớp học</a>
                 </li>
 
                 <?php if ($isLoggedIn): ?>

@@ -43,11 +43,11 @@ if ($userData === false) {
 
         // Chuyển hướng theo vai trò người dùng
         if ($userData->role_name == 'admin') {
-            $pageRedirect = '../Admin/admin.php';
+            $pageRedirect = '../Admin/index.php';
         } elseif ($userData->role_name == 'teacher') {
             $pageRedirect = '../Teacher/index.php';
         } elseif ($userData->role_name == 'student') {
-            $pageRedirect = '../Student/student.php';
+            $pageRedirect = '../Student/index.php';
         }
 
         header("Location: $pageRedirect");

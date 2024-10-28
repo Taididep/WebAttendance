@@ -2,7 +2,7 @@
 session_start();
 $basePath = '../'; // Đường dẫn gốc
 include __DIR__ . '/../../Connect/connect.php';
-include __DIR__ . '/../../LayoutPages/navbar.php';
+include __DIR__ . '/../../LayoutPages/navbar_student.php';
 include __DIR__ . '/../../Account/islogin.php';
 
 // Gọi thủ tục để lấy danh sách học kỳ
@@ -26,10 +26,10 @@ $startDate->modify('monday this week'); // Đặt lại ngày bắt đầu về 
 $endDate = clone $startDate;
 $endDate->modify('sunday this week'); // Đặt ngày kết thúc về Chủ Nhật
 
-// Lấy user_id của giáo viên từ session (giả sử đây là teacher_id)
-$teacher_id = $_SESSION['user_id'];
+// Lấy user_id của sinh viên từ session (giả sử đây là student_id)
+$student_id = $_SESSION['user_id'];
 
-// Truy vấn để lấy lịch học, thông tin lớp và môn học trong khoảng thời gian từ thứ Hai đến Chủ Nhật, và lọc theo học kỳ và teacher_id
+// Truy vấn để lấy lịch học, thông tin lớp và môn học trong khoảng thời gian từ thứ Hai đến Chủ Nhật, và lọc theo học kỳ và student_id
 $sql = "
     SELECT 
         c.class_name,
@@ -48,16 +48,18 @@ $sql = "
         classes c ON s.class_id = c.class_id
     JOIN 
         courses co ON c.course_id = co.course_id
+    JOIN 
+        class_students cs ON c.class_id = cs.class_id
     WHERE 
         s.date BETWEEN ? AND ?
         AND c.semester_id = ?
-        AND c.teacher_id = ? -- Thêm điều kiện lọc theo teacher_id
+        AND cs.student_id = ? -- Thêm điều kiện lọc theo student_id
     ORDER BY 
         s.date, c.class_name
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->execute([$startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $semesterId, $teacher_id]);
+$stmt->execute([$startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $semesterId, $student_id]);
 $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor(); // Đóng con trỏ
 
@@ -77,6 +79,7 @@ $previousWeek->modify('-1 week');
 $nextWeek = clone $startDate;
 $nextWeek->modify('+1 week');
 ?>
+
 
 
 <!DOCTYPE html>

@@ -3,12 +3,6 @@ session_start();
 include __DIR__ . '/../../Connect/connect.php';
 include __DIR__ . '/../../Account/islogin.php';
 
-// Kiểm tra xem người dùng đã đăng nhập chưa
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login_view.php");
-    exit;
-}
-
 // Lấy thông tin người dùng từ phiên
 $user_id = $_SESSION['user_id'];
 

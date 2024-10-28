@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Nhập / Đăng Ký</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <style>
         .input-group-text {
             cursor: pointer;
         }
     </style>
-
 </head>
 
 <body>
@@ -31,10 +31,17 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="password">Password:</label>
-                                    <input type="password" class="form-control" name="password" id="password" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="password" id="password" required>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="togglePassword">
+                                                <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-block">Đăng Nhập</button>
-                                <p class="form-toggle" id="toggle-to-register">Bạn chưa có tài khoản? Đăng ký</p>
+                                <p class="form-toggle text-center mt-3" id="toggle-to-register">Bạn chưa có tài khoản? Đăng ký</p>
                             </form>
                         </div>
 
@@ -50,7 +57,14 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="new_password">Password:</label>
-                                    <input type="password" class="form-control" name="password" id="new_password" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="password" id="new_password" required>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="toggleNewPassword">
+                                                <i class="bi bi-eye-slash" id="toggleNewPasswordIcon"></i>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="lastname">Họ:</label>
@@ -88,30 +102,10 @@
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-block">Đăng Ký</button>
-                                <p class="form-toggle" id="toggle-to-login">Bạn đã có tài khoản? Đăng nhập</p>
+                                <p class="form-toggle text-center mt-3" id="toggle-to-login">Bạn đã có tài khoản? Đăng nhập</p>
                             </form>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal thông báo -->
-    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <?php if (isset($_SESSION['success_message'])): ?>
-                        <?php echo $_SESSION['success_message']; ?>
-                        <?php unset($_SESSION['success_message']); // Xóa thông báo sau khi hiển thị ?>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -143,7 +137,40 @@
                 }, 2000); // Tự động tắt sau 2 giây
             <?php endif; ?>
         });
+
+        // Toggle password visibility for login form
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('togglePasswordIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('bi-eye-slash');
+                passwordIcon.classList.add('bi-eye');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('bi-eye');
+                passwordIcon.classList.add('bi-eye-slash');
+            }
+        });
+
+        // Toggle password visibility for register form
+        document.getElementById('toggleNewPassword').addEventListener('click', function () {
+            const newPasswordInput = document.getElementById('new_password');
+            const newPasswordIcon = document.getElementById('toggleNewPasswordIcon');
+
+            if (newPasswordInput.type === 'password') {
+                newPasswordInput.type = 'text';
+                newPasswordIcon.classList.remove('bi-eye-slash');
+                newPasswordIcon.classList.add('bi-eye');
+            } else {
+                newPasswordInput.type = 'password';
+                newPasswordIcon.classList.remove('bi-eye');
+                newPasswordIcon.classList.add('bi-eye-slash');
+            }
+        });
     </script>
+
 </body>
 
 </html>

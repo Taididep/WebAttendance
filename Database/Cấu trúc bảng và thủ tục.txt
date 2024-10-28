@@ -318,19 +318,21 @@ END //
 DELIMITER ;
 
 
--- Thủ tục lấy danh sach lớp theo học kỳ trong teacher.php(get_classes.php)
+-- Thủ tục lấy danh sach lớp theo học kỳ và giảng viên trong teacher.php(get_classes.php)
 DELIMITER //
-CREATE PROCEDURE GetClassesBySemester(IN semester_id INT)
+CREATE PROCEDURE GetClassesBySemesterAndTeacher(IN semester_id INT, IN teacher_id INT)
 BEGIN
     SELECT 
         c.class_id, 
-        c.class_name
+        c.class_name,
+        co.course_name
     FROM classes c
-    JOIN semesters s ON c.semester_id = s.semester_id
-    JOIN teachers t ON c.teacher_id = t.teacher_id
-    WHERE c.semester_id = semester_id;
+    JOIN courses co ON c.course_id = co.course_id
+    WHERE c.semester_id = semester_id AND c.teacher_id = teacher_id;
 END //
 DELIMITER ;
+
+
 
 
 
@@ -466,5 +468,22 @@ END$$
 DELIMITER ;
 
 
+-- Thủ tục lấy danh sach lớp theo học kỳ và sinh viên trong student.php(get_classes.php)
+DELIMITER //
+CREATE PROCEDURE GetClassesBySemesterAndStudent(IN semester_id INT, IN student_id INT)
+BEGIN
+    SELECT 
+        c.class_id, 
+        c.class_name,
+        co.course_name,
+        t.lastname,
+        t.firstname
+    FROM classes c
+    JOIN class_students cs ON c.class_id = cs.class_id
+    JOIN courses co ON c.course_id = co.course_id
+    JOIN teachers t ON c.teacher_id = t.teacher_id
+    WHERE c.semester_id = semester_id AND cs.student_id = student_id;
+END //
+DELIMITER ;
 
 
