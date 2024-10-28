@@ -12,7 +12,6 @@ if (!isset($_SESSION['user_id'])) {
 // Lấy thông tin người dùng từ phiên
 $user_id = $_SESSION['user_id'];
 
-
 // Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
 $sql = "SELECT * FROM teachers WHERE teacher_id = ?";
 $stmt = $conn->prepare($sql);
@@ -21,7 +20,6 @@ $stmt->execute([$user_id]);
 // Lấy kết quả thông tin giáo viên
 $teacherData = $stmt->fetchObject();
 $stmt->closeCursor();
-
 ?>
 
 <!DOCTYPE html>
@@ -34,35 +32,86 @@ $stmt->closeCursor();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <style>
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            animation: backgroundAnimation 15s ease infinite;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
+        @keyframes backgroundAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .card {
             margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+            background: #ffffff;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
         .card-header {
-            background-color: #007bff;
+            background: linear-gradient(45deg, #007bff, #0056b3);
             color: #fff;
-            border-radius: 10px 10px 0 0;
-            font-size: 1.25rem;
+            border-radius: 15px 15px 0 0;
+            font-size: 1.8rem;
             font-weight: bold;
             text-align: center;
+            padding: 20px 0;
         }
+
         .card-body {
-            background: #fff;
-            padding: 20px;
+            padding: 30px;
         }
+
         .form-label {
             font-weight: bold;
         }
+
+        .form-control {
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
         .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
+            transition: background-color 0.3s, transform 0.3s;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 1.1rem;
         }
+
         .btn-primary:hover {
             background-color: #0056b3;
             border-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .icon {
+            margin-right: 5px;
+            color: #007bff;
+        }
+
+        .text-center a {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 576px) {
+            .card {
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
@@ -100,18 +149,18 @@ $stmt->closeCursor();
                 </div>
                 
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label"><i class="bi bi-envelope-fill icon"></i>Email</label>
                     <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($teacherData->email); ?>" required>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="phone" class="form-label">Điện thoại</label>
+                    <label for="phone" class="form-label"><i class="bi bi-telephone-fill icon"></i>Điện thoại</label>
                     <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($teacherData->phone); ?>" required>
                 </div>
                 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i>Cập nhật</button>
-                    <a href="information.php" class="btn btn-primary">Quay lại</a>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Cập nhật</button>
+                    <a href="information.php" class="btn btn-secondary">Quay lại</a>
                 </div>
             </form>
         </div>

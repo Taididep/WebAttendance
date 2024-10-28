@@ -79,6 +79,9 @@ if (!$classData) {
                         <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
                         <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
                     </div>
+                    <a href="class_QR.php?class_id=<?php echo urlencode($classData['class_id']); ?>" class="btn btn-primary">
+                        <i class="bi bi-qr-code"></i> Mã QR
+                    </a>
                 </div>
             </div>
         </div>
@@ -148,7 +151,6 @@ if (!$classData) {
         toggleTableBtn.addEventListener('click', toggleAttendanceList);
         editModeBtn.addEventListener('click', toggleEditMode);
     </script>
-
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
