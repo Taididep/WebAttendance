@@ -1,79 +1,111 @@
-<?php  
-use PHPMailer\PHPMailer\PHPMailer;  
-use PHPMailer\PHPMailer\Exception;  
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\Exception.php';  
-require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\PHPMailer.php';  
-require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\SMTP.php';  
+require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\Exception.php';
+require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\PHPMailer.php';
+require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\SMTP.php';
 
-$mail = new PHPMailer(true);  
+// Kết nối tới CSDL
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "db_atd";
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra xem form đã được gửi hay chưa  
-if ($_SERVER["REQUEST_METHOD"] == "POST") {  
-    try {  
-        // Cấu hình server SMTP  
-        $mail->isSMTP();   
-        $mail->Host       = 'smtp.gmail.com';   
-        $mail->SMTPAuth   = true;   
-        $mail->Username   = 'thongnguyen@ittc.edu.vn'; // Địa chỉ Gmail của bạn   
-        $mail->Password   = 'xeiq offy nftu upep'; // Mật khẩu ứng dụng bạn đã tạo   
-        $mail->Port       = 587;   
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
+}
+
+// Lấy lịch học cho ngày mai
+$tomorrow = date("Y-m-d", strtotime('+1 day'));
+
+$sql = "SELECT students.email, students.firstname, schedules.date, schedules.start_time, schedules.end_time 
+        FROM students 
+        JOIN attendances ON students.student_id = attendances.student_id 
+        JOIN schedules ON schedules.schedule_id = attendances.schedule_id 
+        WHERE schedules.date = '$tomorrow'";
+
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // Duyệt qua từng sinh viên và gửi email nhắc nhở
+    while ($row = $result->fetch_assoc()) {
+        $email = $row['email'];
+        $firstname = $row['firstname'];
+        $date = $row['date'];
+        $start_time = $row['start_time'];
+        $end_time = $row['end_time'];
         
-        $mail->SMTPDebug = 0; // Thay đổi thành 2 nếu bạn muốn xem thông tin chi tiết về xác thực, 0 để ẩn thông tin  
-        // Thông tin người gửi  
-        $mail->setFrom('thongnguyen@ittc.edu.vn', 'Remind');  
-        
-        // Nhận thông tin người nhận từ form  
-        $recipientEmail = $_POST['recipient_email'];  
-        $mail->addAddress($recipientEmail); // Địa chỉ người nhận  
+        // Cấu hình và gửi email
+        $mail = new PHPMailer(true);
 
-        // Nội dung email  
-        $mail->isHTML(true);                                  
-        $mail->Subject = $_POST['subject']; // Tiêu đề từ form  
-        $mail->Body    = $_POST['body']; // Nội dung từ form  
-        $mail->AltBody = strip_tags($_POST['body']); // Phiên bản plain text của email  
+        try {
+            // Cấu hình server SMTP
+            $mail->isSMTP();
+            
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'thongnguyen@ittc.edu.vn';
+            $mail->Password = 'xeiq offy nftu upep';
+            $mail->Port = 587;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
-        // Gửi email  
-        if ($mail->send()) {  
-            echo '<div class="alert alert-success">Email đã được gửi thành công!</div>';  
-        } else {  
-            echo '<div class="alert alert-danger">Gửi email không thành công!</div>';  
-        }  
-    } catch (Exception $e) {  
-        echo '<div class="alert alert-danger">Tin nhắn không thể gửi. Lỗi Mailer: {$mail->ErrorInfo}</div>';  
-    }  
-}  
-?>  
+            // Người gửi
+            $mail->setFrom('thongnguyen@ittc.edu.vn', 'Remind');
 
-<!DOCTYPE html>  
-<html lang="vi">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Gửi Email Tự Động</title>  
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">  
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">  
-</head>  
-<body>  
-    <div class="container mt-5">  
-        <h2>Gửi Email Tự Động</h2>  
-        <form method="POST">  
-            <div class="mb-3">  
-                <label for="recipient_email" class="form-label">Email Người Nhận</label>  
-                <input type="email" class="form-control" id="recipient_email" name="recipient_email" required>  
-            </div>  
-            <div class="mb-3">  
-                <label for="subject" class="form-label">Tiêu Đề</label>  
-                <input type="text" class="form-control" id="subject" name="subject" required>  
-            </div>  
-            <div class="mb-3">  
-                <label for="body" class="form-label">Nội Dung</label>  
-                <textarea class="form-control" id="body" name="body" rows="4" required></textarea>  
-            </div>  
-            <button type="submit" class="btn btn-primary">Gửi Email</button>  
-        </form>  
-    </div>  
-</body>  
+            // Người nhận
+            $mail->addAddress($email, $firstname);
+
+            // Nội dung email
+            $mail->isHTML(true);
+            $mail->Subject = "Lịch học ngày mai";
+            $mail->Body = "<h3>Chào $firstname,</h3><p>Bạn có lịch học vào ngày mai ($date) từ $start_time đến $end_time.</p>";
+
+            // Gửi email
+            $mail->send();
+            echo "Đã gửi email cho $email<br>";
+
+            // // ***Người nhận - sử dụng giá trị cứng để test***
+            // $email = 'huuthong6363@gmail.com'; // Email của người nhận để test
+            // $firstname = 'Nguyễn Hữu Thông'; // Tên của người nhận để test
+            // $mail->addAddress($email, $firstname);
+
+            // // ***Nội dung email - sử dụng giá trị cứng để test***
+            // $date = '2024-10-24'; // Ngày cố định để test
+            // $start_time = '08:00'; // Thời gian bắt đầu cố định để test
+            // $end_time = '10:00'; // Thời gian kết thúc cố định để test
+
+            // // Nội dung email
+            // $mail->isHTML(true);
+            // $mail->Subject = "Lịch học ngày mai";
+            // $mail->Body = "<h3>Chào $firstname,</h3><p>Bạn có lịch học vào ngày mai ($date) từ $start_time đến $end_time.</p>";
+
+            // Gửi email
+            $mail->send();
+            echo "Đã gửi email cho $email<br>";
+        } catch (Exception $e) {
+            echo "Không thể gửi email: {$mail->ErrorInfo}";
+        }
+    }
+} else {
+    echo "Không có lịch học vào ngày mai.";
+}
+
+$conn->close();
+?>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+
+</head>
+<body>
+   <h1>Email</h1>
+</body>
 </html>
