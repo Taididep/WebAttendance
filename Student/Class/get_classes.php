@@ -22,7 +22,7 @@ if (isset($_POST['semester_id'])) {
             echo '<table class="table table-striped">';
             echo '<thead><tr"><th>STT</th><th>Tên lớp học</th><th>Tên môn học</th><th>Giáo viên</th><th style="width: 1%;"></th></tr></thead>';
             echo '<tbody>';
-                        
+
             // Khởi tạo biến đếm cho số thứ tự
             $counter = 1;
             foreach ($classes as $class) {
@@ -48,7 +48,7 @@ if (isset($_POST['semester_id'])) {
             }
             echo '</tbody></table>';
         } else {
-            echo '<div class="alert alert-warning">Không có lớp học nào trong học kỳ này.</div>';
+            echo '<div class="alert alert-warning">Chưa tham gia lớp học nào trong học kỳ này.</div>';
         }
     } else {
         echo '<div class="alert alert-danger">Không tìm thấy thông tin học sinh.</div>';
@@ -63,9 +63,12 @@ if (isset($_POST['semester_id'])) {
         background-color: #f0f8ff;
         cursor: pointer;
     }
+
     tbody .dropdown-toggle::after {
-        display: none; /* Ẩn mũi tên mặc định của Bootstrap */
+        display: none;
+        /* Ẩn mũi tên mặc định của Bootstrap */
     }
+
     thead tr {
         background-color: inherit;
         cursor: default;

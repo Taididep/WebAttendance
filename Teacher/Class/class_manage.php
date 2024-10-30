@@ -19,6 +19,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +28,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 </head>
+
 <body>
 
     <div class="container mt-4">
@@ -44,9 +46,9 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                         </option>
                     <?php endforeach; ?>
                 </select>
-            </div> 
+            </div>
             <a href="<?php echo $basePath; ?>Semester/semester_create.php" class="btn btn-success d-flex align-items-center" style="height: 100%;">
-                <i class="bi bi-plus-lg fs-5" ></i>
+                <i class="bi bi-plus-lg fs-5"></i>
             </a>
         </form>
 
@@ -54,7 +56,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
         <!-- Bảng lớp học -->
         <div id="classList" class="mt-4">
             <!-- Danh sách lớp sẽ được tải ở đây -->
-        </div> 
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -66,7 +68,9 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                 $.ajax({
                     url: 'get_classes.php', // URL đến file xử lý AJAX
                     type: 'POST',
-                    data: { semester_id: semesterId },
+                    data: {
+                        semester_id: semesterId
+                    },
                     success: function(data) {
                         $('#classList').html(data); // Hiển thị danh sách lớp học
                     },
@@ -83,7 +87,9 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                     $.ajax({
                         url: 'get_classes.php', // URL đến file xử lý AJAX
                         type: 'POST',
-                        data: { semester_id: semesterId },
+                        data: {
+                            semester_id: semesterId
+                        },
                         success: function(data) {
                             $('#classList').html(data); // Hiển thị danh sách lớp học
                         },
@@ -102,7 +108,9 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
             $.ajax({
                 url: 'get_classes.php', // URL đến file xử lý AJAX
                 type: 'POST',
-                data: { semester_id: semesterId },
+                data: {
+                    semester_id: semesterId
+                },
                 success: function(data) {
                     $('#classList').html(data); // Hiển thị danh sách lớp học
                 },
@@ -120,7 +128,9 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                 $.ajax({
                     url: 'delete_class.php', // Đường dẫn đến tệp xử lý
                     type: 'POST',
-                    data: { class_id: classId }, // Gửi class_id
+                    data: {
+                        class_id: classId
+                    }, // Gửi class_id
                     success: function(response) {
                         console.log(response); // Ghi lại phản hồi để kiểm tra
                         if (response.success) {
@@ -138,4 +148,5 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
         });
     </script>
 </body>
+
 </html>

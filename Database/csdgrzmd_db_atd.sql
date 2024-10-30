@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 21, 2024 lúc 07:15 PM
+-- Thời gian đã tạo: Th10 30, 2024 lúc 05:35 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -31,17 +31,19 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
     ORDER BY semester_id DESC; -- Sắp xếp theo semester_id giảm dần
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByClassId` (IN `class_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByClassId` (IN `classId` CHAR(36))   BEGIN
     SELECT sch.date, a.student_id, a.status 
     FROM schedules sch
-    LEFT JOIN attendances a ON sch.schedule_id = a.schedule_id
-    WHERE sch.class_id = class_id;
+    LEFT JOIN attendances a ON sch.schedule_id = a.schedule_id 
+        AND a.student_id IN (SELECT student_id FROM class_students WHERE class_id = classId)
+    WHERE sch.class_id = classId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByScheduleId` (IN `scheduleId` INT)   BEGIN
-    SELECT student_id, status
-    FROM attendances
-    WHERE schedule_id = scheduleId;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByScheduleId` (IN `scheduleId` INT, IN `class_id` CHAR(36))   BEGIN
+    SELECT a.student_id, a.status
+    FROM attendances a
+    JOIN schedules s ON a.schedule_id = s.schedule_id
+    WHERE a.schedule_id = scheduleId AND s.class_id = class_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassDetailsById` (IN `classId` CHAR(36))   BEGIN
@@ -63,35 +65,54 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassDetailsById` (IN `classId` 
         c.class_id = classId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemester` (IN `semester_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemesterAndStudent` (IN `semester_id` INT, IN `student_id` INT)   BEGIN
     SELECT 
         c.class_id, 
-        c.class_name, 
-        co.course_name, 
-        s.semester_name, 
-        t.lastname, 
-        t.firstname 
+        c.class_name,
+        co.course_name,
+        t.lastname,
+        t.firstname
     FROM classes c
+    JOIN class_students cs ON c.class_id = cs.class_id
     JOIN courses co ON c.course_id = co.course_id
-    JOIN semesters s ON c.semester_id = s.semester_id
     JOIN teachers t ON c.teacher_id = t.teacher_id
-    WHERE c.semester_id = semester_id;
+    WHERE c.semester_id = semester_id AND cs.student_id = student_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetDistinctDatesByClassId` (IN `class_id` INT)   BEGIN
-    SELECT DISTINCT date FROM schedules WHERE class_id = class_id;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemesterAndTeacher` (IN `semester_id` INT, IN `teacher_id` INT)   BEGIN
+    SELECT 
+        c.class_id, 
+        c.class_name,
+        co.course_name -- Đảm bảo rằng có course_name trong kết quả trả về
+    FROM classes c
+    JOIN courses co ON c.course_id = co.course_id -- Liên kết với bảng courses để lấy tên môn học
+    WHERE c.semester_id = semester_id AND c.teacher_id = teacher_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesByClassId` (IN `class_id` INT)   BEGIN
-    SELECT schedule_id, date FROM schedules WHERE class_id = class_id;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetDistinctDatesByClassId` (IN `classId` CHAR(36))   BEGIN
+    SELECT DISTINCT date
+    FROM schedules
+    WHERE class_id = classId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassId` (IN `class_id` INT)   BEGIN
-    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday, c.class_name 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesByClassId` (IN `classId` VARCHAR(36))   BEGIN
+    SELECT schedule_id, date 
+    FROM schedules 
+    WHERE class_id = classId;  -- Sử dụng classId (có tham số đầu vào)
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassId` (IN `classId` CHAR(36))   BEGIN
+    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday
     FROM students s
     JOIN class_students cs ON s.student_id = cs.student_id
-    JOIN classes c ON cs.class_id = c.class_id
-    WHERE c.class_id = class_id;
+    WHERE cs.class_id = classId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassIdAndStudentId` (IN `classId` CHAR(36), IN `studentId` INT)   BEGIN
+    SELECT s.*
+    FROM students s
+    JOIN class_students cs ON s.student_id = cs.student_id
+    WHERE cs.class_id = classId AND s.student_id = studentId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_param` INT)   BEGIN
@@ -106,6 +127,26 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_u
     JOIN user_roles ur ON u.user_id = ur.user_id
     JOIN roles r ON ur.role_id = r.role_id
     WHERE u.username = input_username;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateOrInsertAttendance` (IN `p_schedule_id` INT, IN `p_student_id` INT, IN `p_status` INT)   BEGIN
+    DECLARE attendanceExists INT;
+    
+    -- Kiểm tra xem điểm danh đã tồn tại hay chưa
+    SELECT COUNT(*) INTO attendanceExists
+    FROM attendances
+    WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+    
+    IF attendanceExists > 0 THEN
+        -- Nếu đã tồn tại, cập nhật trạng thái
+        UPDATE attendances
+        SET status = p_status
+        WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+    ELSE
+        -- Nếu chưa tồn tại, thêm mới
+        INSERT INTO attendances (schedule_id, student_id, status)
+        VALUES (p_schedule_id, p_student_id, p_status);
+    END IF;
 END$$
 
 DELIMITER ;
@@ -129,8 +170,8 @@ CREATE TABLE `attendances` (
 --
 
 INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status`, `updated_at`) VALUES
-(1, 1, 2001210224, 1, '2024-10-19 16:51:51'),
-(2, 2, 2001210224, 0, '2024-10-19 16:44:17'),
+(1, 1, 2001210224, 2, '2024-10-25 17:17:51'),
+(2, 2, 2001210224, 0, '2024-10-23 10:36:57'),
 (3, 3, 2001210224, 0, '2024-10-19 13:49:04'),
 (4, 4, 2001210224, 0, '2024-10-19 13:49:04'),
 (5, 5, 2001210224, 0, '2024-10-19 13:49:04'),
@@ -138,9 +179,9 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (7, 7, 2001210224, 0, '2024-10-19 13:49:04'),
 (8, 8, 2001210224, 0, '2024-10-19 13:49:04'),
 (9, 9, 2001210224, 0, '2024-10-19 13:49:04'),
-(10, 10, 2001210224, 0, '2024-10-19 13:49:04'),
-(11, 1, 2001211785, 1, '2024-10-19 16:51:51'),
-(12, 2, 2001211785, 0, '2024-10-19 16:44:17'),
+(10, 10, 2001210224, 1, '2024-10-26 12:29:58'),
+(11, 1, 2001211785, 2, '2024-10-26 13:08:15'),
+(12, 2, 2001211785, 0, '2024-10-23 10:36:57'),
 (13, 3, 2001211785, 0, '2024-10-19 13:49:04'),
 (14, 4, 2001211785, 0, '2024-10-19 13:49:04'),
 (15, 5, 2001211785, 0, '2024-10-19 13:49:04'),
@@ -148,9 +189,9 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (17, 7, 2001211785, 0, '2024-10-19 13:49:04'),
 (18, 8, 2001211785, 0, '2024-10-19 13:49:04'),
 (19, 9, 2001211785, 0, '2024-10-19 13:49:04'),
-(20, 10, 2001211785, 0, '2024-10-19 13:49:04'),
-(21, 1, 2001212345, 1, '2024-10-19 17:06:06'),
-(22, 2, 2001212345, 0, '2024-10-19 16:44:17'),
+(20, 10, 2001211785, 1, '2024-10-26 12:29:58'),
+(21, 1, 2001212345, 2, '2024-10-26 13:08:15'),
+(22, 2, 2001212345, 0, '2024-10-23 10:36:57'),
 (23, 3, 2001212345, 0, '2024-10-19 13:49:04'),
 (24, 4, 2001212345, 0, '2024-10-19 13:49:04'),
 (25, 5, 2001212345, 0, '2024-10-19 13:49:04'),
@@ -158,9 +199,9 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (27, 7, 2001212345, 0, '2024-10-19 13:49:04'),
 (28, 8, 2001212345, 0, '2024-10-19 13:49:04'),
 (29, 9, 2001212345, 0, '2024-10-19 13:49:05'),
-(30, 10, 2001212345, 0, '2024-10-19 13:49:05'),
-(31, 1, 2001213456, 1, '2024-10-21 03:31:25'),
-(32, 2, 2001213456, 0, '2024-10-19 16:44:17'),
+(30, 10, 2001212345, 1, '2024-10-26 12:29:58'),
+(31, 1, 2001213456, 0, '2024-10-25 17:14:54'),
+(32, 2, 2001213456, 0, '2024-10-23 10:36:57'),
 (33, 3, 2001213456, 0, '2024-10-19 13:49:05'),
 (34, 4, 2001213456, 0, '2024-10-19 13:49:05'),
 (35, 5, 2001213456, 0, '2024-10-19 13:49:05'),
@@ -169,7 +210,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (38, 8, 2001213456, 0, '2024-10-19 13:49:05'),
 (39, 9, 2001213456, 0, '2024-10-19 13:49:05'),
 (40, 10, 2001213456, 0, '2024-10-19 13:49:05'),
-(41, 1, 2001214567, 1, '2024-10-21 03:31:25'),
+(41, 1, 2001214567, 0, '2024-10-23 10:36:57'),
 (42, 2, 2001214567, 0, '2024-10-19 16:44:17'),
 (43, 3, 2001214567, 0, '2024-10-19 13:49:05'),
 (44, 4, 2001214567, 0, '2024-10-19 13:49:05'),
@@ -179,8 +220,8 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (48, 8, 2001214567, 0, '2024-10-19 13:49:05'),
 (49, 9, 2001214567, 0, '2024-10-19 13:49:05'),
 (50, 10, 2001214567, 0, '2024-10-19 13:49:05'),
-(51, 1, 2001215678, 1, '2024-10-21 03:31:25'),
-(52, 2, 2001215678, 0, '2024-10-19 16:44:18'),
+(51, 1, 2001215678, 0, '2024-10-23 10:36:57'),
+(52, 2, 2001215678, 0, '2024-10-23 10:36:57'),
 (53, 3, 2001215678, 0, '2024-10-19 13:49:05'),
 (54, 4, 2001215678, 0, '2024-10-19 13:49:05'),
 (55, 5, 2001215678, 0, '2024-10-19 13:49:05'),
@@ -189,18 +230,18 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (58, 8, 2001215678, 0, '2024-10-19 13:49:05'),
 (59, 9, 2001215678, 0, '2024-10-19 13:49:05'),
 (60, 10, 2001215678, 0, '2024-10-19 13:49:05'),
-(61, 1, 2001216114, 1, '2024-10-21 03:31:25'),
-(62, 2, 2001216114, 0, '2024-10-19 16:44:18'),
-(63, 3, 2001216114, 0, '2024-10-19 13:49:05'),
-(64, 4, 2001216114, 0, '2024-10-19 13:49:05'),
-(65, 5, 2001216114, 0, '2024-10-19 13:49:05'),
-(66, 6, 2001216114, 0, '2024-10-19 13:49:05'),
-(67, 7, 2001216114, 0, '2024-10-19 13:49:06'),
-(68, 8, 2001216114, 0, '2024-10-19 13:49:06'),
-(69, 9, 2001216114, 0, '2024-10-19 13:49:06'),
-(70, 10, 2001216114, 0, '2024-10-19 13:49:06'),
-(71, 1, 2001217890, 1, '2024-10-21 03:31:25'),
-(72, 2, 2001217890, 0, '2024-10-19 16:44:18'),
+(61, 1, 2001216114, 1, '2024-10-30 12:45:57'),
+(62, 2, 2001216114, 2, '2024-10-30 13:57:39'),
+(63, 3, 2001216114, 1, '2024-10-30 14:02:16'),
+(64, 4, 2001216114, 1, '2024-10-30 14:02:28'),
+(65, 5, 2001216114, 1, '2024-10-30 13:59:52'),
+(66, 6, 2001216114, 1, '2024-10-30 13:58:19'),
+(67, 7, 2001216114, 1, '2024-10-30 14:02:02'),
+(68, 8, 2001216114, 0, '2024-10-23 10:40:09'),
+(69, 9, 2001216114, 0, '2024-10-23 10:40:09'),
+(70, 10, 2001216114, 0, '2024-10-23 10:40:09'),
+(71, 1, 2001217890, 0, '2024-10-23 10:36:57'),
+(72, 2, 2001217890, 0, '2024-10-23 10:36:57'),
 (73, 3, 2001217890, 0, '2024-10-19 13:49:06'),
 (74, 4, 2001217890, 0, '2024-10-19 13:49:06'),
 (75, 5, 2001217890, 0, '2024-10-19 13:49:06'),
@@ -208,7 +249,8 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (77, 7, 2001217890, 0, '2024-10-19 13:49:06'),
 (78, 8, 2001217890, 0, '2024-10-19 13:49:06'),
 (79, 9, 2001217890, 0, '2024-10-19 13:49:06'),
-(80, 10, 2001217890, 0, '2024-10-19 13:49:06');
+(80, 10, 2001217890, 0, '2024-10-19 13:49:06'),
+(85, 11, 2001216114, 0, '2024-10-30 14:32:07');
 
 -- --------------------------------------------------------
 
@@ -244,6 +286,12 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `teacher_id`) VALUES
+('00935a9d-93cc-11ef-9ef4-04421aee9db3', 'NMLT Test', 1, 2, 1000001234),
+('1870f136-96da-11ef-85bf-04421aee9db3', 'KyThuatLapTrinh', 8, 2, 1000001234),
+('b33de4f9-94e1-11ef-9ef4-04421aee9db3', 'AV1', 11, 1, 1000001234),
+('cf0ff099-9161-11ef-8e47-04421aee9db3', 'GT T6', 4, 2, 1000001234),
+('de7f3486-94df-11ef-9ef4-04421aee9db3', 'MMT', 14, 2, 1000001234),
+('e41e1566-9124-11ef-8e47-04421aee9db3', 'NMLT Vân Anh', 1, 2, 1000001234),
 ('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 'CSDL VanAnh', 25, 2, 1000001234);
 
 -- --------------------------------------------------------
@@ -262,6 +310,7 @@ CREATE TABLE `class_students` (
 --
 
 INSERT INTO `class_students` (`class_id`, `student_id`) VALUES
+('e41e1566-9124-11ef-8e47-04421aee9db3', 2001216114),
 ('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001210224),
 ('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001211785),
 ('ee7262a0-84c9-11ef-bbd7-04421aee9db3', 2001212345),
@@ -288,7 +337,7 @@ CREATE TABLE `courses` (
 --
 
 INSERT INTO `courses` (`course_id`, `course_name`, `course_type_id`) VALUES
-(1, 'Nhập môn lập trình', 3),
+(1, 'Nhập môn lập trình', 1),
 (2, 'Thực hành nhập môn lập trình', 5),
 (3, 'Kỹ năng ứng dụng Công nghệ Thông tin', 5),
 (4, 'Giải tích', 3),
@@ -404,7 +453,59 @@ INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_t
 (7, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-11-18', 1, 3),
 (8, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-11-25', 1, 3),
 (9, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-12-02', 1, 3),
-(10, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-12-09', 1, 3);
+(10, 'ee7262a0-84c9-11ef-bbd7-04421aee9db3', '2024-12-09', 1, 3),
+(11, 'e41e1566-9124-11ef-8e47-04421aee9db3', '2024-01-01', 1, 3),
+(16, 'cf0ff099-9161-11ef-8e47-04421aee9db3', '2024-10-25', 7, 9),
+(55, '00935a9d-93cc-11ef-9ef4-04421aee9db3', '2024-10-27', 1, 3),
+(56, '00935a9d-93cc-11ef-9ef4-04421aee9db3', '2024-11-03', 1, 3),
+(57, '00935a9d-93cc-11ef-9ef4-04421aee9db3', '2024-11-10', 1, 3),
+(58, '00935a9d-93cc-11ef-9ef4-04421aee9db3', '2024-11-17', 1, 3),
+(59, '00935a9d-93cc-11ef-9ef4-04421aee9db3', '2024-11-24', 1, 3),
+(60, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-10-28', 4, 6),
+(61, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-11-04', 4, 6),
+(62, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-11-11', 4, 6),
+(63, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-11-18', 4, 6),
+(64, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-11-25', 4, 6),
+(65, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-12-02', 4, 6),
+(66, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-12-09', 4, 6),
+(67, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-12-16', 4, 6),
+(68, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-12-23', 4, 6),
+(69, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2024-12-30', 4, 6),
+(70, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2025-01-06', 4, 6),
+(71, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2025-01-13', 4, 6),
+(72, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2025-01-20', 4, 6),
+(73, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2025-01-27', 4, 6),
+(74, 'de7f3486-94df-11ef-9ef4-04421aee9db3', '2025-02-03', 4, 6),
+(75, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-10-28', 7, 9),
+(76, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-11-04', 7, 9),
+(77, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-11-11', 7, 9),
+(78, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-11-18', 7, 9),
+(79, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-11-25', 7, 9),
+(80, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-12-02', 7, 9),
+(81, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-12-09', 7, 9),
+(82, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-12-16', 7, 9),
+(83, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-12-23', 7, 9),
+(84, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2024-12-30', 7, 9),
+(85, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2025-01-06', 7, 9),
+(86, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2025-01-13', 7, 9),
+(87, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2025-01-20', 7, 9),
+(88, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2025-01-27', 7, 9),
+(89, 'b33de4f9-94e1-11ef-9ef4-04421aee9db3', '2025-02-03', 7, 9),
+(90, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-10-30', 4, 6),
+(91, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-11-06', 4, 6),
+(92, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-11-13', 4, 6),
+(93, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-11-20', 4, 6),
+(94, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-11-27', 4, 6),
+(95, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-12-04', 4, 6),
+(96, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-12-11', 4, 6),
+(97, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-12-18', 4, 6),
+(98, '1870f136-96da-11ef-85bf-04421aee9db3', '2024-12-25', 4, 6),
+(99, '1870f136-96da-11ef-85bf-04421aee9db3', '2025-01-01', 4, 6),
+(100, '1870f136-96da-11ef-85bf-04421aee9db3', '2025-01-08', 4, 6),
+(101, '1870f136-96da-11ef-85bf-04421aee9db3', '2025-01-15', 4, 6),
+(102, '1870f136-96da-11ef-85bf-04421aee9db3', '2025-01-22', 4, 6),
+(103, '1870f136-96da-11ef-85bf-04421aee9db3', '2025-01-29', 4, 6),
+(104, '1870f136-96da-11ef-85bf-04421aee9db3', '2025-02-05', 4, 6);
 
 -- --------------------------------------------------------
 
@@ -462,7 +563,7 @@ INSERT INTO `students` (`student_id`, `lastname`, `firstname`, `email`, `phone`,
 (2001214568, 'Bùi Văn', 'Long', 'buivanlong@gmail.com', '0915678901', '13DHTH15', '2004-02-02', 'Nam'),
 (2001215678, 'Bùi Thị', 'Hồng', 'buithihong@gmail.com', '0906789012', '12DHTH06', '2003-12-19', 'Nữ'),
 (2001215679, 'Lê Thị', 'Như', 'lethinh@gmail.com', '0916789012', '12DHTH16', '2003-11-11', 'Nữ'),
-(2001216114, 'Đinh Văn', 'Tài', 'dinhvantai079@gmail.com', '0901234578', '12DHTH02', '2003-03-30', 'Nam'),
+(2001216114, 'Đinh Văn', 'Tàii', 'dinhvantai079@gmail.com', '0901234578', '12DHTH02', '2003-03-30', 'Nam'),
 (2001216780, 'Trương Văn', 'Dũng', 'truongvandung@gmail.com', '0917890123', '12DHTH17', '2003-01-01', 'Nam'),
 (2001216789, 'Vũ Văn', 'Bình', 'vuvanhbinh@gmail.com', '0907890123', '11DHTH07', '2002-10-10', 'Nam'),
 (2001217890, 'Nguyễn Thị', 'Hoa', 'nguyenthihua@gmail.com', '0908901234', '11DHTH08', '2002-11-17', 'Nữ'),
@@ -514,7 +615,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
 (1000001234, 'vanAnh123', '$2y$10$WZZ9ziqz02krLQJsSW8lruYX4WDRU2QzGsZ0Le0ZS//gCh021cGvW'),
-(1000001235, '1000001235', '$2y$10$PBpe4kyIqX.RX4f/KslZYeKxOOr0Hlck4of6Z6oJLia0R1AWTEHC.'),
+(1000001235, 'tranVanHung', '$2y$10$b5/9Yp2eDk3cun9i38g9EeKuWkM7JnwdV0m25i0uj3aLCXHBfVivC'),
 (1000001236, '1000001236', '$2y$10$MMAunS7wvIsZ2UHe19Xr6OVzGFuQyLy6Xsi/rsLvSdfERNQIKpM0u'),
 (2001210123, '2001210123', '$2y$10$z1syiVxj4fFVzEJ/HGaIP.u3Op7M7plk9KaAmdodnOTx8F4cc5vxW'),
 (2001210224, '2001210224', '$2y$10$6hYJciz1kxXo7NiVTuQmGOA4/IBmFwdUy4u5xOpwLp8x3lo4gSUFm'),
@@ -528,7 +629,7 @@ INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
 (2001214568, '2001214568', '$2y$10$UnfrYs4jMy9Q8r67BAEVvuDHQO7/yhq13I77EmMdxW1O3mBVt9wo.'),
 (2001215678, '2001215678', '$2y$10$1fhFReDh3YI/Y.gU/5qzuOxizPZ.ZZFu1nEnCeotDsasLTExSe/9O'),
 (2001215679, '2001215679', '$2y$10$PDMEa.qk0VBGWmGv1wSSiu4iu/ZODjaCfc7c0nMna6XoX//emIl2q'),
-(2001216114, '2001216114', '$2y$10$AbbaW861JhICgXOEpG0iE.SIquT3hSQK9E9iCfMpDsI8b0mDq/n8K'),
+(2001216114, '2001216114', '$2y$10$byBusCQbqjxey.iGwmfmJecPLzz66QvRayEAMn7IXKunmI5ga7dfa'),
 (2001216780, '2001216780', '$2y$10$XQUAcWPeht0yDlDbu/zLgOEjiPGVuHygw2T9zDO1RX6ei4BxM0Sn2'),
 (2001216789, '2001216789', '$2y$10$UywktTRVWKEfzkb8MoLMZe8Osb1Re1lEU0UoHMu8HLhyyOTWIdgCS'),
 (2001217890, '2001217890', '$2y$10$bv7ceSD5oZdukkXKjI0qmeasYZFCJIXsW91ynKjaZj/VaN789svwu'),
@@ -680,7 +781,7 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
 -- AUTO_INCREMENT cho bảng `attendance_reports`
@@ -710,13 +811,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT cho bảng `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT cho bảng `semesters`
 --
 ALTER TABLE `semesters`
-  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT cho bảng `students`

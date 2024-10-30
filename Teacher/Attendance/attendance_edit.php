@@ -50,9 +50,10 @@ foreach ($schedules as $schedule) {
         <div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>
     <?php else: ?>
         <form method="POST" action="../Attendance/process_attendance.php">
+
             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
             <div class="table-responsive">
-                <table class="table table-striped" style="table-layout: fixed;">
+                <table class="table table-striped" id="attendanceEdit" style="table-layout: fixed;">
                     <thead>
                         <tr>
                             <th style="width: 80px;">STT</th>
@@ -61,10 +62,12 @@ foreach ($schedules as $schedule) {
                             <th style="width: 150px;">Tên</th>
                             <th style="width: 150px;">Lớp</th>
                             <th style="width: 150px;">Ngày sinh</th>
-                            <?php foreach ($schedules as $index => $schedule): ?>
-                                <th style="width: 100px; text-align: center; cursor: pointer;" class="edit-column" data-index="<?php echo $index; ?>">
-                                    <span><?php echo 'Buổi ' . ($schedule['schedule_id']); ?></span><br>
-                                    <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
+                            <?php foreach ($schedules as $schedule): ?>
+                                <th style="width: 100px; text-align: center;" class="edit-column">
+                                    <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>" style="text-decoration: none; color: inherit;">
+                                        <span><?php echo 'Buổi ' . ($schedule['schedule_id']); ?></span><br>
+                                        <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
+                                    </a>
                                 </th>
                             <?php endforeach; ?>
                         </tr>
@@ -91,35 +94,61 @@ foreach ($schedules as $schedule) {
                     </tbody>
                 </table>
             </div>
-            <div class="d-flex justify-content-between">
-                <button id="showAllBtnEdit" class="btn btn-dark mt-3">Hiện tất cả</button>
-                <div class="text-end mt-3">
+
+            <!-- Thanh nhập, nút xác nhận và nút hiện tất cả nằm ngang -->
+            <div class="d-flex align-items-center justify-content-between mt-3">
+                <div class="input-group me-2" style="width: 30%">
+                    <input type="number" id="attendanceInputEdit" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi (1, 2, ...)">
+                    <button type="button" id="confirmAttendanceBtnEdit" class="btn btn-primary">Xác nhận</button>
+                    <button id="showAllBtnEdit" class="btn btn-dark">Hiện tất cả</button>
+                </div>
+
+                <div class="text-end ms-3">
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </div>
             </div>
+
         </form>
     <?php endif; ?>
 </div>
 
-
 <script>
-    // Đăng ký sự kiện cho các tiêu đề cột buổi trong bảng chỉnh sửa
-    document.querySelectorAll('#attendanceEdit .edit-column').forEach(column => {
-        column.addEventListener('click', function () {
-            const index = this.dataset.index;
-            const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${parseInt(index) + 7})`);
+    // Xác nhận buổi học
+    document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', function() {
+        const input = document.getElementById('attendanceInputEdit');
+        const index = parseInt(input.value); // Lấy giá trị buổi nhập vào
+        const totalSchedules = <?php echo count($schedules); ?>; // Tổng số buổi
 
-            cells.forEach(cell => {
-                cell.style.display = cell.style.display === 'none' ? '' : 'none';
-            });
+        if (index < 1 || index > totalSchedules) {
+            alert('Vui lòng nhập buổi hợp lệ (từ 1 đến ' + totalSchedules + ').');
+            return;
+        }
 
-            // Ẩn tiêu đề cột
-            this.style.display = this.style.display === 'none' ? '' : 'none';
+        // Ẩn tất cả các cột và tiêu đề
+        document.querySelectorAll('#attendanceEdit .edit-data, #attendanceEdit .edit-column').forEach(cell => {
+            cell.style.display = 'none';
+        });
+
+        // Hiện cột buổi đã nhập
+        const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${index + 6})`); // Cột thứ index (cột 7 là buổi đầu tiên)
+
+        cells.forEach(cell => {
+            cell.style.display = ''; // Hiện cột tương ứng
+        });
+
+        // Cập nhật tiêu đề cột
+        const headerCells = document.querySelectorAll(`#attendanceEdit th.edit-column`);
+        headerCells.forEach((headerCell, idx) => {
+            if (idx === index - 1) {
+                headerCell.style.display = ''; // Hiện tiêu đề cột tương ứng
+            } else {
+                headerCell.style.display = 'none'; // Ẩn các tiêu đề cột khác
+            }
         });
     });
 
     // Nút hiện tất cả cho bảng chỉnh sửa
-    document.getElementById('showAllBtnEdit').addEventListener('click', function (event) {
+    document.getElementById('showAllBtnEdit').addEventListener('click', function(event) {
         event.preventDefault(); // Ngăn chặn hành vi mặc định
         document.querySelectorAll('#attendanceEdit .edit-data').forEach(cell => {
             cell.style.display = '';

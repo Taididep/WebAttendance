@@ -31,12 +31,18 @@ foreach ($attendanceData as $record) {
     $attendanceMap[$record['student_id']][$record['date']] = $record['status'];
 }
 
-// Lấy danh sách ngày điểm danh từ bảng schedules
-$sqlDates = "CALL GetDistinctDatesByClassId(?)";
-$stmtDates = $conn->prepare($sqlDates);
-$stmtDates->execute([$class_id]);
-$dates = $stmtDates->fetchAll(PDO::FETCH_COLUMN);
-$stmtDates->closeCursor(); // Đóng con trỏ
+// Lấy danh sách ngày điểm danh và schedule_id từ bảng schedules
+$sqlSchedules = "SELECT schedule_id, date FROM schedules WHERE class_id = ?";
+$stmtSchedules = $conn->prepare($sqlSchedules);
+$stmtSchedules->execute([$class_id]);
+$schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
+$stmtSchedules->closeCursor(); // Đóng con trỏ
+
+// Tạo mảng ánh xạ schedule_id với date
+$scheduleMap = [];
+foreach ($schedules as $schedule) {
+    $scheduleMap[$schedule['date']][] = $schedule['schedule_id'];
+}
 ?>
 
 <div id="attendanceTable">
@@ -44,7 +50,7 @@ $stmtDates->closeCursor(); // Đóng con trỏ
         <div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>
     <?php else: ?>
         <div class="table-responsive">
-            <table class="table table-striped" style="table-layout: fixed;">
+            <table class="table table-striped" id="attendanceList" style="table-layout: fixed;">
                 <thead>
                     <tr>
                         <th style="width: 80px;">STT</th>
@@ -53,10 +59,12 @@ $stmtDates->closeCursor(); // Đóng con trỏ
                         <th style="width: 150px;">Tên</th>
                         <th style="width: 150px;">Lớp</th>
                         <th style="width: 150px;">Ngày sinh</th>
-                        <?php foreach ($dates as $index => $date): ?>
-                            <th style="width: 100px; text-align: center; cursor: pointer;" class="list-column" data-index="<?php echo $index; ?>">
-                                <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
-                                <small><?php echo date('d/m', strtotime($date)); ?></small>
+                        <?php foreach ($schedules as $index => $schedule): ?>
+                            <th style="width: 100px; text-align: center;" class="list-column" data-index="<?php echo $index; ?>">
+                                <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>" style="text-decoration: none; color: inherit;">
+                                    <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
+                                    <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
+                                </a>
                             </th>
                         <?php endforeach; ?>
                     </tr>
@@ -70,12 +78,12 @@ $stmtDates->closeCursor(); // Đóng con trỏ
                             <td><?php echo htmlspecialchars($student['firstname']); ?></td>
                             <td><?php echo htmlspecialchars($student['class']); ?></td>
                             <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
-                            <?php foreach ($dates as $date): ?>
+                            <?php foreach ($schedules as $schedule): ?>
                                 <td class="list-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
                                     <?php
                                     // Kiểm tra xem có trạng thái điểm danh không
-                                    if (isset($attendanceMap[$student['student_id']][$date])) {
-                                        $status = $attendanceMap[$student['student_id']][$date];
+                                    if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
+                                        $status = $attendanceMap[$student['student_id']][$schedule['date']];
                                         if ($status === '1') {
                                             echo '1'; // Có mặt
                                         } elseif ($status === '2') {
@@ -94,32 +102,55 @@ $stmtDates->closeCursor(); // Đóng con trỏ
                 </tbody>
             </table>
         </div>
-        <div class="d-flex justify-content-between">
-            <button id="showAllBtnList" class="btn btn-success mt-3">Hiện tất cả</button>
+
+        <div class="d-flex align-items-center mt-3">
+            <div class="input-group me-2" style="width: 30%">
+                <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi (1, 2, ...)">
+                <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>
+                <button id="showAllBtnList" class="btn btn-success">Hiện tất cả</button>
+            </div>
         </div>
+
     <?php endif; ?>
 </div>
 
-
-
 <script>
-    // Đăng ký sự kiện cho các tiêu đề cột buổi trong bảng danh sách
-    document.querySelectorAll('#attendanceList .list-column').forEach(column => {
-        column.addEventListener('click', function () {
-            const index = this.dataset.index;
-            const cells = document.querySelectorAll(`#attendanceList td:nth-child(${parseInt(index) + 7})`);
+    // Xác nhận buổi học
+    document.getElementById('confirmAttendanceBtnList').addEventListener('click', function() {
+        const input = document.getElementById('attendanceInputList');
+        const index = parseInt(input.value); // Lấy giá trị buổi nhập vào
+        const totalDates = <?php echo count($schedules); ?>; // Tổng số buổi
 
-            cells.forEach(cell => {
-                cell.style.display = cell.style.display === 'none' ? '' : 'none';
-            });
+        if (index < 1 || index > totalDates) {
+            alert('Vui lòng nhập buổi hợp lệ (từ 1 đến ' + totalDates + ').');
+            return;
+        }
 
-            // Ẩn tiêu đề cột
-            this.style.display = this.style.display === 'none' ? '' : 'none';
+        // Ẩn tất cả các cột và dữ liệu
+        document.querySelectorAll('#attendanceList .list-data, #attendanceList .list-column').forEach(cell => {
+            cell.style.display = 'none';
+        });
+
+        // Hiện cột buổi đã nhập
+        const cells = document.querySelectorAll(`#attendanceList td:nth-child(${index + 6})`); // Cột thứ index (cột 7 là buổi đầu tiên)
+
+        cells.forEach(cell => {
+            cell.style.display = ''; // Hiện cột tương ứng
+        });
+
+        // Hiện tiêu đề cột tương ứng
+        const headerCells = document.querySelectorAll(`#attendanceList th.list-column`);
+        headerCells.forEach((headerCell, idx) => {
+            if (idx === index - 1) {
+                headerCell.style.display = ''; // Hiện tiêu đề cột tương ứng
+            } else {
+                headerCell.style.display = 'none'; // Ẩn các tiêu đề cột khác
+            }
         });
     });
 
     // Nút hiện tất cả cho bảng danh sách
-    document.getElementById('showAllBtnList').addEventListener('click', function (event) {
+    document.getElementById('showAllBtnList').addEventListener('click', function(event) {
         event.preventDefault(); // Ngăn chặn hành vi mặc định
         document.querySelectorAll('#attendanceList .list-data').forEach(cell => {
             cell.style.display = '';

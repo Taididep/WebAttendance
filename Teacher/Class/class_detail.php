@@ -1,9 +1,9 @@
 <?php
 session_start();
 $basePath = '../'; // Đường dẫn gốc
+include __DIR__ . '../../../Account/islogin.php';
 include __DIR__ . '/../../Connect/connect.php';
 include __DIR__ . '/../../LayoutPages/navbar.php';
-include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem class_id có được gửi qua URL hay không
 if (!isset($_GET['class_id'])) {
@@ -32,6 +32,7 @@ if (!$classData) {
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,24 +49,29 @@ if (!$classData) {
             background-color: #ff8554;
             color: white;
         }
+
         .classroom-card .card-text {
             padding: 20px;
         }
+
         .classroom-card h2 {
             font-weight: bold;
             cursor: pointer;
         }
+
         .table td {
             height: 60px;
             vertical-align: middle;
             white-space: nowrap;
         }
+
         .table th {
             vertical-align: middle;
             white-space: nowrap;
         }
     </style>
 </head>
+
 <body>
 
     <div class="container mt-5">
@@ -79,9 +85,6 @@ if (!$classData) {
                         <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
                         <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
                     </div>
-                    <a href="class_QR.php?class_id=<?php echo urlencode($classData['class_id']); ?>" class="btn btn-primary">
-                        <i class="bi bi-qr-code"></i> Mã QR
-                    </a>
                 </div>
             </div>
         </div>
@@ -109,13 +112,14 @@ if (!$classData) {
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="text-center">Danh sách điểm danh</h2>
             <div>
-                <button class="btn btn-secondary" id="editModeBtn">Chế độ chỉnh sửa</button>
+                <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success">Xuất Excel</a>
+                <button class="btn btn-secondary" id="editModeBtn">Chỉnh sửa</button>
                 <button class="btn btn-primary" id="toggleTableBtn">Ẩn danh sách</button>
             </div>
         </div>
         <hr>
-        
-        <div id="attendanceList" style="display: ;">
+
+        <div id="attendanceList" style="display: inline;">
             <?php include '../Attendance/attendance_list.php'; ?> <!-- Gọi file danh sách điểm danh -->
         </div>
 
@@ -144,8 +148,7 @@ if (!$classData) {
             const isEditVisible = attendanceEdit.style.display === 'block';
             attendanceList.style.display = isEditVisible ? 'block' : 'none';
             attendanceEdit.style.display = isEditVisible ? 'none' : 'block';
-            toggleTableBtn.style.display = isEditVisible ? 'inline-block' : 'none'; // Hiện nút ẩn danh sách khi trở về danh sách
-            editModeBtn.textContent = isEditVisible ? 'Chế độ chỉnh sửa' : 'Quay lại danh sách';
+            editModeBtn.textContent = isEditVisible ? 'Chỉnh sửa' : 'Hủy';
         }
         toggleTableBtn.addEventListener('click', toggleAttendanceList);
         editModeBtn.addEventListener('click', toggleEditMode);
@@ -156,4 +159,5 @@ if (!$classData) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 
 </body>
+
 </html>

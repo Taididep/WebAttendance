@@ -10,6 +10,7 @@ include __DIR__ . '/../Account/islogin.php';
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,19 +21,27 @@ include __DIR__ . '/../Account/islogin.php';
 
     <style>
         .hero {
-            background-color: #f8f9fa; /* Màu nền nhẹ cho panel */
-            padding: 50px 20px; /* Thêm khoảng cách */
-            text-align: center; /* Căn giữa nội dung */
-            border-radius: 5px; /* Bo tròn góc */
+            background-color: #f8f9fa;
+            /* Màu nền nhẹ cho panel */
+            padding: 50px 20px;
+            /* Thêm khoảng cách */
+            text-align: center;
+            /* Căn giữa nội dung */
+            border-radius: 5px;
+            /* Bo tròn góc */
         }
+
         .hero img {
-            max-width: 100%; /* Đảm bảo hình ảnh không vượt quá chiều rộng của container */
-            height: auto; /* Giữ tỷ lệ hình ảnh */
+            max-width: 100%;
+            /* Đảm bảo hình ảnh không vượt quá chiều rộng của container */
+            height: auto;
+            /* Giữ tỷ lệ hình ảnh */
         }
     </style>
 
-</style>
+    </style>
 </head>
+
 <body>
     <div class="container mt-5">
         <div class="hero">
@@ -41,6 +50,7 @@ include __DIR__ . '/../Account/islogin.php';
         </div>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

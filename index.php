@@ -5,6 +5,7 @@ include __DIR__ . '/Account/islogin.php';
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,9 @@ include __DIR__ . '/Account/islogin.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 
 </head>
+
 <body>
-        <a href="../login_view.php">Vào trang đăng nhập</a>
+    <a href="../login_view.php">Vào trang đăng nhập</a>
 </body>
+
 </html>
