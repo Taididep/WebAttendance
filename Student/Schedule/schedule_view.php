@@ -30,34 +30,34 @@ $endDate->modify('sunday this week'); // Đặt ngày kết thúc về Chủ Nh�
 $student_id = $_SESSION['user_id'];
 
 // Truy vấn để lấy lịch học, thông tin lớp và môn học trong khoảng thời gian từ thứ Hai đến Chủ Nhật, và lọc theo học kỳ và student_id
-$sql = "
-    SELECT 
-        c.class_name,
-        co.course_name,
-        s.date,
-        s.start_time,
-        s.end_time,
-        CASE 
-            WHEN s.end_time < 7 THEN 'Sáng'
-            WHEN s.end_time >= 7 AND s.end_time < 13 THEN 'Chiều'
-            ELSE 'Tối'
-        END AS ca_hoc 
-    FROM 
-        schedules s
-    JOIN 
-        classes c ON s.class_id = c.class_id
-    JOIN 
-        courses co ON c.course_id = co.course_id
-    JOIN 
-        class_students cs ON c.class_id = cs.class_id
-    WHERE 
-        s.date BETWEEN ? AND ?
-        AND c.semester_id = ?
-        AND cs.student_id = ? -- Thêm điều kiện lọc theo student_id
-    ORDER BY 
-        s.date, c.class_name
-";
-
+// $sql = "
+//     SELECT 
+//         c.class_name,
+//         co.course_name,
+//         s.date,
+//         s.start_time,
+//         s.end_time,
+//         CASE 
+//             WHEN s.end_time < 7 THEN 'Sáng'
+//             WHEN s.end_time >= 7 AND s.end_time < 13 THEN 'Chiều'
+//             ELSE 'Tối'
+//         END AS ca_hoc 
+//     FROM 
+//         schedules s
+//     JOIN 
+//         classes c ON s.class_id = c.class_id
+//     JOIN 
+//         courses co ON c.course_id = co.course_id
+//     JOIN 
+//         class_students cs ON c.class_id = cs.class_id
+//     WHERE 
+//         s.date BETWEEN ? AND ?
+//         AND c.semester_id = ?
+//         AND cs.student_id = ? -- Thêm điều kiện lọc theo student_id
+//     ORDER BY 
+//         s.date, c.class_name
+// ";
+$sql = "CALL GetStudentSchedules(?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $semesterId, $student_id]);
 $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
