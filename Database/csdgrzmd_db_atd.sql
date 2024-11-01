@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 30, 2024 lúc 05:35 PM
+-- Thời gian đã tạo: Th10 01, 2024 lúc 03:43 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -115,10 +115,64 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassIdAndStudentId` (
     WHERE cs.class_id = classId AND s.student_id = studentId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate` DATE, IN `endDate` DATE, IN `semesterId` INT, IN `student_id` INT)   BEGIN
+    SELECT 
+        c.class_name,
+        co.course_name,
+        s.date,
+        s.start_time,
+        s.end_time,
+        CASE 
+            WHEN s.end_time < 7 THEN 'Sáng'
+            WHEN s.end_time >= 7 AND s.end_time < 13 THEN 'Chiều'
+            ELSE 'Tối'
+        END AS ca_hoc 
+    FROM 
+        schedules s
+    JOIN 
+        classes c ON s.class_id = c.class_id
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    JOIN 
+        class_students cs ON c.class_id = cs.class_id
+    WHERE 
+        s.date BETWEEN startDate AND endDate
+        AND c.semester_id = semesterId
+        AND cs.student_id = student_id
+    ORDER BY 
+        s.date, c.class_name;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_param` INT)   BEGIN
     SELECT lastname, firstname 
     FROM teachers 
     WHERE teacher_id = teacher_id_param;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate` DATE, IN `endDate` DATE, IN `semesterId` INT, IN `teacher_id` INT)   BEGIN
+    SELECT 
+        c.class_name,
+        co.course_name,
+        s.date,
+        s.start_time,
+        s.end_time,
+        CASE 
+            WHEN s.end_time < 7 THEN 'Sáng'
+            WHEN s.end_time >= 7 AND s.end_time < 13 THEN 'Chiều'
+            ELSE 'Tối'
+        END AS ca_hoc 
+    FROM 
+        schedules s
+    JOIN 
+        classes c ON s.class_id = c.class_id
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    WHERE 
+        s.date BETWEEN startDate AND endDate
+        AND c.semester_id = semesterId
+        AND c.teacher_id = teacher_id -- Thêm điều kiện lọc theo teacher_id
+    ORDER BY 
+        s.date, c.class_name;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_username` VARCHAR(255))   BEGIN
