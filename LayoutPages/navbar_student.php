@@ -49,7 +49,7 @@ if (!isset($_SESSION['user_id'])) {
                 <li class="nav-item">
                     <a class="btn btn-success" href="<?php echo $basePath; ?>Class/class_create.php" style="margin-right: 10px;">Tham gia lớp học</a>
                 </li>
-
+                
                 <?php if ($isLoggedIn): ?>
                     <li class="nav-item">
                         <div class="btn-group">
@@ -59,6 +59,8 @@ if (!isset($_SESSION['user_id'])) {
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="<?php echo $basePath; ?>Information/information.php">Thông tin cá nhân</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="<?php echo $basePath; ?>../Account/change-password.php">Đổi mật khẩu</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="<?php echo $basePath; ?>../Account/logout.php">Đăng xuất</a></li>
                             </ul>

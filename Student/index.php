@@ -39,7 +39,7 @@ include __DIR__ . '/../Account/islogin.php';
         }
     </style>
 
-    </style>
+    
 </head>
 
 <body>
