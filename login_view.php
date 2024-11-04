@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,23 +83,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Chuyển đổi giữa các form đăng nhập, đăng ký và quên mật khẩu
-            $('#toggle-to-register').click(function () {
+            $('#toggle-to-register').click(function() {
                 $('#login-form').hide();
                 $('#forgot-password-form').hide();
                 $('#register-form').show();
                 $('#form-title').text('Đăng Ký');
             });
 
-            $('#toggle-to-login, #toggle-to-login-from-forgot').click(function () {
+            $('#toggle-to-login, #toggle-to-login-from-forgot').click(function() {
                 $('#register-form').hide();
                 $('#forgot-password-form').hide();
                 $('#login-form').show();
                 $('#form-title').text('Đăng Nhập');
             });
 
-            $('#toggle-to-forgot-password').click(function () {
+            $('#toggle-to-forgot-password').click(function() {
                 $('#login-form').hide();
                 $('#register-form').hide();
                 $('#forgot-password-form').show();
@@ -106,7 +107,7 @@
             });
 
             // Toggle password visibility
-            $('.toggle-password').click(function () {
+            $('.toggle-password').click(function() {
                 const target = $($(this).data('target'));
                 const icon = $(this).find('i');
                 if (target.attr('type') === 'password') {
@@ -121,11 +122,12 @@
             // Hiển thị modal thông báo nếu có
             <?php if (isset($_SESSION['success_message'])): ?>
                 $('#successModal').modal('show');
-                setTimeout(function () {
+                setTimeout(function() {
                     $('#successModal').modal('hide');
                 }, 2000);
             <?php endif; ?>
         });
     </script>
 </body>
+
 </html>

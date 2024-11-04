@@ -79,8 +79,8 @@ CREATE TABLE classes (
 CREATE TABLE class_students (
     class_id CHAR(36) NOT NULL,
     student_id INT(11) NOT NULL,
-    CONSTRAINT fk_class_student_class_id FOREIGN KEY (class_id) REFERENCES classes(class_id),
-    CONSTRAINT fk_class_student_student_id FOREIGN KEY (student_id) REFERENCES students(student_id),
+    CONSTRAINT fk_class_student_class_id FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE,
+    CONSTRAINT fk_class_student_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
     PRIMARY KEY (class_id, student_id)
 );
 -- 7
@@ -90,7 +90,7 @@ CREATE TABLE schedules (
     date DATE NOT NULL,
     start_time INT NOT NULL,
     end_time INT NOT NULL,	
-    FOREIGN KEY (class_id) REFERENCES classes(class_id)
+    FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE
 );
 -- 8
 CREATE TABLE attendances (
@@ -99,12 +99,10 @@ CREATE TABLE attendances (
     student_id INT(11) NOT NULL,
     status TINYINT(1) NOT NULL COMMENT '0: Absent, 1: Present, 2: Late',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_schedule_id FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id),
-    CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES students(student_id),
+    CONSTRAINT fk_schedule_id FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id) ON DELETE CASCADE,
+    CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
     CONSTRAINT unique_attendance UNIQUE (schedule_id, student_id)
 );
-
-
 -- 9
 CREATE TABLE attendance_reports (
     report_id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -113,8 +111,8 @@ CREATE TABLE attendance_reports (
     total_present INT DEFAULT 0,
     total_absent INT DEFAULT 0,
     total_late INT DEFAULT 0,
-    CONSTRAINT fk_attendance_report_class_id FOREIGN KEY (class_id) REFERENCES classes(class_id),
-    CONSTRAINT fk_attendance_report_student_id FOREIGN KEY (student_id) REFERENCES students(student_id)
+    CONSTRAINT fk_attendance_report_class_id FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE,
+    CONSTRAINT fk_attendance_report_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
 );
 
 ----------------------------------------------------------------------------------------------

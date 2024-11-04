@@ -59,4 +59,3 @@ if ($userData === false) {
         exit;
     }
 }
-?>
