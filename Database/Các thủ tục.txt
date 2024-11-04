@@ -1,0 +1,331 @@
+1GetUserInfoByUsername
+
+3GetAllSemesters
+
+
+2GetTeacherInfo
+
+
+4GetClassesBySemesterAndTeacher 	-- get_classes.php
+
+5GetClassDetailsById			-- class_detail.php
+
+6GetStudentsByClassId			-- export_excel, attendance_list, attendance_edit, 
+
+7GetAttendanceByClassId			-- export_excel, attendance_list
+
+8GetDistinctDatesByClassId
+
+9GetSchedulesByClassId
+
+10GetAttendanceByScheduleId
+
+11UpdateOrInsertAttendance
+
+12GetClassesBySemesterAndStudent
+
+13GetStudentSchedules
+
+14GetTeacherSchedules
+
+15GetStudentsByClassIdAndStudentId 
+
+
+
+
+
+-- 1. Thủ tục trong login.php
+DELIMITER //
+CREATE PROCEDURE GetUserInfoByUsername(IN input_username VARCHAR(255))
+BEGIN
+    SELECT u.user_id, u.username, u.password, r.role_name 
+    FROM users u
+    JOIN user_roles ur ON u.user_id = ur.user_id
+    JOIN roles r ON ur.role_id = r.role_id
+    WHERE u.username = input_username;
+END //
+DELIMITER ;
+
+-- 2. Thủ tục lấy tên giảng viên trong teacher.php
+DELIMITER //
+CREATE PROCEDURE GetTeacherInfo(IN teacher_id_param INT)
+BEGIN
+    SELECT lastname, firstname 
+    FROM teachers 
+    WHERE teacher_id = teacher_id_param;
+END //
+DELIMITER ;
+
+-- 3. Thủ tục lấy tất cả học kỳ trong teacher.php
+DELIMITER //
+CREATE PROCEDURE GetAllSemesters()
+BEGIN
+    SELECT semester_id, semester_name 
+    FROM semesters
+    ORDER BY semester_id DESC;
+END //
+DELIMITER ;
+
+
+-- 4. Thủ tục lấy danh sach lớp theo học kỳ và giảng viên trong teacher.php(get_classes.php)
+DELIMITER //
+CREATE PROCEDURE GetClassesBySemesterAndTeacher(IN semester_id INT, IN teacher_id INT)
+BEGIN
+    SELECT 
+        c.class_id, 
+        c.class_name,
+        co.course_name
+    FROM classes c
+    JOIN courses co ON c.course_id = co.course_id
+    WHERE c.semester_id = semester_id AND c.teacher_id = teacher_id;
+END //
+DELIMITER ;
+
+
+
+-- 5.Thủ tục lấy thông tin lớp (detail_class.php)
+DELIMITER //
+CREATE PROCEDURE GetClassDetailsById(IN classId CHAR(36))
+BEGIN
+    SELECT 
+        c.class_id,
+        c.class_name,
+        s.semester_name,
+        co.course_name,
+        CONCAT(t.lastname, ' ', t.firstname) AS teacher_fullname
+    FROM 
+        classes c
+    JOIN 
+        semesters s ON c.semester_id = s.semester_id
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    JOIN 
+        teachers t ON c.teacher_id = t.teacher_id
+    WHERE 
+        c.class_id = classId;
+END //
+
+
+----------------------------------------------------------------------- Attendance
+-- 6. Thủ Tục Lấy Thông Tin Sinh Viên Trong Lớp -- (attendance_view.php)
+DELIMITER //
+
+CREATE PROCEDURE GetStudentsByClassId(IN classId CHAR(36))
+BEGIN
+    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday
+    FROM students s
+    JOIN class_students cs ON s.student_id = cs.student_id
+    WHERE cs.class_id = classId;
+END //
+
+DELIMITER ;
+
+
+
+
+-- 7. Thủ Tục Lấy Thông Tin Điểm Danh (attendance_view.php)
+DELIMITER $$
+
+CREATE PROCEDURE GetAttendanceByClassId(IN classId CHAR(36))
+BEGIN
+    SELECT sch.date, a.student_id, a.status 
+    FROM schedules sch
+    LEFT JOIN attendances a ON sch.schedule_id = a.schedule_id 
+        AND a.student_id IN (SELECT student_id FROM class_students WHERE class_id = classId)
+    WHERE sch.class_id = classId;
+END $$
+
+DELIMITER ;
+
+
+-- 8. Thủ Tục Lấy Danh Sách Ngày Điểm Danh
+DELIMITER //
+
+CREATE PROCEDURE GetDistinctDatesByClassId(IN classId CHAR(8))
+BEGIN
+    SELECT schedule_id, date
+    FROM schedules
+    WHERE class_id = classId;
+END //
+
+DELIMITER ;
+
+
+
+-- 9. Thủ Tục Lấy Thông Tin Lịch Học
+DELIMITER //
+
+CREATE PROCEDURE GetSchedulesByClassId(IN classId VARCHAR(36))
+BEGIN
+    SELECT schedule_id, date 
+    FROM schedules 
+    WHERE class_id = class_id;  
+END //
+
+DELIMITER ;
+
+
+
+
+
+-- 10. Thủ Tục Lấy Thông Tin Điểm Danh
+DELIMITER $$
+
+CREATE PROCEDURE GetAttendanceByScheduleId(IN scheduleId INT, IN class_id CHAR(36))
+BEGIN
+    SELECT a.student_id, a.status
+    FROM attendances a
+    JOIN schedules s ON a.schedule_id = s.schedule_id
+    WHERE a.schedule_id = scheduleId AND s.class_id = class_id;
+END $$
+
+DELIMITER ;
+
+
+
+
+-- 11. Thủ tục cập nhật hoặc thêm mới điểm danh(process_attendance)
+DELIMITER $$
+
+CREATE PROCEDURE UpdateOrInsertAttendance(
+    IN p_schedule_id INT,
+    IN p_student_id INT,
+    IN p_status INT
+)
+BEGIN
+    DECLARE attendanceExists INT;
+    
+    -- Kiểm tra xem điểm danh đã tồn tại hay chưa
+    SELECT COUNT(*) INTO attendanceExists
+    FROM attendances
+    WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+    
+    IF attendanceExists > 0 THEN
+        -- Nếu đã tồn tại, cập nhật trạng thái
+        UPDATE attendances
+        SET status = p_status
+        WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+    ELSE
+        -- Nếu chưa tồn tại, thêm mới
+        INSERT INTO attendances (schedule_id, student_id, status)
+        VALUES (p_schedule_id, p_student_id, p_status);
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+-- 12. Thủ tục lấy danh sach lớp theo học kỳ và sinh viên trong student.php(get_classes.php)
+DELIMITER //
+CREATE PROCEDURE GetClassesBySemesterAndStudent(IN semester_id INT, IN student_id INT)
+BEGIN
+    SELECT 
+        c.class_id, 
+        c.class_name,
+        co.course_name,
+        t.lastname,
+        t.firstname
+    FROM classes c
+    JOIN class_students cs ON c.class_id = cs.class_id
+    JOIN courses co ON c.course_id = co.course_id
+    JOIN teachers t ON c.teacher_id = t.teacher_id
+    WHERE c.semester_id = semester_id AND cs.student_id = student_id;
+END //
+DELIMITER ;
+
+
+-- 13. Thủ tục lấy lịch học của sinh viên
+DELIMITER //
+
+CREATE PROCEDURE GetStudentSchedules(
+    IN startDate DATE,
+    IN endDate DATE,
+    IN semesterId INT,
+    IN student_id INT
+)
+BEGIN
+    SELECT 
+        c.class_name,
+        co.course_name,
+        s.date,
+        s.start_time,
+        s.end_time,
+        CASE 
+            WHEN s.end_time < 7 THEN 'Sáng'
+            WHEN s.end_time >= 7 AND s.end_time < 13 THEN 'Chiều'
+            ELSE 'Tối'
+        END AS ca_hoc 
+    FROM 
+        schedules s
+    JOIN 
+        classes c ON s.class_id = c.class_id
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    JOIN 
+        class_students cs ON c.class_id = cs.class_id
+    WHERE 
+        s.date BETWEEN startDate AND endDate
+        AND c.semester_id = semesterId
+        AND cs.student_id = student_id
+    ORDER BY 
+        s.date, c.class_name;
+END //
+
+DELIMITER ;
+
+-- 14. Thủ tục lấy lịch dạy của giảng viên
+DELIMITER //
+
+CREATE PROCEDURE GetTeacherSchedules(
+    IN startDate DATE,
+    IN endDate DATE,
+    IN semesterId INT,
+    IN teacher_id INT
+)
+BEGIN
+    SELECT 
+        c.class_name,
+        co.course_name,
+        s.date,
+        s.start_time,
+        s.end_time,
+        CASE 
+            WHEN s.end_time < 7 THEN 'Sáng'
+            WHEN s.end_time >= 7 AND s.end_time < 13 THEN 'Chiều'
+            ELSE 'Tối'
+        END AS ca_hoc 
+    FROM 
+        schedules s
+    JOIN 
+        classes c ON s.class_id = c.class_id
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    WHERE 
+        s.date BETWEEN startDate AND endDate
+        AND c.semester_id = semesterId
+        AND c.teacher_id = teacher_id -- Thêm điều kiện lọc theo teacher_id
+    ORDER BY 
+        s.date, c.class_name;
+END //
+
+DELIMITER ;
+
+ 
+
+-- 15. Thủ tục lấy thông tin sinh viên trong lớp
+DELIMITER $$
+
+CREATE PROCEDURE GetStudentsByClassIdAndStudentId (
+    IN classId CHAR(36),
+    IN studentId INT
+)
+BEGIN
+    SELECT s.*
+    FROM students s
+    JOIN class_students cs ON s.student_id = cs.student_id
+    WHERE cs.class_id = classId AND s.student_id = studentId;
+END$$
+
+DELIMITER ;
+
+
