@@ -26,7 +26,9 @@ if (!isset($_SESSION['user_id'])) {
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
     <div class="container-fluid">
-        <a href="<?php echo $basePath; ?>index.php" class="navbar-brand"><h2><i class="bi bi-journal-medical">TLT</i></h2></a>
+        <a href="<?php echo $basePath; ?>index.php" class="navbar-brand">
+            <h2><i class="bi bi-journal-medical">TLT</i></h2>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -45,11 +47,11 @@ if (!isset($_SESSION['user_id'])) {
             </ul>
 
             <ul class="navbar-nav ms-auto">
-                <!-- Nút Thêm Lớp -->
+                <!-- Nút tham gia Lớp -->
                 <li class="nav-item">
-                    <a class="btn btn-success" href="<?php echo $basePath; ?>Class/class_create.php" style="margin-right: 10px;">Tham gia lớp học</a>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#joinClassModal" style="margin-right: 10px;">Tham gia lớp học</button>
                 </li>
-                
+
                 <?php if ($isLoggedIn): ?>
                     <li class="nav-item">
                         <div class="btn-group">
@@ -59,9 +61,13 @@ if (!isset($_SESSION['user_id'])) {
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="<?php echo $basePath; ?>Information/information.php">Thông tin cá nhân</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item" href="<?php echo $basePath; ?>../Account/change-password.php">Đổi mật khẩu</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item" href="<?php echo $basePath; ?>../Account/logout.php">Đăng xuất</a></li>
                             </ul>
                         </div>
@@ -76,8 +82,80 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 </nav>
 
+<!-- Modal Nhập Mã Lớp Học -->
+<div class="modal fade" id="joinClassModal" tabindex="-1" aria-labelledby="joinClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="joinClassModalLabel">Tham gia lớp học</h5>
+            </div>
+            <div class="modal-body">
+                <!-- Phần này hiển thị thông báo lỗi hoặc thành công -->
+                <div id="joinClassMessage" class="alert d-none"></div>
+
+                <form id="joinClassForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="classId" name="class_id" placeholder="Mã lớp" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Tham gia</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById("joinClassForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Ngăn chặn gửi form theo cách thông thường
+
+        // Lấy dữ liệu class_id từ input
+        const classId = document.getElementById("classId").value;
+        const joinClassMessage = document.getElementById("joinClassMessage");
+
+        // Gửi yêu cầu AJAX tới join_class.php
+        fetch("<?php echo $basePath; ?>Class/join_class.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `class_id=${encodeURIComponent(classId)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                joinClassMessage.classList.remove("d-none");
+                if (data.includes("thành công")) {
+                    joinClassMessage.classList.add("alert-success");
+                    joinClassMessage.classList.remove("alert-danger");
+                    joinClassMessage.innerText = data;
+                    // Reset form sau khi tham gia thành công
+                    document.getElementById("joinClassForm").reset();
+                } else {
+                    joinClassMessage.classList.add("alert-danger");
+                    joinClassMessage.classList.remove("alert-success");
+                    joinClassMessage.innerText = data;
+                }
+            })
+            .catch(error => {
+                joinClassMessage.classList.remove("d-none");
+                joinClassMessage.classList.add("alert-danger");
+                joinClassMessage.classList.remove("alert-success");
+                joinClassMessage.innerText = "Có lỗi xảy ra. Vui lòng thử lại.";
+            });
+    });
+</script>
+
+
+
+
+
+
 <style>
     nav .dropdown-toggle::after {
-        display: none; /* Ẩn mũi tên mặc định của Bootstrap */
+        display: none;
+        /* Ẩn mũi tên mặc định của Bootstrap */
     }
 </style>
