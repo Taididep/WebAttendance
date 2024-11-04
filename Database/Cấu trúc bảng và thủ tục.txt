@@ -286,7 +286,8 @@ VALUES
 
 
 
--- Thủ tục trong login.php
+
+-- 1. Thủ tục trong login.php
 DELIMITER //
 CREATE PROCEDURE GetUserInfoByUsername(IN input_username VARCHAR(255))
 BEGIN
@@ -298,7 +299,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- Thủ tục lấy tên giảng viên trong teacher.php
+-- 2. Thủ tục lấy tên giảng viên trong teacher.php
 DELIMITER //
 CREATE PROCEDURE GetTeacherInfo(IN teacher_id_param INT)
 BEGIN
@@ -308,18 +309,18 @@ BEGIN
 END //
 DELIMITER ;
 
--- Thủ tục lấy tất cả học kỳ trong teacher.php
+-- 3. Thủ tục lấy tất cả học kỳ trong teacher.php
 DELIMITER //
 CREATE PROCEDURE GetAllSemesters()
 BEGIN
     SELECT semester_id, semester_name 
     FROM semesters
-    ORDER BY semester_id DESC; -- Sắp xếp theo semester_id giảm dần
+    ORDER BY semester_id DESC;
 END //
 DELIMITER ;
 
 
--- Thủ tục lấy danh sach lớp theo học kỳ và giảng viên trong teacher.php(get_classes.php)
+-- 4. Thủ tục lấy danh sach lớp theo học kỳ và giảng viên trong teacher.php(get_classes.php)
 DELIMITER //
 CREATE PROCEDURE GetClassesBySemesterAndTeacher(IN semester_id INT, IN teacher_id INT)
 BEGIN
@@ -335,9 +336,7 @@ DELIMITER ;
 
 
 
-
-
--- Thủ tục lấy thông tin lớp (detail_class.php)
+-- 5.Thủ tục lấy thông tin lớp (detail_class.php)
 DELIMITER //
 CREATE PROCEDURE GetClassDetailsById(IN classId CHAR(36))
 BEGIN
@@ -361,7 +360,7 @@ END //
 
 
 ----------------------------------------------------------------------- Attendance
--- Thủ Tục Lấy Thông Tin Sinh Viên Trong Lớp -- (attendance_view.php)
+-- 6. Thủ Tục Lấy Thông Tin Sinh Viên Trong Lớp -- (attendance_view.php)
 DELIMITER //
 
 CREATE PROCEDURE GetStudentsByClassId(IN classId CHAR(36))
@@ -377,7 +376,7 @@ DELIMITER ;
 
 
 
--- Thủ Tục Lấy Thông Tin Điểm Danh (attendance_view.php)
+-- 7. Thủ Tục Lấy Thông Tin Điểm Danh (attendance_view.php)
 DELIMITER $$
 
 CREATE PROCEDURE GetAttendanceByClassId(IN classId CHAR(36))
@@ -392,7 +391,7 @@ END $$
 DELIMITER ;
 
 
--- Thủ Tục Lấy Danh Sách Ngày Điểm Danh
+-- 8. Thủ Tục Lấy Danh Sách Ngày Điểm Danh
 DELIMITER //
 
 CREATE PROCEDURE GetDistinctDatesByClassId(IN classId CHAR(36))
@@ -406,7 +405,7 @@ DELIMITER ;
 
 
 
--- Thủ Tục Lấy Thông Tin Lịch Học
+-- 9. Thủ Tục Lấy Thông Tin Lịch Học
 DELIMITER //
 
 CREATE PROCEDURE GetSchedulesByClassId(IN classId VARCHAR(36))
@@ -422,7 +421,7 @@ DELIMITER ;
 
 
 
--- Thủ Tục Lấy Thông Tin Điểm Danh
+-- 10. Thủ Tục Lấy Thông Tin Điểm Danh
 DELIMITER $$
 
 CREATE PROCEDURE GetAttendanceByScheduleId(IN scheduleId INT, IN class_id CHAR(36))
@@ -438,7 +437,7 @@ DELIMITER ;
 
 
 
--- Thủ tục cập nhật hoặc thêm mới điểm danh(process_attendance)
+-- 11. Thủ tục cập nhật hoặc thêm mới điểm danh(process_attendance)
 DELIMITER $$
 
 CREATE PROCEDURE UpdateOrInsertAttendance(
@@ -469,7 +468,7 @@ END$$
 DELIMITER ;
 
 
--- Thủ tục lấy danh sach lớp theo học kỳ và sinh viên trong student.php(get_classes.php)
+-- 12. Thủ tục lấy danh sach lớp theo học kỳ và sinh viên trong student.php(get_classes.php)
 DELIMITER //
 CREATE PROCEDURE GetClassesBySemesterAndStudent(IN semester_id INT, IN student_id INT)
 BEGIN
@@ -488,7 +487,7 @@ END //
 DELIMITER ;
 
 
--- Thủ tục lấy lịch học của sinh viên
+-- 13. Thủ tục lấy lịch học của sinh viên
 DELIMITER //
 
 CREATE PROCEDURE GetStudentSchedules(
@@ -527,7 +526,7 @@ END //
 
 DELIMITER ;
  
--- Thủ tục lấy lịch dạy của giảng viên
+-- 14. Thủ tục lấy lịch dạy của giảng viên
 DELIMITER //
 
 CREATE PROCEDURE GetTeacherSchedules(
@@ -564,7 +563,7 @@ END //
 
 DELIMITER ;
 
--- Thủ tục lấy thông tin sinh viên trong lớp
+-- 15. Thủ tục lấy thông tin sinh viên trong lớp
 DELIMITER $$
 
 CREATE PROCEDURE GetStudentsByClassIdAndStudentId (
