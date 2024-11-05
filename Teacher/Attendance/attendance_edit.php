@@ -18,12 +18,6 @@ $stmtStudents->execute([$class_id]);
 $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 $stmtStudents->closeCursor(); // Đóng con trỏ
 
-// Lấy thông tin lịch học
-$sqlSchedules = "CALL GetSchedulesAndAttendanceByClassId(?)";
-$stmtSchedules = $conn->prepare($sqlSchedules);
-$stmtSchedules->execute([$class_id]);
-$schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
-$stmtSchedules->closeCursor(); // Đóng con trỏ
 
 // Lấy thông tin điểm danh
 $attendanceMap = [];
@@ -42,8 +36,8 @@ foreach ($schedules as $schedule) {
     }
     $stmtAttendance->closeCursor(); // Đóng con trỏ sau mỗi lần thực thi
 }
-
 ?>
+
 
 <div id="attendanceTable">
     <?php if (empty($students)): ?>
