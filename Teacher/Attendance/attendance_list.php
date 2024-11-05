@@ -19,7 +19,7 @@ $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 $stmtStudents->closeCursor(); // Đóng con trỏ
 
 // Lấy thông tin điểm danh
-$sqlAttendance = "CALL GetAttendanceByClassId(?)";
+$sqlAttendance = "CALL GetSchedulesAndAttendanceByClassId(?)";
 $stmtAttendance = $conn->prepare($sqlAttendance);
 $stmtAttendance->execute([$class_id]);
 $attendanceData = $stmtAttendance->fetchAll(PDO::FETCH_ASSOC);
@@ -43,6 +43,7 @@ $scheduleMap = [];
 foreach ($schedules as $schedule) {
     $scheduleMap[$schedule['date']][] = $schedule['schedule_id'];
 }
+
 ?>
 
 <div id="attendanceTable">

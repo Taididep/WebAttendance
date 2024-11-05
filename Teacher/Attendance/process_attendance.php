@@ -20,28 +20,15 @@ $attendanceData = $_POST['attendance'];
 // Lặp qua từng sinh viên và trạng thái điểm danh
 foreach ($attendanceData as $student_id => $schedules) {
     foreach ($schedules as $schedule_id => $status) {
-        // Kiểm tra nếu status không phải là 0 hoặc 1 hoặc 2 thì bỏ qua
+        // Kiểm tra nếu status không phải là 0, 1 hoặc 2 thì bỏ qua
         if ($status != 0 && $status != 1 && $status != 2) {
             continue;
         }
-        
-        // Kiểm tra xem điểm danh đã tồn tại hay chưa
-        $sqlCheck = "SELECT * FROM attendances WHERE schedule_id = ? AND student_id = ?";
-        $stmtCheck = $conn->prepare($sqlCheck);
-        $stmtCheck->execute([$schedule_id, $student_id]);
-        $attendanceRecord = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
-        if ($attendanceRecord) {
-            // Nếu đã tồn tại, cập nhật trạng thái
-            $sqlUpdate = "UPDATE attendances SET status = ? WHERE schedule_id = ? AND student_id = ?";
-            $stmtUpdate = $conn->prepare($sqlUpdate);
-            $stmtUpdate->execute([$status, $schedule_id, $student_id]);
-        } else {
-            // Nếu chưa tồn tại, thêm mới
-            $sqlInsert = "INSERT INTO attendances (schedule_id, student_id, status) VALUES (?, ?, ?)";
-            $stmtInsert = $conn->prepare($sqlInsert);
-            $stmtInsert->execute([$schedule_id, $student_id, $status]);
-        }
+        // Gọi thủ tục UpdateOrInsertAttendance
+        $sql = "CALL UpdateOrInsertAttendance(?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$schedule_id, $student_id, $status]);
     }
 }
 

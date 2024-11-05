@@ -68,7 +68,8 @@ if (!$classData) {
             margin-bottom: 10px;
         }
 
-        .table td, .table th {
+        .table td,
+        .table th {
             vertical-align: middle;
             white-space: nowrap;
             text-align: center;
@@ -127,7 +128,7 @@ if (!$classData) {
     <div class="container mt-5">
         <!-- Card hiển thị thông tin lớp học -->
         <div class="card classroom-card shadow-lg">
-            <div class="card-body text-center">
+            <div class="card-body">
                 <h2 data-bs-toggle="modal" data-bs-target="#classModal"><?php echo htmlspecialchars($classData['class_name']); ?></h2>
                 <hr>
                 <div>
@@ -197,7 +198,7 @@ if (!$classData) {
             attendanceEdit.style.display = isEditVisible ? 'none' : 'block';
             editModeBtn.textContent = isEditVisible ? 'Chỉnh sửa' : 'Hủy';
         }
-        
+
         toggleTableBtn.addEventListener('click', toggleAttendanceList);
         editModeBtn.addEventListener('click', toggleEditMode);
     </script>

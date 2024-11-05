@@ -12,11 +12,10 @@
 
 6GetStudentsByClassId			-- export_excel, attendance_list, attendance_edit, 
 
-7GetAttendanceByClassId			-- export_excel, attendance_list
+7GetSchedulesAndAttendanceByClassId
 
 8GetDistinctDatesByClassId
 
-9GetSchedulesByClassId
 
 10GetAttendanceByScheduleId
 
@@ -121,21 +120,29 @@ END //
 DELIMITER ;
 
 
+-- 7. Lấy thông tin ngày điểm danh
 
-
--- 7. Thủ Tục Lấy Thông Tin Điểm Danh (attendance_view.php)
 DELIMITER $$
 
-CREATE PROCEDURE GetAttendanceByClassId(IN classId CHAR(36))
+CREATE PROCEDURE GetSchedulesAndAttendanceByClassId(IN classId CHAR(8))
 BEGIN
-    SELECT sch.date, a.student_id, a.status 
+    SELECT 
+        sch.schedule_id,
+        sch.date, 
+        a.student_id, 
+        a.status 
     FROM schedules sch
-    LEFT JOIN attendances a ON sch.schedule_id = a.schedule_id 
+    LEFT JOIN attendances a 
+        ON sch.schedule_id = a.schedule_id 
         AND a.student_id IN (SELECT student_id FROM class_students WHERE class_id = classId)
     WHERE sch.class_id = classId;
 END $$
 
 DELIMITER ;
+
+
+
+
 
 
 -- 8. Thủ Tục Lấy Danh Sách Ngày Điểm Danh
@@ -152,17 +159,26 @@ DELIMITER ;
 
 
 
--- 9. Thủ Tục Lấy Thông Tin Lịch Học
-DELIMITER //
+--
+DELIMITER $$
 
-CREATE PROCEDURE GetSchedulesByClassId(IN classId VARCHAR(36))
+CREATE PROCEDURE GetSchedulesAndAttendanceByClassId(IN classId CHAR(8))
 BEGIN
-    SELECT schedule_id, date 
-    FROM schedules 
-    WHERE class_id = class_id;  
-END //
+    SELECT 
+        sch.schedule_id,
+        sch.date, 
+        a.student_id, 
+        a.status 
+    FROM schedules sch
+    LEFT JOIN attendances a 
+        ON sch.schedule_id = a.schedule_id 
+        AND a.student_id IN (SELECT student_id FROM class_students WHERE class_id = classId)
+    WHERE sch.class_id = classId;
+END $$
 
 DELIMITER ;
+
+
 
 
 

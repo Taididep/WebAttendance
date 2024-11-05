@@ -28,7 +28,7 @@ if (empty($students)) {
 }
 
 // Lấy thông tin điểm danh
-$sqlAttendance = "CALL GetAttendanceByClassId(?)";
+$sqlAttendance = "CALL GetSchedulesAndAttendanceByClassId(?)";
 $stmtAttendance = $conn->prepare($sqlAttendance);
 $stmtAttendance->execute([$class_id]);
 $attendanceData = $stmtAttendance->fetchAll(PDO::FETCH_ASSOC);
@@ -40,12 +40,21 @@ foreach ($attendanceData as $record) {
     $attendanceMap[$record['student_id']][$record['date']] = $record['status'];
 }
 
+
+
 // Lấy danh sách ngày điểm danh từ bảng schedules
-$sqlDates = "CALL GetDistinctDatesByClassId(?)";
-$stmtDates = $conn->prepare($sqlDates);
-$stmtDates->execute([$class_id]);
-$dates = $stmtDates->fetchAll(PDO::FETCH_COLUMN);
-$stmtDates->closeCursor(); // Đóng con trỏ
+$sqlSchedules = "CALL GetDistinctDatesByClassId(?)";
+$stmtSchedules = $conn->prepare($sqlSchedules);
+$stmtSchedules->execute([$class_id]);
+$schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
+$stmtSchedules->closeCursor(); // Đóng con trỏ
+
+// Tạo mảng ánh xạ schedule_id với date
+$scheduleMap = [];
+foreach ($schedules as $schedule) {
+    $scheduleMap[$schedule['date']][] = $schedule['schedule_id'];
+}
+
 ?>
 
 <div id="attendanceTable">
@@ -59,10 +68,12 @@ $stmtDates->closeCursor(); // Đóng con trỏ
                     <th style="width: 150px;">Tên</th>
                     <th style="width: 150px;">Lớp</th>
                     <th style="width: 150px;">Ngày sinh</th>
-                    <?php foreach ($dates as $index => $date): ?>
+                    <?php foreach ($schedules as $index => $schedule): ?>
                         <th style="width: 100px; text-align: center;" class="list-column" data-index="<?php echo $index; ?>">
-                            <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
-                            <small><?php echo date('d/m', strtotime($date)); ?></small>
+                            <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>" style="text-decoration: none; color: inherit;">
+                                <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
+                                <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
+                            </a>
                         </th>
                     <?php endforeach; ?>
                 </tr>
@@ -76,12 +87,12 @@ $stmtDates->closeCursor(); // Đóng con trỏ
                         <td><?php echo htmlspecialchars($student['firstname']); ?></td>
                         <td><?php echo htmlspecialchars($student['class']); ?></td>
                         <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
-                        <?php foreach ($dates as $date): ?>
+                        <?php foreach ($schedules as $schedule): ?>
                             <td class="list-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
                                 <?php
                                 // Kiểm tra xem có trạng thái điểm danh không
-                                if (isset($attendanceMap[$student['student_id']][$date])) {
-                                    $status = $attendanceMap[$student['student_id']][$date];
+                                if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
+                                    $status = $attendanceMap[$student['student_id']][$schedule['date']];
                                     if ($status === '1') {
                                         echo '1'; // Có mặt
                                     } elseif ($status === '2') {
