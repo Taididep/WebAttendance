@@ -22,7 +22,7 @@ $stmtStudents->execute([$class_id]);
 $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 $stmtStudents->closeCursor();
 
-$sqlAttendance = "CALL GetAttendanceByClassId(?)";
+$sqlAttendance = "CALL GetSchedulesAndAttendanceByClassId(?)";
 $stmtAttendance = $conn->prepare($sqlAttendance);
 $stmtAttendance->execute([$class_id]);
 $attendanceData = $stmtAttendance->fetchAll(PDO::FETCH_ASSOC);
@@ -75,6 +75,32 @@ foreach ($students as $index => $student) {
     $sheet->fromArray($row, NULL, 'A' . $rowIndex);
     $rowIndex++;
 }
+
+// Tính số lượng học sinh có mặt cho mỗi buổi
+$attendanceCounts = [];
+foreach ($schedules as $schedule) {
+    $date = $schedule['date'];
+    $countPresent = 0;
+    foreach ($students as $student) {
+        if (isset($attendanceMap[$student['student_id']][$date]) && $attendanceMap[$student['student_id']][$date] === '1') {
+            $countPresent++;
+        }
+    }
+    $attendanceCounts[] = $countPresent;
+}
+
+// Thêm số lượng học sinh có mặt vào hàng tiếp theo
+$attendanceCountsRow = ['Tổng điểm danh', '', '', '', '', '']; // Đặt giá trị cho 6 cột đầu tiên
+foreach ($attendanceCounts as $count) {
+    $attendanceCountsRow[] = $count;
+}
+
+// Ghi dữ liệu số lượng học sinh có mặt vào hàng
+$sheet->fromArray($attendanceCountsRow, NULL, 'A' . $rowIndex);
+
+// Hợp nhất ô cho dòng "Số học sinh có mặt"
+$sheet->mergeCells("A{$rowIndex}:F{$rowIndex}"); // Hợp nhất từ cột A đến cột F ở hàng số $rowIndex
+$sheet->getStyle("A{$rowIndex}:F{$rowIndex}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER); // Canh giữa
 
 // Xuất file Excel
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

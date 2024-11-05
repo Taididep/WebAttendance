@@ -18,22 +18,25 @@ $totalDays = 0;
 
 if ($classId) {
     // Lấy thông tin tiết lý thuyết và thực hành từ bảng course_types
-    $sql = "SELECT ct.theory_periods, ct.practice_periods
-            FROM classes c
-            JOIN courses co ON c.course_id = co.course_id
-            JOIN course_types ct ON co.course_type_id = ct.course_type_id
-            WHERE c.class_id = ?";
+    $sql = "CALL GetCoursePeriodsByClassId(?)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$classId]);
     $course = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->closeCursor(); // Đóng con trỏ
 
-    $theoryPeriods = $course['theory_periods'];
-    $practicePeriods = $course['practice_periods'];
+    if ($course) {
+        $theoryPeriods = $course['theory_periods'];
+        $practicePeriods = $course['practice_periods'];
 
-    // Tính số ngày cần tạo
-    $theoryDays = ceil($theoryPeriods / 3); // Mỗi ngày 3 tiết
-    $practiceDays = ceil($practicePeriods / 4); // Mỗi ngày 4 tiết
-    $totalDays = $theoryDays + $practiceDays;
+        // Tính số ngày cần tạo
+        $theoryDays = ceil($theoryPeriods / 3); // Mỗi ngày 3 tiết
+        $practiceDays = ceil($practicePeriods / 4); // Mỗi ngày 4 tiết
+        $totalDays = $theoryDays + $practiceDays;
+    } else {
+        // Xử lý trường hợp không tìm thấy thông tin lớp
+        echo '<div class="alert alert-danger">Không tìm thấy thông tin cho lớp học này.</div>';
+        exit;
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -46,26 +49,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($dates) || empty($startTimes) || empty($endTimes)) {
         $errorMessage = "Vui lòng điền đầy đủ thông tin.";
     } else {
-        // Thêm lịch học vào cơ sở dữ liệu
-        $sql_schedule = "INSERT INTO schedules (class_id, date, start_time, end_time) VALUES (?, ?, ?, ?)";
+        // Chuyển đổi mảng thành JSON để truyền vào thủ tục
+        $datesJson = json_encode($dates);
+        $startTimesJson = json_encode($startTimes);
+        $endTimesJson = json_encode($endTimes);
+
+        // Gọi thủ tục thêm lịch học
+        $sql_schedule = "CALL AddSchedules(?, ?, ?, ?)";
         $stmt_schedule = $conn->prepare($sql_schedule);
+        $stmt_schedule->execute([$classId, $datesJson, $startTimesJson, $endTimesJson]);
 
-        foreach ($dates as $index => $date) {
-            $startTime = isset($startTimes[$index]) ? $startTimes[$index] : null;
-            $endTime = isset($endTimes[$index]) ? $endTimes[$index] : null;
-
-            if ($startTime !== null && $endTime !== null) {
-                $stmt_schedule->execute([$classId, $date, $startTime, $endTime]);
-            } else {
-                $errorMessage = "Thông tin thời gian không hợp lệ.";
-                break;
-            }
-        }
-
-        if (!isset($errorMessage)) {
+        if ($stmt_schedule->rowCount() > 0) {
             // Chuyển hướng về trang quản lý lớp học
             header("Location: {$basePath}Class/class_manage.php");
             exit();
+        } else {
+            $errorMessage = "Đã xảy ra lỗi khi thêm lịch học.";
         }
     }
 }

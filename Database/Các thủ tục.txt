@@ -109,9 +109,9 @@ END //
 -- 6. Thủ Tục Lấy Thông Tin Sinh Viên Trong Lớp -- (attendance_view.php)
 DELIMITER //
 
-CREATE PROCEDURE GetStudentsByClassId(IN classId CHAR(36))
+CREATE PROCEDURE GetStudentsByClassId(IN classId CHAR(8))
 BEGIN
-    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday
+    SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday, s.gender
     FROM students s
     JOIN class_students cs ON s.student_id = cs.student_id
     WHERE cs.class_id = classId;
@@ -343,5 +343,64 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+-- 16. Thủ Tục Lấy Thông Tin Tiết
+DELIMITER $$
+
+CREATE PROCEDURE GetCoursePeriodsByClassId(IN p_class_id CHAR(36))
+BEGIN
+    SELECT ct.theory_periods, ct.practice_periods
+    FROM classes c
+    JOIN courses co ON c.course_id = co.course_id
+    JOIN course_types ct ON co.course_type_id = ct.course_type_id
+    WHERE c.class_id = p_class_id;
+END$$
+
+DELIMITER ;
+
+-- 17. Thủ tục thêm lịch học
+DELIMITER $$
+
+CREATE PROCEDURE AddSchedules(
+    IN p_class_id CHAR(36),
+    IN p_dates TEXT,
+    IN p_start_times TEXT,
+    IN p_end_times TEXT
+)
+BEGIN
+    DECLARE v_date VARCHAR(10);
+    DECLARE v_start_time TIME;
+    DECLARE v_end_time TIME;
+    DECLARE done INT DEFAULT FALSE;
+
+    DECLARE i INT DEFAULT 0;
+    DECLARE n INT DEFAULT 0;
+
+    -- Đếm số phần tử trong các chuỗi JSON
+    SET n = JSON_LENGTH(p_dates);
+
+    read_loop: LOOP
+        -- Lấy giá trị từ JSON
+        SET v_date = JSON_UNQUOTE(JSON_EXTRACT(p_dates, CONCAT('$[', i, ']')));
+        SET v_start_time = JSON_UNQUOTE(JSON_EXTRACT(p_start_times, CONCAT('$[', i, ']')));
+        SET v_end_time = JSON_UNQUOTE(JSON_EXTRACT(p_end_times, CONCAT('$[', i, ']')));
+
+        -- Nếu i >= n, kết thúc vòng lặp
+        IF i >= n THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Thêm lịch học vào bảng schedules
+        INSERT INTO schedules (class_id, date, start_time, end_time) VALUES (p_class_id, v_date, v_start_time, v_end_time);
+
+        SET i = i + 1; -- Tăng chỉ số
+    END LOOP;
+
+END$$
+
+DELIMITER ;
+
+
 
 

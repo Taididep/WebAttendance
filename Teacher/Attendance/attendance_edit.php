@@ -60,6 +60,7 @@ foreach ($schedules as $schedule) {
                             <th style="width: 150px;">Mã sinh viên</th>
                             <th style="width: 200px;">Họ đệm</th>
                             <th style="width: 150px;">Tên</th>
+                            <th style="width: 150px;">Giới tính</th>
                             <th style="width: 150px;">Lớp</th>
                             <th style="width: 150px;">Ngày sinh</th>
                             <?php foreach ($schedules as $index => $schedule): ?>
@@ -80,6 +81,7 @@ foreach ($schedules as $schedule) {
                                 <td><?php echo htmlspecialchars($student['student_id']); ?></td>
                                 <td><?php echo htmlspecialchars($student['lastname']); ?></td>
                                 <td><?php echo htmlspecialchars($student['firstname']); ?></td>
+                                <td><?php echo htmlspecialchars($student['gender']); ?></td>
                                 <td><?php echo htmlspecialchars($student['class']); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
                                 <?php foreach ($schedules as $schedule): ?>
@@ -131,7 +133,7 @@ foreach ($schedules as $schedule) {
         });
 
         // Hiện cột buổi đã nhập
-        const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${index + 6})`); // Cột thứ index (cột 7 là buổi đầu tiên)
+        const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${index + 7})`); // Cột thứ index (cột 8 là buổi đầu tiên)
 
         cells.forEach(cell => {
             cell.style.display = ''; // Hiện cột tương ứng

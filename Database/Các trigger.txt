@@ -1,0 +1,46 @@
+DELIMITER $$
+
+CREATE TRIGGER after_attendance_insert
+AFTER INSERT ON attendances
+FOR EACH ROW
+BEGIN
+    DECLARE total_present INT DEFAULT 0;
+    DECLARE total_absent INT DEFAULT 0;
+    DECLARE total_late INT DEFAULT 0;
+
+    -- Tính tổng số lần có mặt cho sinh viên
+    SELECT COUNT(*) INTO total_present
+    FROM attendances
+    WHERE student_id = NEW.student_id AND status = 1;
+
+    -- Tính tổng số lần vắng mặt cho sinh viên
+    SELECT COUNT(*) INTO total_absent
+    FROM attendances
+    WHERE student_id = NEW.student_id AND status = 0;
+
+    -- Tính tổng số lần muộn cho sinh viên
+    SELECT COUNT(*) INTO total_late
+    FROM attendances
+    WHERE student_id = NEW.student_id AND status = 2;
+
+    -- Kiểm tra xem bản ghi báo cáo đã tồn tại hay chưa
+    IF EXISTS (SELECT 1 FROM attendance_reports WHERE class_id = (SELECT class_id FROM schedules WHERE schedule_id = NEW.schedule_id) AND student_id = NEW.student_id) THEN
+        -- Nếu đã tồn tại, cập nhật bản ghi
+        UPDATE attendance_reports
+        SET total_present = total_present,
+            total_absent = total_absent,
+            total_late = total_late
+        WHERE class_id = (SELECT class_id FROM schedules WHERE schedule_id = NEW.schedule_id) 
+          AND student_id = NEW.student_id;
+    ELSE
+        -- Nếu chưa tồn tại, thêm mới bản ghi
+        INSERT INTO attendance_reports (class_id, student_id, total_present, total_absent, total_late)
+        VALUES ((SELECT class_id FROM schedules WHERE schedule_id = NEW.schedule_id), 
+                NEW.student_id, 
+                total_present, 
+                total_absent, 
+                total_late);
+    END IF;
+END$$
+
+DELIMITER ;
