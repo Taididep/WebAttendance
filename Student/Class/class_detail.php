@@ -45,21 +45,87 @@ if (!$classData) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <style>
+        body {
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #343a40;
+        }
+
         .classroom-card {
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             background-color: #ff8554;
             color: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .classroom-card .card-text {
+        .classroom-card .card-body {
             padding: 20px;
         }
 
         .classroom-card h2 {
             font-weight: bold;
+            cursor: pointer;
+            font-size: 1.8rem;
+        }
+
+        .classroom-card hr {
+            border-color: white;
+            margin: 10px 0;
+        }
+
+        .classroom-card .class-details h5 {
+            font-size: 1.1rem;
+            font-weight: normal;
+        }
+
+        /* Hiệu ứng hover */
+        .classroom-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(0, 123, 255, 0.2);
+        }
+
+        .table td,
+        .table th {
+            vertical-align: middle;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Nút ẩn/hiện */
+        .btn-custom {
+            margin: 0 5px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            background-color: #0056b3;
+        }
+
+        /* Tiêu đề danh sách điểm danh */
+        h2.text-center {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* Ẩn bảng khi ở màn hình nhỏ */
+        @media (max-width: 768px) {
+            .classroom-card h2 {
+                font-size: 1.5rem;
+            }
+
+            h2.text-center {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
@@ -72,11 +138,9 @@ if (!$classData) {
             <div class="card-body">
                 <h2><?php echo htmlspecialchars($classData['class_name']); ?></h2>
                 <hr>
-                <div class="d-flex justify-content-between align-items-end">
-                    <div>
-                        <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
-                        <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
-                    </div>
+                <div class="class-details">
+                    <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
+                    <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
                 </div>
             </div>
         </div>
@@ -86,7 +150,7 @@ if (!$classData) {
     <div class="container mt-5 mb-5">
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="text-center">Thông tin điểm danh</h2>
-            <button class="btn btn-primary" id="toggleTableBtn">Ẩn</button>
+            <button class="btn btn-primary btn-custom" id="toggleTableBtn">Ẩn</button>
         </div>
         <hr>
 
@@ -94,7 +158,6 @@ if (!$classData) {
             <?php include '../Attendance/attendance_list.php'; ?>
         </div>
     </div>
-
 
     <script>
         const toggleTableBtn = document.getElementById('toggleTableBtn');
@@ -110,7 +173,6 @@ if (!$classData) {
         // Gán sự kiện click cho nút
         toggleTableBtn.addEventListener('click', toggleAttendanceList);
     </script>
-
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

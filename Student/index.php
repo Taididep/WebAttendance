@@ -4,8 +4,6 @@ $basePath = ''; // Đường dẫn gốc từ index.php đến thư mục gốc
 include __DIR__ . '/../Connect/connect.php';
 include __DIR__ . '/../LayoutPages/navbar_student.php';
 include __DIR__ . '/../Account/islogin.php';
-
-
 ?>
 
 <!DOCTYPE html>
@@ -14,42 +12,104 @@ include __DIR__ . '/../Account/islogin.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang sinh viên</title>
+    <title>Trang Sinh Viên</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 
     <style>
+        body {
+            background-color: #eef2f3;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding-bottom: 60px; /* Để đảm bảo nội dung không bị che bởi footer */
+            position: relative;
+            min-height: 100vh; /* Đảm bảo body có chiều cao tối thiểu */
+        }
+
         .hero {
-            background-color: #f8f9fa;
-            /* Màu nền nhẹ cho panel */
-            padding: 50px 20px;
-            /* Thêm khoảng cách */
+            background-color: #ffffff;
+            padding: 60px 20px;
             text-align: center;
-            /* Căn giữa nội dung */
-            border-radius: 5px;
-            /* Bo tròn góc */
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            transition: transform 0.3s;
+        }
+
+        .hero:hover {
+            transform: translateY(-5px);
         }
 
         .hero img {
-            max-width: 100%;
-            /* Đảm bảo hình ảnh không vượt quá chiều rộng của container */
+            max-width: 80%;
             height: auto;
-            /* Giữ tỷ lệ hình ảnh */
+            border-radius: 10px;
+            transition: transform 0.3s;
+            margin-top: 20px;
+        }
+
+        .hero img:hover {
+            transform: scale(1.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        p {
+            color: #555;
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 10px;
+            position: absolute; /* Đặt footer ở vị trí cố định */
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero img {
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
         }
     </style>
 
-    
 </head>
 
 <body>
     <div class="container mt-5">
         <div class="hero">
-            <h1>Welcome</h1>
-            <img src="../Image/pngtree-school-cartoon-classroom-background-image_907637.png" alt="Hình ảnh cho trang chủ" class="img-fluid">
+            <h1>WELLCOME!</h1>
+            <img src="../Image/pngtree-school-cartoon-classroom-background-image_907637.png" alt="Hình ảnh cho trang sinh viên" class="img-fluid">
+            <p class="mt-4">Cảm ơn bạn đã tham gia học tập cùng chúng tôi! Chúng tôi hy vọng bạn sẽ có một trải nghiệm học tập tuyệt vời tại trường.</p>
         </div>
     </div>
 
+    <div class="footer">
+        <p>&copy; 2024 Trường Học TLT. Tất cả quyền được bảo lưu.</p>
+    </div>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

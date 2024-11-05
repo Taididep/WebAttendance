@@ -29,32 +29,7 @@ $endDate->modify('sunday this week'); // Đặt ngày kết thúc về Chủ Nh�
 // Lấy user_id của giáo viên từ session (giả sử đây là teacher_id)
 $teacher_id = $_SESSION['user_id'];
 
-// Truy vấn để lấy lịch học, thông tin lớp và môn học trong khoảng thời gian từ thứ Hai đến Chủ Nhật, và lọc theo học kỳ và teacher_id
-// $sql = "
-//     SELECT 
-//         c.class_name,
-//         co.course_name,
-//         s.date,
-//         s.start_time,
-//         s.end_time,
-//         CASE 
-//             WHEN s.end_time < 7 THEN 'Sáng'
-//             WHEN s.end_time >= 7 AND s.end_time < 13 THEN 'Chiều'
-//             ELSE 'Tối'
-//         END AS ca_hoc 
-//     FROM 
-//         schedules s
-//     JOIN 
-//         classes c ON s.class_id = c.class_id
-//     JOIN 
-//         courses co ON c.course_id = co.course_id
-//     WHERE 
-//         s.date BETWEEN ? AND ?
-//         AND c.semester_id = ?
-//         AND c.teacher_id = ? -- Thêm điều kiện lọc theo teacher_id
-//     ORDER BY 
-//         s.date, c.class_name
-// ";
+// Truy vấn để lấy lịch học
 $sql = "CALL GetTeacherSchedules(?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $semesterId, $teacher_id]);
@@ -78,7 +53,6 @@ $nextWeek = clone $startDate;
 $nextWeek->modify('+1 week');
 ?>
 
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -89,10 +63,72 @@ $nextWeek->modify('+1 week');
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f1f3f5;
+            font-family: 'Roboto', sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h2 {
+            color: #0056b3;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .custom-select {
+            border: 1px solid #007bff; /* Đường viền xanh */
+            border-radius: 25px; /* Bo tròn viền */
+            padding: 10px; /* Padding bên trong */
+            background-color: #ffffff; /* Màu nền trắng */
+            transition: border-color 0.3s; /* Hiệu ứng chuyển màu */
+        }
+        .custom-select:focus {
+            border-color: #0056b3; /* Đổi màu viền khi focus */
+            box-shadow: 0 0 5px rgba(0, 86, 179, 0.5); /* Hiệu ứng bóng */
+        }
+        .schedule-item {
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 10px;
+            background-color: #d1ecf1;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .schedule-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid #dee2e6; /* Đường viền cho các ô */
+            padding: 1rem;
+        }
+        .table th {
+            background-color: #007bff; /* Màu nền cho tiêu đề */
+            color: #fff;
+        }
+        .table td {
+            background-color: #ffffff;
+            transition: background-color 0.3s;
+        }
+        .table td:hover {
+            background-color: #f8f9fa; /* Nền xám nhạt khi hover */
+        }
+        .btn-primary, .btn-secondary, .btn-success {
+            border-radius: 25px; /* Bo tròn viền */
+            transition: background-color 0.3s, transform 0.3s; /* Hiệu ứng chuyển màu */
+            padding: 10px 20px; /* Thay đổi kích thước nút */
+        }
+        .btn-primary:hover, .btn-secondary:hover, .btn-success:hover {
+            transform: scale(1.05); /* Tăng kích thước khi hover */
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container mt-5">
+    <div class="container">
         <h2 class="text-center">Lịch học từ <?php echo $startDate->format('d/m/Y'); ?> đến <?php echo $endDate->format('d/m/Y'); ?></h2>
         <hr>
 
@@ -100,7 +136,7 @@ $nextWeek->modify('+1 week');
         <form method="GET" class="d-flex justify-content-between align-items-center mb-3">
             <input type="hidden" name="week" value="<?php echo $startDate->format('Y-m-d'); ?>">
             <div class="mb-0 me-2" style="flex: 1;">
-                <select name="semester_id" id="semester_id" class="form-select" required onchange="this.form.submit()">
+                <select name="semester_id" id="semester_id" class="form-select custom-select" required onchange="this.form.submit()">
                     <?php foreach ($semesters as $semester): ?>
                         <option value="<?php echo $semester['semester_id']; ?>" <?php echo $semester['semester_id'] == $semesterId ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($semester['semester_name']); ?>
@@ -109,20 +145,26 @@ $nextWeek->modify('+1 week');
                 </select>
             </div>
             <div class="d-flex">
-                <!-- Nút điều hướng tuần -->
-                <a href="?week=<?php echo $previousWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-primary me-2 d-flex align-items-center" style="height: 100%;">
-                    Trở về
+                <a href="?week=<?php echo $previousWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-primary me-2 d-flex align-items-center">
+                    <i class="bi bi-arrow-left"></i> Trở về
                 </a>
-                <a href="?week=<?php echo $nextWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-primary d-flex align-items-center" style="height: 100%;">
-                    Tiếp
+                <a href="?week=<?php echo (new DateTime('now'))->modify('monday this week')->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-secondary me-2 d-flex align-items-center">
+                    <i class="bi bi-calendar-week"></i> Hiện tại
+                </a>
+                <a href="?week=<?php echo $nextWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-primary me-2 d-flex align-items-center">
+                    Tiếp <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
+            <!-- Nút in lịch -->
+            <button class="btn btn-success" onclick="window.print()">
+                <i class="bi bi-printer"></i> In lịch
+            </button>
         </form>
 
         <table class="table table-bordered text-center">
             <thead>
                 <tr>
-                    <th class="text-center align-middle">Ca học</th>
+                    <th class="align-middle">Ca học</th>
                     <?php foreach ($daysOfWeek as $index => $day): ?>
                         <?php
                         // Lấy ngày cụ thể trong tuần
@@ -130,7 +172,7 @@ $nextWeek->modify('+1 week');
                         $currentDate->modify("+$index days");
                         $formattedDate = $currentDate->format('d/m/Y');
                         ?>
-                        <th class="text-center align-middle">
+                        <th class="align-middle">
                             <?php echo $day; ?><br><?php echo $formattedDate; ?>
                         </th>
                     <?php endforeach; ?>
@@ -142,7 +184,7 @@ $nextWeek->modify('+1 week');
                 $shifts = ['Sáng', 'Chiều', 'Tối'];
                 foreach ($shifts as $shift): ?>
                     <tr>
-                        <td class="text-center align-middle"><?php echo $shift; ?></td>
+                        <td class="align-middle"><?php echo $shift; ?></td>
                         <?php foreach ($daysOfWeek as $index => $day): ?>
                             <?php
                             // Lấy ngày cụ thể trong tuần
@@ -150,12 +192,12 @@ $nextWeek->modify('+1 week');
                             $currentDate->modify("+$index days");
                             $formattedDate = $currentDate->format('Y-m-d');
                             ?>
-                            <td class="text-center">
+                            <td>
                                 <?php if (isset($weeklySchedules[$formattedDate])): ?>
                                     <div class="schedule-boxes">
                                         <?php foreach ($weeklySchedules[$formattedDate] as $schedule): ?>
                                             <?php if ($schedule['ca_hoc'] === $shift): ?>
-                                                <div class="schedule-item border p-3 mb-2 bg-info-subtle">
+                                                <div class="schedule-item">
                                                     <strong><?php echo htmlspecialchars($schedule['class_name']); ?></strong><br>
                                                     <small><?php echo htmlspecialchars($schedule['course_name']); ?></small><br>
                                                     <small>Tiết: <?php echo htmlspecialchars($schedule['start_time']) . ' - ' . htmlspecialchars($schedule['end_time']); ?></small>

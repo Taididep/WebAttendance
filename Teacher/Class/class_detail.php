@@ -41,33 +41,83 @@ if (!$classData) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <style>
-        .classroom-card {
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            background-color: #ff8554;
-            color: white;
+        body {
+            background: linear-gradient(135deg, #e9ecef 0%, #ffffff 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #343a40;
         }
 
-        .classroom-card .card-text {
-            padding: 20px;
+        .classroom-card {
+            border-radius: 15px;
+            overflow: hidden;
+            background-color: #007bff;
+            color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 30px rgba(0, 123, 255, 0.3);
+        }
+
+        .classroom-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(0, 123, 255, 0.5);
         }
 
         .classroom-card h2 {
             font-weight: bold;
             cursor: pointer;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
         }
 
-        .table td {
-            height: 60px;
+        .table td, .table th {
             vertical-align: middle;
             white-space: nowrap;
+            text-align: center;
         }
 
         .table th {
-            vertical-align: middle;
-            white-space: nowrap;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-custom {
+            margin: 0 5px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            background-color: #0056b3;
+        }
+
+        .modal-header {
+            background-color: #007bff;
+            color: white;
+            border-bottom: none;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+        }
+
+        .modal-body {
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        h2.text-center {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            h2.text-center {
+                font-size: 1.8rem;
+            }
+
+            .classroom-card h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -77,14 +127,12 @@ if (!$classData) {
     <div class="container mt-5">
         <!-- Card hiển thị thông tin lớp học -->
         <div class="card classroom-card shadow-lg">
-            <div class="card-body">
+            <div class="card-body text-center">
                 <h2 data-bs-toggle="modal" data-bs-target="#classModal"><?php echo htmlspecialchars($classData['class_name']); ?></h2>
                 <hr>
-                <div class="d-flex justify-content-between align-items-end">
-                    <div>
-                        <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
-                        <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
-                    </div>
+                <div>
+                    <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
+                    <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
                 </div>
             </div>
         </div>
@@ -96,6 +144,7 @@ if (!$classData) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="classModalLabel">Mã lớp học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <?php echo htmlspecialchars($classData['class_id']); ?>
@@ -112,9 +161,9 @@ if (!$classData) {
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="text-center">Danh sách điểm danh</h2>
             <div>
-                <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success">Xuất Excel</a>
-                <button class="btn btn-secondary" id="editModeBtn">Chỉnh sửa</button>
-                <button class="btn btn-primary" id="toggleTableBtn">Ẩn danh sách</button>
+                <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
+                <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
+                <button class="btn btn-primary btn-custom" id="toggleTableBtn">Ẩn danh sách</button>
             </div>
         </div>
         <hr>
@@ -135,21 +184,20 @@ if (!$classData) {
         const toggleTableBtn = document.getElementById('toggleTableBtn');
         const editModeBtn = document.getElementById('editModeBtn');
 
-        // Hàm để kiểm tra và ẩn/hiện các thành phần
         function toggleAttendanceList() {
             const isHidden = attendanceList.style.display === 'none';
             attendanceList.style.display = isHidden ? 'block' : 'none';
-            editModeBtn.style.display = isHidden ? 'inline-block' : 'none'; // Ẩn hoặc hiện nút chế độ chỉnh sửa
+            editModeBtn.style.display = isHidden ? 'inline-block' : 'none';
             toggleTableBtn.textContent = isHidden ? 'Ẩn danh sách' : 'Hiện danh sách';
         }
 
-        // Thay đổi chế độ chỉnh sửa
         function toggleEditMode() {
             const isEditVisible = attendanceEdit.style.display === 'block';
             attendanceList.style.display = isEditVisible ? 'block' : 'none';
             attendanceEdit.style.display = isEditVisible ? 'none' : 'block';
             editModeBtn.textContent = isEditVisible ? 'Chỉnh sửa' : 'Hủy';
         }
+        
         toggleTableBtn.addEventListener('click', toggleAttendanceList);
         editModeBtn.addEventListener('click', toggleEditMode);
     </script>

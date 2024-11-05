@@ -30,33 +30,6 @@ $endDate->modify('sunday this week'); // Đặt ngày kết thúc về Chủ Nh�
 $student_id = $_SESSION['user_id'];
 
 // Truy vấn để lấy lịch học, thông tin lớp và môn học trong khoảng thời gian từ thứ Hai đến Chủ Nhật, và lọc theo học kỳ và student_id
-// $sql = "
-//     SELECT 
-//         c.class_name,
-//         co.course_name,
-//         s.date,
-//         s.start_time,
-//         s.end_time,
-//         CASE 
-//             WHEN s.end_time < 7 THEN 'Sáng'
-//             WHEN s.end_time >= 7 AND s.end_time < 13 THEN 'Chiều'
-//             ELSE 'Tối'
-//         END AS ca_hoc 
-//     FROM 
-//         schedules s
-//     JOIN 
-//         classes c ON s.class_id = c.class_id
-//     JOIN 
-//         courses co ON c.course_id = co.course_id
-//     JOIN 
-//         class_students cs ON c.class_id = cs.class_id
-//     WHERE 
-//         s.date BETWEEN ? AND ?
-//         AND c.semester_id = ?
-//         AND cs.student_id = ? -- Thêm điều kiện lọc theo student_id
-//     ORDER BY 
-//         s.date, c.class_name
-// ";
 $sql = "CALL GetStudentSchedules(?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $semesterId, $student_id]);
@@ -78,9 +51,11 @@ $previousWeek->modify('-1 week');
 
 $nextWeek = clone $startDate;
 $nextWeek->modify('+1 week');
+
+// Lấy ngày hiện tại
+$currentWeek = new DateTime('now');
+$currentWeek->modify('monday this week'); // Đặt lại ngày bắt đầu tuần hiện tại về thứ Hai
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -91,6 +66,107 @@ $nextWeek->modify('+1 week');
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        h2 {
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .schedule-item {
+            cursor: pointer;
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: #d1ecf1;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .schedule-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background-color: #a2d2e0;
+        }
+
+        .btn {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 0 5px;
+        }
+
+        .btn-print {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background-color: #218838;
+        }
+
+        .btn-week {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-week:hover {
+            background-color: #0056b3;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .schedule-boxes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .schedule-boxes .schedule-item {
+            background-color: #e7f5ff;
+            border: 1px solid #007bff;
+        }
+
+        .d-flex .btn-group {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-group .btn {
+            margin-left: 5px;
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">
@@ -109,18 +185,23 @@ $nextWeek->modify('+1 week');
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="d-flex">
-            <!-- Nút điều hướng tuần -->
-            <a href="?week=<?php echo $previousWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-primary me-2 d-flex align-items-center" style="height: 100%;">
-                Trở về
+        <div class="d-flex justify-content-end">
+            <a href="?week=<?php echo $previousWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-week">
+                <i class="bi bi-arrow-left-circle"></i> Trở về
             </a>
-            <a href="?week=<?php echo $nextWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-primary d-flex align-items-center" style="height: 100%;">
-                Tiếp
+            <a href="?week=<?php echo $currentWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-week">
+                <i class="bi bi-house-door"></i> Hiện tại
             </a>
+            <a href="?week=<?php echo $nextWeek->format('Y-m-d'); ?>&semester_id=<?php echo $semesterId; ?>" class="btn btn-week">
+                <i class="bi bi-arrow-right-circle"></i> Tiếp
+            </a>
+            <button class="btn btn-print" onclick="window.print()">
+                <i class="bi bi-printer"></i> In lịch
+            </button>
         </div>
     </form>
 
-    <table class="table table-bordered text-center">
+    <table class="table table-bordered text-center" id="scheduleTable">
         <thead>
             <tr>
                 <th class="text-center align-middle">Ca học</th>
@@ -156,7 +237,7 @@ $nextWeek->modify('+1 week');
                                 <div class="schedule-boxes">
                                     <?php foreach ($weeklySchedules[$formattedDate] as $schedule): ?>
                                         <?php if ($schedule['ca_hoc'] === $shift): ?>
-                                            <div class="schedule-item border p-3 mb-2 bg-info-subtle">
+                                            <div class="schedule-item">
                                                 <strong><?php echo htmlspecialchars($schedule['class_name']); ?></strong><br>
                                                 <small><?php echo htmlspecialchars($schedule['course_name']); ?></small><br>
                                                 <small>Tiết: <?php echo htmlspecialchars($schedule['start_time']) . ' - ' . htmlspecialchars($schedule['end_time']); ?></small>
@@ -173,7 +254,6 @@ $nextWeek->modify('+1 week');
     </table>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

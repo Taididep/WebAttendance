@@ -4,7 +4,6 @@ $basePath = '';
 include __DIR__ . '/../Connect/connect.php';
 include __DIR__ . '/../LayoutPages/navbar.php';
 include __DIR__ . '/../Account/islogin.php';
-
 ?>
 
 <!DOCTYPE html>
@@ -19,28 +18,93 @@ include __DIR__ . '/../Account/islogin.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 
     <style>
+        body {
+            background-color: #eef2f3;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding-bottom: 60px; /* Để đảm bảo nội dung không bị che bởi footer */
+            position: relative;
+            min-height: 100vh; /* Đảm bảo body có chiều cao tối thiểu */
+        }
+
         .hero {
-            background-color: #f8f9fa;
-            padding: 50px 20px;
+            background-color: #ffffff;
+            padding: 60px 20px;
             text-align: center;
-            border-radius: 5px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            transition: transform 0.3s;
+        }
+
+        .hero:hover {
+            transform: translateY(-5px);
         }
 
         .hero img {
-            max-width: 100%;
+            max-width: 80%;
             height: auto;
+            border-radius: 10px;
+            transition: transform 0.3s;
+            margin-top: 20px;
         }
-    </style>
 
+        .hero img:hover {
+            transform: scale(1.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        p {
+            color: #555;
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 10px;
+            position: absolute; /* Đặt footer ở vị trí cố định */
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero img {
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container mt-5">
         <div class="hero">
-            <h1>Welcome</h1>
+            <h1>WELLCOME</h1>
             <img src="../Image/pngtree-school-cartoon-classroom-background-image_907637.png" alt="Hình ảnh cho trang chủ" class="img-fluid">
+            <p class="mt-4">Cảm ơn bạn đã tham gia cùng chúng tôi trong hành trình giáo dục!</p>
         </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Trường Học TLT. Tất cả quyền được bảo lưu.</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
