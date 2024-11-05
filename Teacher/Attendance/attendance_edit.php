@@ -58,7 +58,7 @@ foreach ($schedules as $schedule) {
                             <th style="width: 150px;">Lớp</th>
                             <th style="width: 150px;">Ngày sinh</th>
                             <?php foreach ($schedules as $index => $schedule): ?>
-                                <th style="width: 100px; text-align: center;" class="list-column" data-index="<?php echo $index; ?>">
+                                <th style="width: 100px; text-align: center;" class="edit-column" data-index="<?php echo $index; ?>">
                                     <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>" style="text-decoration: none; color: inherit;">
                                         <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
                                         <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
