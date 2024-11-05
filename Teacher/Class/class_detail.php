@@ -68,6 +68,12 @@ if (!$classData) {
             margin-bottom: 10px;
         }
 
+        .nav-tabs .nav-link.active {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
         .table td,
         .table th {
             vertical-align: middle;
@@ -103,22 +109,6 @@ if (!$classData) {
         .modal-body {
             text-align: center;
             font-size: 1.5rem;
-        }
-
-        h2.text-center {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            h2.text-center {
-                font-size: 1.8rem;
-            }
-
-            .classroom-card h2 {
-                font-size: 1.5rem;
-            }
         }
     </style>
 </head>
@@ -157,51 +147,64 @@ if (!$classData) {
         </div>
     </div>
 
-    <!-- Danh sách điểm danh -->
+    <!-- Tabs cho Bảng tin và Danh sách điểm danh -->
     <div class="container mt-5 mb-5">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2 class="text-center">Danh sách điểm danh</h2>
-            <div>
-                <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
-                <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
-                <button class="btn btn-primary btn-custom" id="toggleTableBtn">Ẩn danh sách</button>
+        <ul class="nav nav-tabs" id="tabMenu">
+            <li class="nav-item">
+                <a class="nav-link" id="news-tab" href="#news" data-bs-toggle="tab">Bảng tin</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="attendance-tab" href="#attendance" data-bs-toggle="tab">Danh sách</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3">
+            <!-- Nội dung Bảng tin -->
+            <div class="tab-pane fade" id="news" role="tabpanel" aria-labelledby="news-tab">
+                <p class="text-center">Nội dung bảng tin sẽ hiển thị ở đây.</p>
             </div>
-        </div>
-        <hr>
 
-        <div id="attendanceList" style="display: inline;">
-            <?php include '../Attendance/attendance_list.php'; ?> <!-- Gọi file danh sách điểm danh -->
-        </div>
+            <!-- Nội dung Danh sách điểm danh -->
+            <div class="tab-pane fade show active" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
 
-        <div id="attendanceEdit" style="display: none;">
-            <?php include '../Attendance/attendance_edit.php'; ?> <!-- Gọi file chỉnh sửa danh sách điểm danh -->
+                <div id="attendanceList" style="display: inline;">
+                    <?php include '../Attendance/attendance_list.php'; ?> <!-- Gọi file danh sách điểm danh -->
+                </div>
+
+                <div id="attendanceEdit" style="display: none;">
+                    <?php include '../Attendance/attendance_edit.php'; ?> <!-- Gọi file chỉnh sửa danh sách điểm danh -->
+                </div>
+
+            </div>
+
+
+
         </div>
     </div>
 
-    <!-- JavaScript để ẩn/hiện bảng -->
     <script>
         const attendanceList = document.getElementById('attendanceList');
         const attendanceEdit = document.getElementById('attendanceEdit');
-        const toggleTableBtn = document.getElementById('toggleTableBtn');
-        const editModeBtn = document.getElementById('editModeBtn');
+        const editModeBtn = document.getElementById('editModeBtn'); // Nút chuyển sang chế độ chỉnh sửa
+        const listModeBtn = document.getElementById('listModeBtn'); // Nút hủy chỉnh sửa, chỉ hiển thị trong attendanceEdit
 
-        function toggleAttendanceList() {
-            const isHidden = attendanceList.style.display === 'none';
-            attendanceList.style.display = isHidden ? 'block' : 'none';
-            editModeBtn.style.display = isHidden ? 'inline-block' : 'none';
-            toggleTableBtn.textContent = isHidden ? 'Ẩn danh sách' : 'Hiện danh sách';
-        }
-
-        function toggleEditMode() {
+        // Chuyển đổi giữa chế độ xem danh sách và chế độ chỉnh sửa
+        function toggleEditMode(event) {
+            event.preventDefault(); // Ngăn chặn hành động mặc định của nút
             const isEditVisible = attendanceEdit.style.display === 'block';
-            attendanceList.style.display = isEditVisible ? 'block' : 'none';
-            attendanceEdit.style.display = isEditVisible ? 'none' : 'block';
-            editModeBtn.textContent = isEditVisible ? 'Chỉnh sửa' : 'Hủy';
+            attendanceList.style.display = isEditVisible ? 'block' : 'none'; // Hiện danh sách nếu đang trong chế độ chỉnh sửa
+            attendanceEdit.style.display = isEditVisible ? 'none' : 'block'; // Ẩn danh sách nếu không trong chế độ chỉnh sửa
+            editModeBtn.textContent = isEditVisible ? 'Chỉnh sửa' : 'Hủy'; // Thay đổi nội dung nút chỉnh sửa
+            if (listModeBtn) listModeBtn.style.display = isEditVisible ? 'none' : 'inline-block'; // Hiện nút Hủy khi đang trong chế độ chỉnh sửa
         }
 
-        toggleTableBtn.addEventListener('click', toggleAttendanceList);
+        // Đặt sự kiện cho nút chỉnh sửa
         editModeBtn.addEventListener('click', toggleEditMode);
+        if (listModeBtn) listModeBtn.addEventListener('click', toggleEditMode); // Đặt sự kiện cho nút Hủy nếu tồn tại
     </script>
+
+
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
