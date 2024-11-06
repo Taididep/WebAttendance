@@ -33,25 +33,14 @@ include __DIR__ . '/../Account/islogin.php';
             padding: 60px 20px;
             text-align: center;
             border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
             margin-bottom: 30px;
-            transition: transform 0.3s;
-        }
-
-        .hero:hover {
-            transform: translateY(-5px);
         }
 
         .hero img {
             max-width: 80%;
             height: auto;
             border-radius: 10px;
-            transition: transform 0.3s;
             margin-top: 20px;
-        }
-
-        .hero img:hover {
-            transform: scale(1.1);
         }
 
         h1 {
@@ -69,28 +58,13 @@ include __DIR__ . '/../Account/islogin.php';
 
         .footer {
             text-align: center;
-            padding: 20px;
-            background-color: #2c3e50;
+            padding: 5px;
+            background-color: gray;
             color: white;
-            border-radius: 10px;
             position: absolute; /* Đặt footer ở vị trí cố định */
             bottom: 0;
             left: 0;
             right: 0;
-        }
-
-        @media (max-width: 768px) {
-            .hero img {
-                max-width: 100%;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            p {
-                font-size: 1rem;
-            }
         }
     </style>
 

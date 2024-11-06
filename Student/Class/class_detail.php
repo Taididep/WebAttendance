@@ -1,37 +1,36 @@
 <?php
 session_start();
-$basePath = '../'; // Đường dẫn gốc
+$basePath = '../'; // Base path
 include __DIR__ . '../../../Account/islogin.php';
 include __DIR__ . '/../../Connect/connect.php';
 include __DIR__ . '/../../LayoutPages/navbar_student.php';
 
-// Kiểm tra xem class_id có được gửi qua URL hay không
+// Check if class_id is sent through URL
 if (!isset($_GET['class_id'])) {
     echo 'Không tìm thấy thông tin lớp học.';
     exit;
 }
 
-// Lấy class_id từ URL
+// Get class_id from URL
 $class_id = $_GET['class_id'];
 
-// Lấy user_id từ phiên làm việc
+// Get user_id from session
 $student_id = $_SESSION['user_id'];
 
-// Truy vấn để lấy thông tin lớp học từ bảng classes
+// Query to get class details from the database
 $sql = "CALL GetClassDetailsById(?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$class_id]);
 
-// Lấy kết quả truy vấn
+// Fetch the result
 $classData = $stmt->fetch(PDO::FETCH_ASSOC);
 $stmt->closeCursor();
 
-// Kiểm tra xem có kết quả hay không
+// Check if result exists
 if (!$classData) {
     echo 'Không tìm thấy thông tin lớp học.';
     exit;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -81,7 +80,7 @@ if (!$classData) {
             font-weight: normal;
         }
 
-        /* Hiệu ứng hover */
+        /* Hover effect */
         .classroom-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 45px rgba(0, 123, 255, 0.2);
@@ -99,7 +98,7 @@ if (!$classData) {
             color: white;
         }
 
-        /* Nút ẩn/hiện */
+        /* Custom button */
         .btn-custom {
             margin: 0 5px;
             transition: background-color 0.2s, transform 0.2s;
@@ -110,14 +109,14 @@ if (!$classData) {
             background-color: #0056b3;
         }
 
-        /* Tiêu đề danh sách điểm danh */
+        /* Header styles */
         h2.text-center {
             font-size: 2.2rem;
             margin-bottom: 20px;
             font-weight: bold;
         }
 
-        /* Ẩn bảng khi ở màn hình nhỏ */
+        /* Responsive styles */
         @media (max-width: 768px) {
             .classroom-card h2 {
                 font-size: 1.5rem;
@@ -133,7 +132,7 @@ if (!$classData) {
 <body>
 
     <div class="container mt-5">
-        <!-- Card hiển thị thông tin lớp học -->
+        <!-- Card displaying class information -->
         <div class="card classroom-card shadow-lg">
             <div class="card-body">
                 <h2><?php echo htmlspecialchars($classData['class_name']); ?></h2>
@@ -146,7 +145,7 @@ if (!$classData) {
         </div>
     </div>
 
-    <!-- Thông tin điểm danh -->
+    <!-- Attendance information -->
     <div class="container mt-5 mb-5">
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="text-center">Thông tin điểm danh</h2>
@@ -154,23 +153,23 @@ if (!$classData) {
         </div>
         <hr>
 
-        <div id="attendanceList" style="display: inline;">
+        <div id="attendanceList" style="display: block;">
             <?php include '../Attendance/attendance_list.php'; ?>
         </div>
     </div>
 
     <script>
         const toggleTableBtn = document.getElementById('toggleTableBtn');
-        const attendanceList = document.getElementById('attendanceList'); // Lấy bảng danh sách
+        const attendanceList = document.getElementById('attendanceList');
 
-        // Hàm để kiểm tra và ẩn/hiện các thành phần
+        // Function to toggle attendance list visibility
         function toggleAttendanceList() {
             const isHidden = attendanceList.style.display === 'none' || attendanceList.style.display === '';
             attendanceList.style.display = isHidden ? 'block' : 'none';
             toggleTableBtn.textContent = isHidden ? 'Ẩn' : 'Hiện';
         }
 
-        // Gán sự kiện click cho nút
+        // Event listener for toggle button
         toggleTableBtn.addEventListener('click', toggleAttendanceList);
     </script>
 
