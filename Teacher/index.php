@@ -29,7 +29,7 @@ include __DIR__ . '/../Account/islogin.php';
     </div>
 
     <div class="footer">
-        <p>&copy; 2024 Trường Học TLT. Tất cả quyền được bảo lưu.</p>
+        <p class="text-light">&copy; 2024 Khoa Công Nghệ Thông Tin.</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
