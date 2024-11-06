@@ -16,6 +16,7 @@ include __DIR__ . '/../Account/islogin.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+<<<<<<< HEAD
 
     <style>
         body {
@@ -66,6 +67,9 @@ include __DIR__ . '/../Account/islogin.php';
             right: 0;
         }
     </style>
+=======
+    <link rel="stylesheet" href="Css/teacher.css">
+>>>>>>> b2ceb12625af8c88f70f117c87617aeb87e81659
 </head>
 
 <body>
@@ -78,7 +82,7 @@ include __DIR__ . '/../Account/islogin.php';
     </div>
 
     <div class="footer">
-        <p>&copy; 2024 Trường Học TLT. Tất cả quyền được bảo lưu.</p>
+        <p class="text-light">&copy; 2024 Khoa Công Nghệ Thông Tin.</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
