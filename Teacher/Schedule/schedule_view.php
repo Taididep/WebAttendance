@@ -63,7 +63,111 @@ $nextWeek->modify('+1 week');
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+<<<<<<< HEAD
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        h2 {
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .schedule-item {
+            cursor: pointer;
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: #d1ecf1;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .schedule-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background-color: #a2d2e0;
+        }
+
+        .btn {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 0 5px;
+        }
+
+        .btn-print {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background-color: #218838;
+        }
+
+        .btn-week {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-week:hover {
+            background-color: #0056b3;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .schedule-boxes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .schedule-boxes .schedule-item {
+            background-color: #e7f5ff;
+            border: 1px solid #007bff;
+        }
+
+        .d-flex .btn-group {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-group .btn {
+            margin-left: 5px;
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+=======
     <link rel="stylesheet" href="../Css/schedule_view.css">
+>>>>>>> 129b9e0d625e4b8226e486779f844c06f1fdb266
 </head>
 
 <body>
