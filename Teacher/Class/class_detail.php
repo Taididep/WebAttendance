@@ -49,10 +49,10 @@ if (!$classData) {
     <div class="side-tabs">
         <ul class="nav nav-tabs flex-column" id="tabMenu">
             <li class="nav-item">
-                <a class="nav-link active" id="news-tab" href="#news" data-bs-toggle="tab">Bảng tin</a>
+                <a class="nav-link" id="news-tab" href="#news" data-bs-toggle="tab">Bảng tin</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="attendance-tab" href="#attendance" data-bs-toggle="tab">Danh sách</a>
+                <a class="nav-link active" id="attendance-tab" href="#attendance" data-bs-toggle="tab">Danh sách</a>
             </li>
         </ul>
     </div>
@@ -92,10 +92,9 @@ if (!$classData) {
     <div class="container mt-5 mb-5">
         <div class="tab-content mt-3">
             <!-- Nội dung Bảng tin -->
-            <div class="tab-pane fade show active" id="news" role="tabpanel" aria-labelledby="news-tab">
+            <div class="tab-pane fade show" id="news" role="tabpanel" aria-labelledby="news-tab">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3>Bảng tin lớp học</h3>
-
                     <!-- Nút để mở modal tạo thông báo -->
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAnnouncementModal">
                         Tạo thông báo
@@ -122,7 +121,7 @@ if (!$classData) {
                                     <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>"> <!-- class_id ẩn -->
                                     <button type="submit" class="btn btn-primary">Tạo thông báo</button>
                                 </form>
-                            </div>s
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -153,7 +152,7 @@ if (!$classData) {
             </div>
 
             <!-- Nội dung Danh sách điểm danh -->
-            <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+            <div class="tab-pane fade show active" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
                 <div id="attendanceList" style="display: inline;">
                     <?php include '../Attendance/attendance_list.php'; ?> <!-- Gọi file danh sách điểm danh -->
                 </div>

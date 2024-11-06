@@ -44,6 +44,9 @@ foreach ($schedules as $schedule) {
     $scheduleMap[$schedule['date']][] = $schedule['schedule_id'];
 }
 
+// Ngày hiện tại
+$currentDate = date('Y-m-d');
+
 ?>
 
 <div id="attendanceList">
@@ -56,6 +59,7 @@ foreach ($schedules as $schedule) {
             </div>
         </div>
         <div>
+            <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-info">Thống kê điểm danh</a>
             <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
             <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
         </div>
@@ -80,7 +84,7 @@ foreach ($schedules as $schedule) {
                             <th style="width: 100px; text-align: center;" class="list-column" data-index="<?php echo $index; ?>">
                                 <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>" style="text-decoration: none; color: inherit;">
                                     <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
-                                    <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
+                                    <small><?php echo date('d/m/Y', strtotime($schedule['date'])); ?></small>
                                 </a>
                             </th>
                         <?php endforeach; ?>
@@ -141,13 +145,31 @@ foreach ($schedules as $schedule) {
                     </tr>
                 </tfoot>
             </table>
+        <?php endif; ?>
     </div>
-
-<?php endif; ?>
 </div>
 
-
 <script>
-    const totalDatesList = <?php echo count($schedules); ?>;
+    const currentDate = new Date('<?php echo $currentDate; ?>');
+    const scheduleCells = document.querySelectorAll('.list-column');
+
+    scheduleCells.forEach(cell => {
+        const dateText = cell.querySelector('small').innerText;
+        const [day, month, year] = dateText.split('/').map(Number);
+        const scheduleDate = new Date(year, month - 1, day); // Khởi tạo đối tượng Date với năm, tháng, ngày
+
+        // So sánh ngày điểm danh với ngày hiện tại
+        if (scheduleDate < currentDate) {
+            cell.classList.add('table-secondary'); // Thay đổi màu sắc cho các buổi đã qua
+            cell.innerHTML += '<br><span class="text-muted"><i class="bi bi-lock-fill"></i></span>'; // Thêm thông báo đã khóa
+            const link = cell.querySelector('a');
+            if (link) link.style.pointerEvents = 'none'; // Vô hiệu hóa liên kết
+            cell.style.pointerEvents = 'none'; // Vô hiệu hóa tương tác với ô điểm danh
+        }
+    });
 </script>
+
+<script> 
+    const totalDatesList = <?php echo count($schedules); ?>; 
+</script> 
 <script src="../JavaScript/attendance_list.js"></script>

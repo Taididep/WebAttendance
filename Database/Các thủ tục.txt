@@ -159,7 +159,7 @@ DELIMITER ;
 
 
 
---
+--9
 DELIMITER $$
 
 CREATE PROCEDURE GetSchedulesAndAttendanceByClassId(IN classId CHAR(8))
