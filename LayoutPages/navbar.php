@@ -7,8 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     // Lấy thông tin người dùng từ phiên
     $user_id = $_SESSION['user_id'];
 
-    // include __DIR__ . '/../Connect/connect.php';
-
     // Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
     $sql = "SELECT * FROM teachers WHERE teacher_id = ?";
     $stmt = $conn->prepare($sql);

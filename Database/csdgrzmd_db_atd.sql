@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 05, 2024 lúc 02:29 PM
+-- Thời gian đã tạo: Th10 06, 2024 lúc 10:04 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -139,6 +139,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesAndAttendanceByClassId`
     WHERE sch.class_id = classId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesByClassId` (IN `classId` VARCHAR(36))   BEGIN
+    SELECT schedule_id, date 
+    FROM schedules 
+    WHERE class_id = class_id;  
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassId` (IN `classId` CHAR(36))   BEGIN
     SELECT s.student_id, s.lastname, s.firstname, s.class, s.birthday, s.gender
     FROM students s
@@ -208,9 +214,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate
     WHERE 
         s.date BETWEEN startDate AND endDate
         AND c.semester_id = semesterId
-        AND c.teacher_id = teacher_id -- Thêm điều kiện lọc theo teacher_id
+        AND c.teacher_id = teacher_id
     ORDER BY 
-        s.date, c.class_name;
+        s.date, s.start_time;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_username` VARCHAR(255))   BEGIN
@@ -246,6 +252,29 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `announcement_id` int(11) NOT NULL,
+  `class_id` char(8) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `announcements`
+--
+
+INSERT INTO `announcements` (`announcement_id`, `class_id`, `title`, `content`, `created_at`, `updated_at`) VALUES
+(1, 'a409fd1d', 'Thong bao 01', 'Hom nay khong co bai tap ve nha', '2024-11-06 08:42:03', '2024-11-06 08:42:03'),
+(2, 'a409fd1d', 'Thong bao 02', 'thong bao nay nham muc dich de thu nghiem', '2024-11-06 08:53:31', '2024-11-06 08:53:31');
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `attendances`
 --
 
@@ -262,9 +291,9 @@ CREATE TABLE `attendances` (
 --
 
 INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status`, `updated_at`) VALUES
-(1, 16, 2001216114, 1, '2024-11-05 11:09:42'),
-(2, 17, 2001216114, 1, '2024-11-05 11:36:34'),
-(3, 18, 2001216114, 0, '2024-11-05 11:09:42'),
+(1, 16, 2001216114, 0, '2024-11-05 14:19:17'),
+(2, 17, 2001216114, 0, '2024-11-05 14:19:17'),
+(3, 18, 2001216114, 0, '2024-11-05 14:19:17'),
 (4, 19, 2001216114, 0, '2024-11-05 11:09:42'),
 (5, 20, 2001216114, 0, '2024-11-05 11:09:42'),
 (6, 21, 2001216114, 0, '2024-11-05 11:09:42'),
@@ -292,23 +321,23 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (28, 43, 2001216114, 0, '2024-11-05 11:09:43'),
 (29, 44, 2001216114, 0, '2024-11-05 11:09:43'),
 (30, 45, 2001216114, 0, '2024-11-05 11:09:43'),
-(31, 16, 2001210224, 1, '2024-11-05 12:57:05'),
-(32, 17, 2001210224, 1, '2024-11-05 12:57:05'),
-(33, 18, 2001210224, 0, '2024-11-05 12:57:05'),
-(34, 19, 2001210224, 0, '2024-11-05 12:57:05'),
-(35, 20, 2001210224, 0, '2024-11-05 12:57:05'),
-(36, 21, 2001210224, 0, '2024-11-05 12:57:05'),
-(37, 22, 2001210224, 0, '2024-11-05 12:57:05'),
-(38, 23, 2001210224, 0, '2024-11-05 12:57:05'),
-(39, 24, 2001210224, 0, '2024-11-05 12:57:05'),
+(31, 16, 2001210224, 2, '2024-11-05 17:44:04'),
+(32, 17, 2001210224, 1, '2024-11-05 14:21:05'),
+(33, 18, 2001210224, 1, '2024-11-05 14:21:05'),
+(34, 19, 2001210224, 1, '2024-11-05 14:21:05'),
+(35, 20, 2001210224, 1, '2024-11-05 14:21:05'),
+(36, 21, 2001210224, 1, '2024-11-05 14:21:05'),
+(37, 22, 2001210224, 2, '2024-11-05 14:21:05'),
+(38, 23, 2001210224, 2, '2024-11-05 14:21:05'),
+(39, 24, 2001210224, 2, '2024-11-05 14:21:05'),
 (40, 25, 2001210224, 0, '2024-11-05 12:57:05'),
 (41, 26, 2001210224, 0, '2024-11-05 12:57:05'),
 (42, 27, 2001210224, 0, '2024-11-05 12:57:05'),
 (43, 28, 2001210224, 0, '2024-11-05 12:57:05'),
 (44, 29, 2001210224, 0, '2024-11-05 12:57:05'),
 (45, 30, 2001210224, 0, '2024-11-05 12:57:05'),
-(46, 16, 2001214567, 0, '2024-11-05 12:57:05'),
-(47, 17, 2001214567, 0, '2024-11-05 12:57:05'),
+(46, 16, 2001214567, 1, '2024-11-05 14:21:18'),
+(47, 17, 2001214567, 2, '2024-11-05 14:21:18'),
 (48, 18, 2001214567, 0, '2024-11-05 12:57:05'),
 (49, 19, 2001214567, 0, '2024-11-05 12:57:05'),
 (50, 20, 2001214567, 0, '2024-11-05 12:57:05'),
@@ -322,7 +351,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (58, 28, 2001214567, 0, '2024-11-05 12:57:06'),
 (59, 29, 2001214567, 0, '2024-11-05 12:57:06'),
 (60, 30, 2001214567, 0, '2024-11-05 12:57:06'),
-(61, 16, 2001214568, 0, '2024-11-05 12:57:06'),
+(61, 16, 2001214568, 0, '2024-11-05 14:19:17'),
 (62, 17, 2001214568, 0, '2024-11-05 12:57:06'),
 (63, 18, 2001214568, 0, '2024-11-05 12:57:06'),
 (64, 19, 2001214568, 0, '2024-11-05 12:57:06'),
@@ -337,7 +366,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (73, 28, 2001214568, 0, '2024-11-05 12:57:06'),
 (74, 29, 2001214568, 0, '2024-11-05 12:57:06'),
 (75, 30, 2001214568, 0, '2024-11-05 12:57:07'),
-(76, 16, 2001215678, 0, '2024-11-05 12:57:07'),
+(76, 16, 2001215678, 0, '2024-11-05 14:19:17'),
 (77, 17, 2001215678, 0, '2024-11-05 12:57:07'),
 (78, 18, 2001215678, 0, '2024-11-05 12:57:07'),
 (79, 19, 2001215678, 0, '2024-11-05 12:57:07'),
@@ -352,7 +381,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (88, 28, 2001215678, 0, '2024-11-05 12:57:07'),
 (89, 29, 2001215678, 0, '2024-11-05 12:57:07'),
 (90, 30, 2001215678, 0, '2024-11-05 12:57:07'),
-(91, 16, 2001216780, 0, '2024-11-05 12:57:07'),
+(91, 16, 2001216780, 0, '2024-11-05 14:19:17'),
 (92, 17, 2001216780, 0, '2024-11-05 12:57:07'),
 (93, 18, 2001216780, 0, '2024-11-05 12:57:07'),
 (94, 19, 2001216780, 0, '2024-11-05 12:57:07'),
@@ -367,7 +396,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (103, 28, 2001216780, 0, '2024-11-05 12:57:08'),
 (104, 29, 2001216780, 0, '2024-11-05 12:57:08'),
 (105, 30, 2001216780, 0, '2024-11-05 12:57:08'),
-(106, 16, 2001216789, 0, '2024-11-05 12:57:08'),
+(106, 16, 2001216789, 0, '2024-11-05 14:19:17'),
 (107, 17, 2001216789, 0, '2024-11-05 12:57:08'),
 (108, 18, 2001216789, 0, '2024-11-05 12:57:08'),
 (109, 19, 2001216789, 0, '2024-11-05 12:57:08'),
@@ -382,7 +411,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (118, 28, 2001216789, 0, '2024-11-05 12:57:08'),
 (119, 29, 2001216789, 0, '2024-11-05 12:57:08'),
 (120, 30, 2001216789, 0, '2024-11-05 12:57:08'),
-(121, 16, 2001217890, 0, '2024-11-05 12:57:08'),
+(121, 16, 2001217890, 0, '2024-11-05 14:19:18'),
 (122, 17, 2001217890, 0, '2024-11-05 12:57:08'),
 (123, 18, 2001217890, 0, '2024-11-05 12:57:08'),
 (124, 19, 2001217890, 0, '2024-11-05 12:57:08'),
@@ -397,7 +426,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (133, 28, 2001217890, 0, '2024-11-05 12:57:08'),
 (134, 29, 2001217890, 0, '2024-11-05 12:57:08'),
 (135, 30, 2001217890, 0, '2024-11-05 12:57:08'),
-(136, 16, 2001218902, 0, '2024-11-05 12:57:09'),
+(136, 16, 2001218902, 0, '2024-11-05 14:19:18'),
 (137, 17, 2001218902, 0, '2024-11-05 12:57:09'),
 (138, 18, 2001218902, 0, '2024-11-05 12:57:09'),
 (139, 19, 2001218902, 0, '2024-11-05 12:57:09'),
@@ -412,7 +441,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (148, 28, 2001218902, 0, '2024-11-05 12:57:09'),
 (149, 29, 2001218902, 0, '2024-11-05 12:57:09'),
 (150, 30, 2001218902, 0, '2024-11-05 12:57:09'),
-(151, 16, 2001219012, 0, '2024-11-05 12:57:09'),
+(151, 16, 2001219012, 0, '2024-11-05 14:19:18'),
 (152, 17, 2001219012, 0, '2024-11-05 12:57:09'),
 (153, 18, 2001219012, 0, '2024-11-05 12:57:09'),
 (154, 19, 2001219012, 0, '2024-11-05 12:57:09'),
@@ -432,7 +461,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 -- Bẫy `attendances`
 --
 DELIMITER $$
-CREATE TRIGGER `after_attendance_insert` AFTER INSERT ON `attendances` FOR EACH ROW BEGIN
+CREATE TRIGGER `after_attendance_update` AFTER UPDATE ON `attendances` FOR EACH ROW BEGIN
     DECLARE total_present INT DEFAULT 0;
     DECLARE total_absent INT DEFAULT 0;
     DECLARE total_late INT DEFAULT 0;
@@ -494,15 +523,16 @@ CREATE TABLE `attendance_reports` (
 --
 
 INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_present`, `total_absent`, `total_late`) VALUES
-(1, 'a409fd1d', 2001210224, 2, 13, 0),
-(2, 'a409fd1d', 2001214567, 0, 15, 0),
+(1, 'a409fd1d', 2001210224, 5, 6, 4),
+(2, 'a409fd1d', 2001214567, 1, 13, 1),
 (3, 'a409fd1d', 2001214568, 0, 15, 0),
 (4, 'a409fd1d', 2001215678, 0, 15, 0),
 (5, 'a409fd1d', 2001216780, 0, 15, 0),
 (6, 'a409fd1d', 2001216789, 0, 15, 0),
 (7, 'a409fd1d', 2001217890, 0, 15, 0),
 (8, 'a409fd1d', 2001218902, 0, 15, 0),
-(9, 'a409fd1d', 2001219012, 0, 15, 0);
+(9, 'a409fd1d', 2001219012, 0, 15, 0),
+(10, 'a409fd1d', 2001216114, 0, 30, 0);
 
 -- --------------------------------------------------------
 
@@ -523,6 +553,7 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `teacher_id`) VALUES
+('1432cd49', 'KTMT T4 (1 - 3)', 7, 2, 1000001234),
 ('28d7e18c', 'TH KTLT T3(7-11)', 9, 2, 1000001234),
 ('a409fd1d', 'NMLT Vân Anh (T2 1-3)', 1, 2, 1000001234),
 ('d4b9ea2c', 'HDH T4 (4-6)', 5, 2, 1000001234);
@@ -553,6 +584,20 @@ INSERT INTO `class_students` (`class_id`, `student_id`) VALUES
 ('a409fd1d', 2001217890),
 ('a409fd1d', 2001218902),
 ('a409fd1d', 2001219012);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `comments`
+--
+
+CREATE TABLE `comments` (
+  `comment_id` int(11) NOT NULL,
+  `announcement_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `comment_text` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -715,7 +760,22 @@ INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_t
 (50, '28d7e18c', '2024-12-03', 7, 11),
 (51, '28d7e18c', '2024-12-10', 7, 11),
 (52, '28d7e18c', '2024-12-17', 7, 11),
-(53, '28d7e18c', '2024-12-24', 7, 11);
+(53, '28d7e18c', '2024-12-24', 7, 11),
+(99, '1432cd49', '2024-11-06', 1, 3),
+(100, '1432cd49', '2024-11-13', 1, 3),
+(101, '1432cd49', '2024-11-20', 1, 3),
+(102, '1432cd49', '2024-11-27', 1, 3),
+(103, '1432cd49', '2024-12-04', 1, 3),
+(104, '1432cd49', '2024-12-11', 1, 3),
+(105, '1432cd49', '2024-12-18', 1, 3),
+(106, '1432cd49', '2024-12-25', 1, 3),
+(107, '1432cd49', '2025-01-01', 1, 3),
+(108, '1432cd49', '2025-01-08', 1, 3),
+(109, '1432cd49', '2025-01-15', 1, 3),
+(110, '1432cd49', '2025-01-22', 1, 3),
+(111, '1432cd49', '2025-01-29', 1, 3),
+(112, '1432cd49', '2025-02-05', 1, 3),
+(113, '1432cd49', '2025-02-12', 1, 3);
 
 -- --------------------------------------------------------
 
@@ -753,34 +813,35 @@ CREATE TABLE `students` (
   `phone` varchar(15) DEFAULT NULL,
   `class` varchar(50) DEFAULT NULL,
   `birthday` date NOT NULL,
-  `gender` enum('Nam','Nữ') DEFAULT NULL
+  `gender` enum('Nam','Nữ') DEFAULT NULL,
+  `avatar` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `students`
 --
 
-INSERT INTO `students` (`student_id`, `lastname`, `firstname`, `email`, `phone`, `class`, `birthday`, `gender`) VALUES
-(2001210123, 'Trần Văn', 'Tùng', 'tranvantung@gmail.com', '0911234567', '12DHTH11', '2003-03-01', 'Nam'),
-(2001210224, 'Nguyễn Hữu', 'Thông', 'huuthong@gmail.com', '0901234567', '12DHTH14', '2003-03-15', 'Nam'),
-(2001211234, 'Phạm Thị', 'Vân', 'phamthivan@gmail.com', '0912345678', '14DHTH12', '2005-10-17', 'Nữ'),
-(2001211785, 'Phùng Vĩnh', 'Luân', 'vinhluan171@gmail.com', '0902345678', '12DHTH07', '2003-07-22', 'Nam'),
-(2001212345, 'Lê Minh', 'Cường', 'leminhcuong@gmail.com', '0903456789', '12DHTH03', '2003-02-11', 'Nam'),
-(2001212346, 'Hoàng Thị', 'Mai', 'hoangthimai@gmail.com', '0913456789', '13DHTH13', '2004-08-12', 'Nữ'),
-(2001213456, 'Trương Thị', 'Lan', 'truongthilan@gmail.com', '0904567890', '12DHTH04', '2003-06-06', 'Nữ'),
-(2001213457, 'Nguyễn Văn', 'Hùng', 'nguyenvanhung@gmail.com', '0914567890', '12DHTH14', '2002-05-05', 'Nam'),
-(2001214567, 'Hoàng Văn', 'Linh', 'hoangvanlinh@gmail.com', '0905678901', '12DHTH05', '2003-04-08', 'Nam'),
-(2001214568, 'Bùi Văn', 'Long', 'buivanlong@gmail.com', '0915678901', '13DHTH15', '2004-02-02', 'Nam'),
-(2001215678, 'Bùi Thị', 'Hồng', 'buithihong@gmail.com', '0906789012', '12DHTH06', '2003-12-19', 'Nữ'),
-(2001215679, 'Lê Thị', 'Như', 'lethinh@gmail.com', '0916789012', '12DHTH16', '2003-11-11', 'Nữ'),
-(2001216114, 'Đinh Văn', 'Tài', 'dinhvantai079@gmail.com', '0901234578', '12DHTH02', '2003-03-30', 'Nam'),
-(2001216780, 'Trương Văn', 'Dũng', 'truongvandung@gmail.com', '0917890123', '12DHTH17', '2003-01-01', 'Nam'),
-(2001216789, 'Vũ Văn', 'Bình', 'vuvanhbinh@gmail.com', '0907890123', '11DHTH07', '2002-10-10', 'Nam'),
-(2001217890, 'Nguyễn Thị', 'Hoa', 'nguyenthihua@gmail.com', '0908901234', '11DHTH08', '2002-11-17', 'Nữ'),
-(2001217891, 'Vũ Thị', 'Hạnh', 'vuthihanh@gmail.com', '0918901234', '13DHTH18', '2004-05-17', 'Nữ'),
-(2001218901, 'Đặng Văn', 'Quân', 'dangvanquan@gmail.com', '0909012345', '11DHTH09', '2002-05-30', 'Nam'),
-(2001218902, 'Đặng Thị', 'Thu', 'dangthithu@gmail.com', '0920123456', '13DHTH19', '2004-11-12', 'Nữ'),
-(2001219012, 'Lương Thị', 'Ngân', 'luongthingan@gmail.com', '0910123456', '12DHTH10', '2003-11-16', 'Nữ');
+INSERT INTO `students` (`student_id`, `lastname`, `firstname`, `email`, `phone`, `class`, `birthday`, `gender`, `avatar`) VALUES
+(2001210123, 'Trần Văn', 'Tùng', 'tranvantung@gmail.com', '0911234567', '12DHTH11', '2003-03-01', 'Nam', NULL),
+(2001210224, 'Nguyễn Hữu', 'Thông', 'huuthong@gmail.com', '0901234567', '12DHTH14', '2003-03-15', 'Nam', NULL),
+(2001211234, 'Phạm Thị', 'Vân', 'phamthivan@gmail.com', '0912345678', '14DHTH12', '2005-10-17', 'Nữ', NULL),
+(2001211785, 'Phùng Vĩnh', 'Luân', 'vinhluan171@gmail.com', '0902345678', '12DHTH07', '2003-07-22', 'Nam', NULL),
+(2001212345, 'Lê Minh', 'Cường', 'leminhcuong@gmail.com', '0903456789', '12DHTH03', '2003-02-11', 'Nam', NULL),
+(2001212346, 'Hoàng Thị', 'Mai', 'hoangthimai@gmail.com', '0913456789', '13DHTH13', '2004-08-12', 'Nữ', NULL),
+(2001213456, 'Trương Thị', 'Lan', 'truongthilan@gmail.com', '0904567890', '12DHTH04', '2003-06-06', 'Nữ', NULL),
+(2001213457, 'Nguyễn Văn', 'Hùng', 'nguyenvanhung@gmail.com', '0914567890', '12DHTH14', '2002-05-05', 'Nam', NULL),
+(2001214567, 'Hoàng Văn', 'Linh', 'hoangvanlinh@gmail.com', '0905678901', '12DHTH05', '2003-04-08', 'Nam', NULL),
+(2001214568, 'Bùi Văn', 'Long', 'buivanlong@gmail.com', '0915678901', '13DHTH15', '2004-02-02', 'Nam', NULL),
+(2001215678, 'Bùi Thị', 'Hồng', 'buithihong@gmail.com', '0906789012', '12DHTH06', '2003-12-19', 'Nữ', NULL),
+(2001215679, 'Lê Thị', 'Như', 'lethinh@gmail.com', '0916789012', '12DHTH16', '2003-11-11', 'Nữ', NULL),
+(2001216114, 'Đinh Văn', 'Tài', 'dinhvantai079@gmail.com', '0901234578', '12DHTH02', '2003-03-30', 'Nam', NULL),
+(2001216780, 'Trương Văn', 'Dũng', 'truongvandung@gmail.com', '0917890123', '12DHTH17', '2003-01-01', 'Nam', NULL),
+(2001216789, 'Vũ Văn', 'Bình', 'vuvanhbinh@gmail.com', '0907890123', '11DHTH07', '2002-10-10', 'Nam', NULL),
+(2001217890, 'Nguyễn Thị', 'Hoa', 'nguyenthihua@gmail.com', '0908901234', '11DHTH08', '2002-11-17', 'Nữ', NULL),
+(2001217891, 'Vũ Thị', 'Hạnh', 'vuthihanh@gmail.com', '0918901234', '13DHTH18', '2004-05-17', 'Nữ', NULL),
+(2001218901, 'Đặng Văn', 'Quân', 'dangvanquan@gmail.com', '0909012345', '11DHTH09', '2002-05-30', 'Nam', NULL),
+(2001218902, 'Đặng Thị', 'Thu', 'dangthithu@gmail.com', '0920123456', '13DHTH19', '2004-11-12', 'Nữ', NULL),
+(2001219012, 'Lương Thị', 'Ngân', 'luongthingan@gmail.com', '0910123456', '12DHTH10', '2003-11-16', 'Nữ', NULL);
 
 -- --------------------------------------------------------
 
@@ -795,17 +856,18 @@ CREATE TABLE `teachers` (
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
   `birthday` date NOT NULL,
-  `gender` enum('Nam','Nữ') DEFAULT NULL
+  `gender` enum('Nam','Nữ') DEFAULT NULL,
+  `avatar` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `teachers`
 --
 
-INSERT INTO `teachers` (`teacher_id`, `lastname`, `firstname`, `email`, `phone`, `birthday`, `gender`) VALUES
-(1000001234, 'Trần Thị Vân', 'Anh', 'vanAnh123@example.com', '0903456789', '1995-01-01', 'Nữ'),
-(1000001235, 'Trần Văn', 'Hùng', 'HungTV@example.com', '0903456790', '1990-01-01', 'Nam'),
-(1000001236, 'Nguyễn Văn', 'Tùng', 'NguyenVT@example.com', '0904567890', '1992-01-01', 'Nam');
+INSERT INTO `teachers` (`teacher_id`, `lastname`, `firstname`, `email`, `phone`, `birthday`, `gender`, `avatar`) VALUES
+(1000001234, 'Trần Thị Vân', 'Anh', 'vanAnh123@example.com', '0903456789', '1995-01-01', 'Nữ', '../../Image/Avatar/new_teacher.jpeg'),
+(1000001235, 'Trần Văn', 'Hùng', 'HungTV@example.com', '0903456790', '1990-01-01', 'Nam', NULL),
+(1000001236, 'Nguyễn Văn', 'Tùng', 'NguyenVT@example.com', '0904567890', '1992-01-01', 'Nam', NULL);
 
 -- --------------------------------------------------------
 
@@ -893,6 +955,13 @@ INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 --
 
 --
+-- Chỉ mục cho bảng `announcements`
+--
+ALTER TABLE `announcements`
+  ADD PRIMARY KEY (`announcement_id`),
+  ADD KEY `class_id` (`class_id`);
+
+--
 -- Chỉ mục cho bảng `attendances`
 --
 ALTER TABLE `attendances`
@@ -923,6 +992,14 @@ ALTER TABLE `classes`
 ALTER TABLE `class_students`
   ADD PRIMARY KEY (`class_id`,`student_id`),
   ADD KEY `fk_class_student_student_id` (`student_id`);
+
+--
+-- Chỉ mục cho bảng `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `announcement_id` (`announcement_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Chỉ mục cho bảng `courses`
@@ -988,6 +1065,12 @@ ALTER TABLE `user_roles`
 --
 
 --
+-- AUTO_INCREMENT cho bảng `announcements`
+--
+ALTER TABLE `announcements`
+  MODIFY `announcement_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
@@ -997,7 +1080,13 @@ ALTER TABLE `attendances`
 -- AUTO_INCREMENT cho bảng `attendance_reports`
 --
 ALTER TABLE `attendance_reports`
-  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT cho bảng `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT cho bảng `courses`
@@ -1021,7 +1110,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT cho bảng `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 
 --
 -- AUTO_INCREMENT cho bảng `semesters`
@@ -1052,6 +1141,12 @@ ALTER TABLE `users`
 --
 
 --
+-- Các ràng buộc cho bảng `announcements`
+--
+ALTER TABLE `announcements`
+  ADD CONSTRAINT `announcements_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE;
+
+--
 -- Các ràng buộc cho bảng `attendances`
 --
 ALTER TABLE `attendances`
@@ -1079,6 +1174,13 @@ ALTER TABLE `classes`
 ALTER TABLE `class_students`
   ADD CONSTRAINT `fk_class_student_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_class_student_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`announcement_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `courses`

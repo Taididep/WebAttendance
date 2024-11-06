@@ -26,6 +26,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+<<<<<<< HEAD
     <style>
         body {
             background-color: #f4f6f9;
@@ -109,6 +110,9 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
             transition: all 0.3s ease;
         }
     </style>
+=======
+    <link rel="stylesheet" href="../Css/class_manage.css">
+>>>>>>> 129b9e0d625e4b8226e486779f844c06f1fdb266
 </head>
 
 <body>
@@ -141,64 +145,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            var semesterId = $('#semester').val() || "<?php echo $defaultSemesterId; ?>";
-            if (semesterId) {
-                loadClasses(semesterId);
-            }
-
-            $('#semester').change(function() {
-                var semesterId = $(this).val();
-                if (semesterId) {
-                    loadClasses(semesterId);
-                } else {
-                    $('#classList').empty();
-                }
-            });
-        });
-
-        function loadClasses(semesterId) {
-            $.ajax({
-                url: 'get_classes.php',
-                type: 'POST',
-                data: {
-                    semester_id: semesterId
-                },
-                success: function(data) {
-                    $('#classList').html(data);
-                },
-                error: function() {
-                    $('#classList').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải dữ liệu.</div>');
-                }
-            });
-        }
-
-        $(document).on('click', '.btn-cancel', function(e) {
-            e.preventDefault();
-            var classId = $(this).data('class-id');
-            if (confirm('Bạn có chắc chắn muốn hủy lớp này không?')) {
-                $.ajax({
-                    url: 'delete_class.php',
-                    type: 'POST',
-                    data: {
-                        class_id: classId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            alert('Lớp đã được xóa thành công.');
-                            $('#semester').change();
-                        } else {
-                            alert('Có lỗi xảy ra: ' + response.message);
-                        }
-                    },
-                    error: function() {
-                        alert('Có lỗi xảy ra khi xóa lớp.');
-                    }
-                });
-            }
-        });
-    </script>
+    <script src="../JavaScript/class_manage.js"></script>
 </body>
 
 </html>

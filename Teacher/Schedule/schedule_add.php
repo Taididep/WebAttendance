@@ -8,8 +8,8 @@ include __DIR__ . '/../../Account/islogin.php';
 // Nhận giá trị từ URL
 $classId = isset($_GET['class_id']) ? $_GET['class_id'] : null;
 $startDate = isset($_GET['start_date']) ? $_GET['start_date'] : null;
-$startPeriod = isset($_GET['start_period']) ? $_GET['start_period'] : null; // Nhận tiết bắt đầu
-$endPeriod = isset($_GET['end_period']) ? $_GET['end_period'] : null; // Nhận tiết kết thúc
+$startPeriod = isset($_GET['start_period']) ? $_GET['start_period'] : null;
+$endPeriod = isset($_GET['end_period']) ? $_GET['end_period'] : null;
 
 // Khai báo biến cho các tiết
 $theoryPeriods = 0;
@@ -17,59 +17,24 @@ $practicePeriods = 0;
 $totalDays = 0;
 
 if ($classId) {
-    // Lấy thông tin tiết lý thuyết và thực hành từ bảng course_types
     $sql = "CALL GetCoursePeriodsByClassId(?)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$classId]);
     $course = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stmt->closeCursor(); // Đóng con trỏ
+    $stmt->closeCursor();
 
     if ($course) {
         $theoryPeriods = $course['theory_periods'];
         $practicePeriods = $course['practice_periods'];
-
-        // Tính số ngày cần tạo
-        $theoryDays = ceil($theoryPeriods / 3); // Mỗi ngày 3 tiết
-        $practiceDays = ceil($practicePeriods / 4); // Mỗi ngày 4 tiết
+        $theoryDays = ceil($theoryPeriods / 3);
+        $practiceDays = ceil($practicePeriods / 4);
         $totalDays = $theoryDays + $practiceDays;
     } else {
-        // Xử lý trường hợp không tìm thấy thông tin lớp
         echo '<div class="alert alert-danger">Không tìm thấy thông tin cho lớp học này.</div>';
         exit;
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Lấy thông tin lịch học
-    $dates = isset($_POST['dates']) ? $_POST['dates'] : [];
-    $startTimes = isset($_POST['start_time']) ? $_POST['start_time'] : [];
-    $endTimes = isset($_POST['end_time']) ? $_POST['end_time'] : [];
-
-    // Kiểm tra xem có dữ liệu nào không
-    if (empty($dates) || empty($startTimes) || empty($endTimes)) {
-        $errorMessage = "Vui lòng điền đầy đủ thông tin.";
-    } else {
-        // Chuyển đổi mảng thành JSON để truyền vào thủ tục
-        $datesJson = json_encode($dates);
-        $startTimesJson = json_encode($startTimes);
-        $endTimesJson = json_encode($endTimes);
-
-        // Gọi thủ tục thêm lịch học
-        $sql_schedule = "CALL AddSchedules(?, ?, ?, ?)";
-        $stmt_schedule = $conn->prepare($sql_schedule);
-        $stmt_schedule->execute([$classId, $datesJson, $startTimesJson, $endTimesJson]);
-
-        if ($stmt_schedule->rowCount() > 0) {
-            // Chuyển hướng về trang quản lý lớp học
-            header("Location: {$basePath}Class/class_manage.php");
-            exit();
-        } else {
-            $errorMessage = "Đã xảy ra lỗi khi thêm lịch học.";
-        }
-    }
-}
-
-// Chuyển đổi ngày bắt đầu thành timestamp
 $startDateTimestamp = strtotime($startDate);
 ?>
 
@@ -95,7 +60,8 @@ $startDateTimestamp = strtotime($startDate);
             <div class="alert alert-success"><?php echo $successMessage; ?></div>
         <?php endif; ?>
 
-        <form method="POST">
+        <!-- Form thêm lịch học -->
+        <form method="POST" action="add_schedule.php">
             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($classId); ?>">
 
             <div id="scheduleFields">
@@ -146,49 +112,7 @@ $startDateTimestamp = strtotime($startDate);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        document.getElementById('addDate').addEventListener('click', function() {
-            const scheduleFields = document.getElementById('scheduleFields');
-            const scheduleRows = document.querySelectorAll('.schedule-row');
-            const newIndex = scheduleRows.length + 1;
-
-            // Lấy ngày cuối cùng hiện tại
-            const lastDateInput = scheduleRows[scheduleRows.length - 1].querySelector('input[name="dates[]"]');
-            const lastDate = lastDateInput ? new Date(lastDateInput.value) : new Date();
-
-            // Tính toán ngày mới (tăng thêm 7 ngày)
-            lastDate.setDate(lastDate.getDate() + 7);
-
-            const newField = document.createElement('div');
-            newField.classList.add('row', 'mb-3', 'align-items-end', 'schedule-row');
-            newField.innerHTML = `
-            <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text">${newIndex}</span>
-                    <input type="date" class="form-control" name="dates[]" required value="${lastDate.toISOString().split('T')[0]}">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <input type="number" class="form-control" name="start_time[]" required min="1" max="17" placeholder="Tiết bắt đầu" value="<?php echo htmlspecialchars($startPeriod); ?>">
-            </div>
-            <div class="col-md-3">
-                <input type="number" class="form-control" name="end_time[]" required min="1" max="17" placeholder="Tiết kết thúc" value="<?php echo htmlspecialchars($endPeriod); ?>">
-            </div>
-            <div class="col-md-1">
-                <button type="button" class="btn btn-danger btn-lg remove-date"><i class="bi bi-trash fs-5"></i></button>
-            </div>
-        `;
-
-            scheduleFields.appendChild(newField);
-        });
-
-        document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('remove-date')) {
-                event.target.closest('.schedule-row').remove();
-            }
-        });
-    </script>
+    <script src="../JavaScript/schedule_add.js"></script>
 
 </body>
 

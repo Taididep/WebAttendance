@@ -1,0 +1,81 @@
+body {
+    background: linear-gradient(135deg, #e9ecef 0%, #ffffff 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #343a40;
+}
+
+.classroom-card {
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: #007bff;
+    color: white;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 8px 30px rgba(0, 123, 255, 0.3);
+}
+
+.classroom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 45px rgba(0, 123, 255, 0.5);
+}
+
+.classroom-card h2 {
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.table th {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-custom {
+    margin: 0 5px;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-custom:hover {
+    transform: translateY(-2px);
+    background-color: #0056b3;
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: white;
+    border-bottom: none;
+}
+
+.modal-content {
+    border-radius: 15px;
+}
+
+.modal-body {
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+/* Cố định thanh tab bên trái */
+.side-tabs {
+    position: absolute;
+    top: auto;
+    left: 0;
+    width: 150px;
+    height: 100%;
+    background-color: #f8f9fa;
+    border-right: 1px solid #ccc;
+    padding-top: 20px;
+}

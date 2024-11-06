@@ -1,7 +1,7 @@
 DELIMITER $$
 
-CREATE TRIGGER after_attendance_insert
-AFTER INSERT ON attendances
+CREATE TRIGGER after_attendance_update
+AFTER UPDATE ON attendances
 FOR EACH ROW
 BEGIN
     DECLARE total_present INT DEFAULT 0;

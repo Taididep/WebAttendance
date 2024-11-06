@@ -319,12 +319,13 @@ BEGIN
     WHERE 
         s.date BETWEEN startDate AND endDate
         AND c.semester_id = semesterId
-        AND c.teacher_id = teacher_id -- Thêm điều kiện lọc theo teacher_id
+        AND c.teacher_id = teacher_id -- lọc theo teacher_id
     ORDER BY 
-        s.date, c.class_name;
+        s.date, s.start_time; -- Sắp xếp theo start_time (tăng dần)
 END //
 
 DELIMITER ;
+
 
  
 
