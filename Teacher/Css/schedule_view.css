@@ -1,0 +1,92 @@
+body {
+    background-color: #f1f3f5;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+h2 {
+    color: #0056b3;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.custom-select {
+    border: 1px solid #007bff;
+    /* Đường viền xanh */
+    border-radius: 25px;
+    /* Bo tròn viền */
+    padding: 10px;
+    /* Padding bên trong */
+    background-color: #ffffff;
+    /* Màu nền trắng */
+    transition: border-color 0.3s;
+    /* Hiệu ứng chuyển màu */
+}
+
+.custom-select:focus {
+    border-color: #0056b3;
+    /* Đổi màu viền khi focus */
+    box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
+    /* Hiệu ứng bóng */
+}
+
+.schedule-item {
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 10px;
+    background-color: #d1ecf1;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.schedule-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.table {
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th,
+.table td {
+    border: 1px solid #dee2e6;
+    /* Đường viền cho các ô */
+    padding: 1rem;
+}
+
+.table th {
+    background-color: #007bff;
+    /* Màu nền cho tiêu đề */
+    color: #fff;
+}
+
+.table td {
+    background-color: #ffffff;
+    transition: background-color 0.3s;
+}
+
+.table td:hover {
+    background-color: #f8f9fa;
+    /* Nền xám nhạt khi hover */
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-success {
+    border-radius: 25px;
+    /* Bo tròn viền */
+    transition: background-color 0.3s, transform 0.3s;
+    /* Hiệu ứng chuyển màu */
+    padding: 10px 20px;
+    /* Thay đổi kích thước nút */
+}
+
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-success:hover {
+    transform: scale(1.05);
+    /* Tăng kích thước khi hover */
+}

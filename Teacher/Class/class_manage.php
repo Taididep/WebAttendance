@@ -25,66 +25,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
     <title>Trang giáo viên</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
-        }
-
-        .container {
-            margin-top: 50px;
-        }
-
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            color: #343a40;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-select {
-            border-radius: 0.5rem;
-            border: 1px solid #007bff;
-            /* Đường viền xanh */
-            transition: border-color 0.3s;
-        }
-
-        .form-select:focus {
-            border-color: #0056b3;
-            /* Đổi màu viền khi focus */
-            box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
-        }
-
-        .btn-success {
-            border-radius: 50px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-            transform: scale(1.05);
-        }
-
-        .class-table {
-            margin-top: 20px;
-        }
-
-        .class-table th {
-            background-color: #007bff;
-            color: #ffffff;
-        }
-
-        .class-table tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        .alert {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="../Css/class_manage.css">
 </head>
 
 <body>

@@ -11,7 +11,7 @@ if (!isset($_GET['class_id'])) {
 // Lấy class_id từ URL
 $class_id = $_GET['class_id'];
 
-// Lấy thông tin sinh viên trong lớp theo class_id
+// Lấy thông tin sinh viên trong lớp
 $sqlStudents = "CALL GetStudentsByClassId(?)";
 $stmtStudents = $conn->prepare($sqlStudents);
 $stmtStudents->execute([$class_id]);

@@ -16,8 +16,7 @@ $sqlStudents = "CALL GetStudentsByClassId(?)";
 $stmtStudents = $conn->prepare($sqlStudents);
 $stmtStudents->execute([$class_id]);
 $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
-$stmtStudents->closeCursor(); // Đóng con trỏ
-
+$stmtStudents->closeCursor();
 
 // Lấy thông tin điểm danh
 $attendanceMap = [];
@@ -28,13 +27,13 @@ foreach ($schedules as $schedule) {
     // Lấy trạng thái điểm danh cho lịch học
     $sqlAttendance = "CALL GetAttendanceByScheduleId(?, ?)";
     $stmtAttendance = $conn->prepare($sqlAttendance);
-    $stmtAttendance->execute([$schedule_id, $class_id]); // Cung cấp cả hai tham số
+    $stmtAttendance->execute([$schedule_id, $class_id]);
     $attendanceData = $stmtAttendance->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($attendanceData as $record) {
         $attendanceMap[$record['student_id']][$date] = $record['status'];
     }
-    $stmtAttendance->closeCursor(); // Đóng con trỏ sau mỗi lần thực thi
+    $stmtAttendance->closeCursor();
 }
 ?>
 

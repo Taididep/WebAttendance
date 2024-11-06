@@ -1,6 +1,6 @@
 <?php
 session_start();
-$basePath = '../'; // Đường dẫn gốc
+$basePath = '../';
 include __DIR__ . '/../../Connect/connect.php';
 
 // Kiểm tra xem class_id có được gửi qua URL hay không
