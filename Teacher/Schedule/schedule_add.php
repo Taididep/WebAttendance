@@ -52,13 +52,6 @@ $startDateTimestamp = strtotime($startDate);
 <body>
 
     <div class="container mt-5">
-        <h2>Thêm lịch học cho lớp ID: <?php echo htmlspecialchars($classId); ?></h2>
-        <hr>
-        <?php if (isset($errorMessage)): ?>
-            <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
-        <?php elseif (isset($successMessage)): ?>
-            <div class="alert alert-success"><?php echo $successMessage; ?></div>
-        <?php endif; ?>
 
         <!-- Form thêm lịch học -->
         <form method="POST" action="add_schedule.php">
