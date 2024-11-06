@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 05, 2024 lúc 04:35 PM
+-- Thời gian đã tạo: Th10 06, 2024 lúc 10:04 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -214,9 +214,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate
     WHERE 
         s.date BETWEEN startDate AND endDate
         AND c.semester_id = semesterId
-        AND c.teacher_id = teacher_id -- Thêm điều kiện lọc theo teacher_id
+        AND c.teacher_id = teacher_id
     ORDER BY 
-        s.date, c.class_name;
+        s.date, s.start_time;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_username` VARCHAR(255))   BEGIN
@@ -248,6 +248,29 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateOrInsertAttendance` (IN `p_sc
 END$$
 
 DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `announcement_id` int(11) NOT NULL,
+  `class_id` char(8) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `announcements`
+--
+
+INSERT INTO `announcements` (`announcement_id`, `class_id`, `title`, `content`, `created_at`, `updated_at`) VALUES
+(1, 'a409fd1d', 'Thong bao 01', 'Hom nay khong co bai tap ve nha', '2024-11-06 08:42:03', '2024-11-06 08:42:03'),
+(2, 'a409fd1d', 'Thong bao 02', 'thong bao nay nham muc dich de thu nghiem', '2024-11-06 08:53:31', '2024-11-06 08:53:31');
 
 -- --------------------------------------------------------
 
@@ -298,7 +321,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (28, 43, 2001216114, 0, '2024-11-05 11:09:43'),
 (29, 44, 2001216114, 0, '2024-11-05 11:09:43'),
 (30, 45, 2001216114, 0, '2024-11-05 11:09:43'),
-(31, 16, 2001210224, 1, '2024-11-05 14:21:05'),
+(31, 16, 2001210224, 2, '2024-11-05 17:44:04'),
 (32, 17, 2001210224, 1, '2024-11-05 14:21:05'),
 (33, 18, 2001210224, 1, '2024-11-05 14:21:05'),
 (34, 19, 2001210224, 1, '2024-11-05 14:21:05'),
@@ -500,7 +523,7 @@ CREATE TABLE `attendance_reports` (
 --
 
 INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_present`, `total_absent`, `total_late`) VALUES
-(1, 'a409fd1d', 2001210224, 6, 6, 3),
+(1, 'a409fd1d', 2001210224, 5, 6, 4),
 (2, 'a409fd1d', 2001214567, 1, 13, 1),
 (3, 'a409fd1d', 2001214568, 0, 15, 0),
 (4, 'a409fd1d', 2001215678, 0, 15, 0),
@@ -530,6 +553,7 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `teacher_id`) VALUES
+('1432cd49', 'KTMT T4 (1 - 3)', 7, 2, 1000001234),
 ('28d7e18c', 'TH KTLT T3(7-11)', 9, 2, 1000001234),
 ('a409fd1d', 'NMLT Vân Anh (T2 1-3)', 1, 2, 1000001234),
 ('d4b9ea2c', 'HDH T4 (4-6)', 5, 2, 1000001234);
@@ -560,6 +584,20 @@ INSERT INTO `class_students` (`class_id`, `student_id`) VALUES
 ('a409fd1d', 2001217890),
 ('a409fd1d', 2001218902),
 ('a409fd1d', 2001219012);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `comments`
+--
+
+CREATE TABLE `comments` (
+  `comment_id` int(11) NOT NULL,
+  `announcement_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `comment_text` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -722,7 +760,22 @@ INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_t
 (50, '28d7e18c', '2024-12-03', 7, 11),
 (51, '28d7e18c', '2024-12-10', 7, 11),
 (52, '28d7e18c', '2024-12-17', 7, 11),
-(53, '28d7e18c', '2024-12-24', 7, 11);
+(53, '28d7e18c', '2024-12-24', 7, 11),
+(99, '1432cd49', '2024-11-06', 1, 3),
+(100, '1432cd49', '2024-11-13', 1, 3),
+(101, '1432cd49', '2024-11-20', 1, 3),
+(102, '1432cd49', '2024-11-27', 1, 3),
+(103, '1432cd49', '2024-12-04', 1, 3),
+(104, '1432cd49', '2024-12-11', 1, 3),
+(105, '1432cd49', '2024-12-18', 1, 3),
+(106, '1432cd49', '2024-12-25', 1, 3),
+(107, '1432cd49', '2025-01-01', 1, 3),
+(108, '1432cd49', '2025-01-08', 1, 3),
+(109, '1432cd49', '2025-01-15', 1, 3),
+(110, '1432cd49', '2025-01-22', 1, 3),
+(111, '1432cd49', '2025-01-29', 1, 3),
+(112, '1432cd49', '2025-02-05', 1, 3),
+(113, '1432cd49', '2025-02-12', 1, 3);
 
 -- --------------------------------------------------------
 
@@ -902,6 +955,13 @@ INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 --
 
 --
+-- Chỉ mục cho bảng `announcements`
+--
+ALTER TABLE `announcements`
+  ADD PRIMARY KEY (`announcement_id`),
+  ADD KEY `class_id` (`class_id`);
+
+--
 -- Chỉ mục cho bảng `attendances`
 --
 ALTER TABLE `attendances`
@@ -932,6 +992,14 @@ ALTER TABLE `classes`
 ALTER TABLE `class_students`
   ADD PRIMARY KEY (`class_id`,`student_id`),
   ADD KEY `fk_class_student_student_id` (`student_id`);
+
+--
+-- Chỉ mục cho bảng `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `announcement_id` (`announcement_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Chỉ mục cho bảng `courses`
@@ -997,6 +1065,12 @@ ALTER TABLE `user_roles`
 --
 
 --
+-- AUTO_INCREMENT cho bảng `announcements`
+--
+ALTER TABLE `announcements`
+  MODIFY `announcement_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
@@ -1007,6 +1081,12 @@ ALTER TABLE `attendances`
 --
 ALTER TABLE `attendance_reports`
   MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT cho bảng `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT cho bảng `courses`
@@ -1030,7 +1110,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT cho bảng `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 
 --
 -- AUTO_INCREMENT cho bảng `semesters`
@@ -1061,6 +1141,12 @@ ALTER TABLE `users`
 --
 
 --
+-- Các ràng buộc cho bảng `announcements`
+--
+ALTER TABLE `announcements`
+  ADD CONSTRAINT `announcements_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE;
+
+--
 -- Các ràng buộc cho bảng `attendances`
 --
 ALTER TABLE `attendances`
@@ -1088,6 +1174,13 @@ ALTER TABLE `classes`
 ALTER TABLE `class_students`
   ADD CONSTRAINT `fk_class_student_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_class_student_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`announcement_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `courses`

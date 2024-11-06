@@ -47,27 +47,24 @@ foreach ($schedules as $schedule) {
 ?>
 
 <div id="attendanceList">
-    <?php if (empty($students)): ?>
-        <div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>
-    <?php else: ?>
-
-        <!-- Các nút -->
-        <div class="table-responsive">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex" style="width: 40%;">
-                    <div class="input-group d-flex">
-                        <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi (1, 2, ...)">
-                        <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>
-                        <button type="button" id="showAllBtnList" class="btn btn-success">Hiện tất cả</button>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
-                    <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
-                </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex" style="width: 40%;">
+            <div class="input-group d-flex">
+                <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi (1, 2, ...)">
+                <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>
+                <button type="button" id="showAllBtnList" class="btn btn-success">Hiện tất cả</button>
             </div>
-            <hr>
-
+        </div>
+        <div>
+            <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
+            <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
+        </div>
+    </div>
+    <hr>
+    <div class="table-responsive">
+        <?php if (empty($students)): ?>
+            <div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>
+        <?php else: ?>
             <!-- Danh sách -->
             <table class="table table-striped" id="attendanceTable" style="table-layout: fixed;">
                 <thead>
@@ -144,9 +141,9 @@ foreach ($schedules as $schedule) {
                     </tr>
                 </tfoot>
             </table>
-        </div>
+    </div>
 
-    <?php endif; ?>
+<?php endif; ?>
 </div>
 
 

@@ -30,44 +30,57 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
             background-color: #f8f9fa;
             font-family: 'Arial', sans-serif;
         }
+
         .container {
             margin-top: 50px;
         }
+
         .card {
             border-radius: 15px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
+
         h2 {
             color: #343a40;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
         }
+
         .form-select {
             border-radius: 0.5rem;
-            border: 1px solid #007bff; /* Đường viền xanh */
+            border: 1px solid #007bff;
+            /* Đường viền xanh */
             transition: border-color 0.3s;
         }
+
         .form-select:focus {
-            border-color: #0056b3; /* Đổi màu viền khi focus */
+            border-color: #0056b3;
+            /* Đổi màu viền khi focus */
             box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
         }
+
         .btn-success {
             border-radius: 50px;
             transition: background-color 0.3s, transform 0.3s;
         }
+
         .btn-success:hover {
             background-color: #218838;
             transform: scale(1.05);
         }
+
         .class-table {
             margin-top: 20px;
         }
+
         .class-table th {
             background-color: #007bff;
             color: #ffffff;
         }
+
         .class-table tr:hover {
             background-color: #f1f1f1;
         }
+
         .alert {
             margin-top: 20px;
         }
@@ -104,64 +117,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            var semesterId = $('#semester').val() || "<?php echo $defaultSemesterId; ?>";
-            if (semesterId) {
-                loadClasses(semesterId);
-            }
-
-            $('#semester').change(function() {
-                var semesterId = $(this).val();
-                if (semesterId) {
-                    loadClasses(semesterId);
-                } else {
-                    $('#classList').empty();
-                }
-            });
-        });
-
-        function loadClasses(semesterId) {
-            $.ajax({
-                url: 'get_classes.php',
-                type: 'POST',
-                data: {
-                    semester_id: semesterId
-                },
-                success: function(data) {
-                    $('#classList').html(data);
-                },
-                error: function() {
-                    $('#classList').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải dữ liệu.</div>');
-                }
-            });
-        }
-
-        $(document).on('click', '.btn-cancel', function(e) {
-            e.preventDefault();
-            var classId = $(this).data('class-id');
-            if (confirm('Bạn có chắc chắn muốn hủy lớp này không?')) {
-                $.ajax({
-                    url: 'delete_class.php',
-                    type: 'POST',
-                    data: {
-                        class_id: classId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            alert('Lớp đã được xóa thành công.');
-                            $('#semester').change();
-                        } else {
-                            alert('Có lỗi xảy ra: ' + response.message);
-                        }
-                    },
-                    error: function() {
-                        alert('Có lỗi xảy ra khi xóa lớp.');
-                    }
-                });
-            }
-        });
-    </script>
+    <script src="../JavaScript/class_manage.js"></script>
 </body>
 
 </html>

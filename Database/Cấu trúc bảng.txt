@@ -123,6 +123,30 @@ CREATE TABLE attendance_reports (
     CONSTRAINT fk_attendance_report_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
 );
 
+-- 10
+CREATE TABLE announcements (
+    announcement_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    class_id CHAR(8),
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE
+);
+-- 11
+CREATE TABLE comments (
+    comment_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    announcement_id INT(11),
+    user_id INT(11),
+    comment_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (announcement_id) REFERENCES announcements(announcement_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+
+
+
 ----------------------------------------------------------------------------------------------
 -- 1a
 INSERT INTO roles (role_name) 
