@@ -31,14 +31,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($count_result > 0) {  
         $_SESSION['error_message'] = "Mã giáo viên đã tồn tại.";  
-        header("Location: ../register_teacher.php");  
+        header("Location: ../register.php");  
         exit();  
     }  
 
     // Kiểm tra xem username đã tồn tại chưa  
     if (checkUsernameExists($conn, $username)) {  
         $_SESSION['error_message'] = "Username đã tồn tại.";  
-        header("Location: ../register_teacher.php");  
+        header("Location: ../register.php");  
         exit();  
     }  
 
