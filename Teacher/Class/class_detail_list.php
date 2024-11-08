@@ -1,3 +1,5 @@
+<!-- class_detail_list.php -->
+
 <?php
 session_start();
 $basePath = '../';
@@ -41,13 +43,14 @@ if (!$classData) {
     <div class="side-tabs">
         <ul class="nav nav-tabs flex-column" id="tabMenu">
             <li class="nav-item">
-                <a class="nav-link active" id="news-tab" href="#news" data-bs-toggle="tab">Bảng tin</a>
+                <a class="nav-link" id="news-tab" href="class_detail_announcement.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Bảng tin</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="attendance-tab" href="#attendance" data-bs-toggle="tab">Danh sách</a>
+                <a class="nav-link active" id="attendance-tab" href="class_detail_list.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Danh sách</a>
             </li>
         </ul>
     </div>
+
 
     <div class="container mt-5">
         <div class="card classroom-card shadow-lg">
@@ -82,47 +85,7 @@ if (!$classData) {
 
     <div class="container mt-5 mb-5">
         <div class="tab-content mt-3">
-            <div class="tab-pane fade show active" id="news" role="tabpanel" aria-labelledby="news-tab">
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3>Bảng tin lớp học</h3>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAnnouncementModal">
-                        Tạo thông báo
-                    </button>
-                </div>
-
-                <!-- Modal tạo thông báo -->
-                <div class="modal fade" id="createAnnouncementModal" tabindex="-1" aria-labelledby="createAnnouncementModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="createAnnouncementModalLabel">Tạo bảng tin mới</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="create_announcement.php" method="POST">
-                                    <div class="mb-3">
-                                        <label for="announcementTitle" class="form-label">Tiêu đề</label>
-                                        <input type="text" class="form-control" id="announcementTitle" name="title" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="announcementContent" class="form-label">Nội dung</label>
-                                        <textarea class="form-control" id="announcementContent" name="content" rows="4" required></textarea>
-                                    </div>
-                                    <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
-                                    <button type="submit" class="btn btn-primary">Tạo thông báo</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bao gồm bảng tin -->
-                <?php include 'announcement.php'; ?>
-
-            </div>
-
-            <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+            <div class="tab-pane fade show active" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
                 <div id="attendanceList" style="display: inline;">
                     <?php include '../Attendance/attendance_list.php'; ?>
                 </div>
@@ -132,17 +95,6 @@ if (!$classData) {
             </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById("commentsTitle").addEventListener("click", function() {
-            var allComments = document.getElementById("allComments");
-            if (allComments.style.display === "none") {
-                allComments.style.display = "block"; // Hiển thị tất cả bình luận
-            } else {
-                allComments.style.display = "none"; // Ẩn các bình luận thêm
-            }
-        });
-    </script>
 
     <script src="../JavaScript/class_detail.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

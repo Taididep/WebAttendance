@@ -89,6 +89,7 @@ if (!isset($_SESSION['user_id'])) {
             <div class="modal-header">
                 <h5 class="modal-title" id="joinClassModalLabel">Tham gia lớp học</h5>
             </div>
+
             <div class="modal-body">
                 <!-- Phần này hiển thị thông báo lỗi hoặc thành công -->
                 <div id="joinClassMessage" class="alert d-none"></div>

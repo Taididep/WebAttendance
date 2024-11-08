@@ -16,60 +16,7 @@ include __DIR__ . '/../Account/islogin.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
-<<<<<<< HEAD
-
-    <style>
-        body {
-            background-color: #eef2f3;
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding-bottom: 60px; /* Để đảm bảo nội dung không bị che bởi footer */
-            position: relative;
-            min-height: 100vh; /* Đảm bảo body có chiều cao tối thiểu */
-        }
-
-        .hero {
-            background-color: #ffffff;
-            padding: 60px 20px;
-            text-align: center;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-
-        .hero img {
-            max-width: 80%;
-            height: auto;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-
-        p {
-            color: #555;
-            font-size: 1.2rem;
-            margin-top: 15px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 5px;
-            background-color: gray;
-            color: white;
-            position: absolute; /* Đặt footer ở vị trí cố định */
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-    </style>
-=======
     <link rel="stylesheet" href="Css/teacher.css">
->>>>>>> b2ceb12625af8c88f70f117c87617aeb87e81659
 </head>
 
 <body>

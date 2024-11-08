@@ -27,9 +27,9 @@ if (isset($_POST['semester_id'])) {
             $counter = 1;
             foreach ($classes as $class) {
                 echo '<tr>';
-                echo '<td style="padding-left: 17px;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
-                echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
-                echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
+                echo '<td style="padding-left: 17px;" onclick="window.location.href=\'class_detail_announcement.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
+                echo '<td onclick="window.location.href=\'class_detail_announcement.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
+                echo '<td onclick="window.location.href=\'class_detail_announcement.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
                 echo '<td>';
                 echo '<div class="dropdown">';
                 echo '<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $counter . '" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">';

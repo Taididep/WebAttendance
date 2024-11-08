@@ -35,17 +35,14 @@ try {
     $stmt->execute([$class_id, $user_id]);
 
     if ($stmt->rowCount() > 0) {
-        echo "Bạn đã tham gia lớp học này rồi.";
-        exit();
+        $stmt = $conn->prepare("UPDATE class_students SET status = 1 WHERE class_id = ? AND student_id = ?");
+        $stmt->execute([$class_id, $user_id]);
+        echo "Tham gia lớp học thành công.";
+    } else {
+        echo "Bạn không có trong danh sách lớp";
     }
 
-    // Thêm bản ghi mới vào bảng class_students
-    $stmt = $conn->prepare("INSERT INTO class_students (class_id, student_id) VALUES (?, ?)");
-    $stmt->execute([$class_id, $user_id]);
-
     $conn->commit();
-
-    echo "Tham gia lớp học thành công.";
 } catch (Exception $e) {
     $conn->rollBack();
     echo "Lỗi: " . $e->getMessage();

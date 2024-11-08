@@ -51,18 +51,24 @@ $currentDate = date('Y-m-d');
 
 <div id="attendanceList">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="d-flex" style="width: 40%;">
+
+        <div class="d-flex" style="width: 24%;">
             <div class="input-group d-flex">
-                <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi (1, 2, ...)">
+                <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi">
                 <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>
                 <button type="button" id="showAllBtnList" class="btn btn-success">Hiện tất cả</button>
             </div>
         </div>
         <div>
+            <span class="mx-3"><strong>0:</strong> Vắng mặt</span>
+            <span class="mx-3"><strong>1:</strong> Có mặt</span>
+            <span class="mx-3"><strong>2:</strong> Đi trễ</span>
+        </div>
+        <div>
             <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-info">Thống kê điểm danh</a>
-            <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
             <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
         </div>
+
     </div>
     <hr>
     <div class="table-responsive">
@@ -124,30 +130,106 @@ $currentDate = date('Y-m-d');
                 </tbody>
                 <tfoot>
                     <tr class="bg-dark-subtle">
-                        <td colspan="7" style="text-align: center;">Tổng điểm danh</td>
+                        <td colspan="7" style="text-align: center;">Tổng sinh viên có mặt</td>
                         <?php foreach ($schedules as $schedule): ?>
                             <td class="list-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
                                 <?php
-                                // Tính số học sinh có mặt cho ngày này
                                 $countPresent = 0;
                                 foreach ($students as $student) {
                                     if (
                                         isset($attendanceMap[$student['student_id']][$schedule['date']]) &&
-                                        $attendanceMap[$student['student_id']][$schedule['date']] === '1'
+                                        ($attendanceMap[$student['student_id']][$schedule['date']] === '1' ||
+                                            $attendanceMap[$student['student_id']][$schedule['date']] === '2')
                                     ) {
                                         $countPresent++;
                                     }
                                 }
-                                echo $countPresent; // Hiển thị số học sinh có mặt
+                                echo $countPresent;
                                 ?>
                             </td>
                         <?php endforeach; ?>
                     </tr>
                 </tfoot>
+
             </table>
         <?php endif; ?>
     </div>
+    <div class="d-flex align-items-center justify-content-between mt-3">
+        <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Thêm sinh viên</button>
+        <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
+    </div>
 </div>
+
+
+<!-- Modal Nhập Mã Lớp Học -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addStudentModalLabel">Thêm sinh viên vào lớp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="addStudentForm" method="post">
+                <div class="modal-body">
+                    <div id="joinClassMessage" class="alert d-none"></div>
+
+                    <div class="mb-3">
+                        <label for="studentIdInput" class="form-label">Mã sinh viên</label>
+                        <input type="text" class="form-control" id="studentIdInput" name="student_id" required maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                    </div>
+
+                    <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Thêm sinh viên</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById("addStudentForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Ngăn chặn gửi form theo cách thông thường
+
+        const classId = document.querySelector("input[name='class_id']").value;
+        const studentId = document.getElementById("studentIdInput").value;
+        const joinClassMessage = document.getElementById("joinClassMessage");
+
+        // Gửi yêu cầu AJAX tới add_student.php
+        fetch("<?php echo $basePath; ?>Class/add_student.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `class_id=${encodeURIComponent(classId)}&student_id=${encodeURIComponent(studentId)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                joinClassMessage.classList.remove("d-none");
+                if (data.success) {
+                    joinClassMessage.classList.add("alert-success");
+                    joinClassMessage.classList.remove("alert-danger");
+                    joinClassMessage.innerText = data.message;
+                    // Reset form sau khi thêm sinh viên thành công
+                    document.getElementById("addStudentForm").reset();
+                } else {
+                    joinClassMessage.classList.add("alert-danger");
+                    joinClassMessage.classList.remove("alert-success");
+                    joinClassMessage.innerText = data.message;
+                }
+            })
+            .catch(error => {
+                joinClassMessage.classList.remove("d-none");
+                joinClassMessage.classList.add("alert-danger");
+                joinClassMessage.classList.remove("alert-success");
+                joinClassMessage.innerText = "Có lỗi xảy ra. Vui lòng thử lại.";
+            });
+    });
+</script>
 
 <script>
     const currentDate = new Date('<?php echo $currentDate; ?>');
@@ -169,7 +251,7 @@ $currentDate = date('Y-m-d');
     });
 </script>
 
-<script> 
-    const totalDatesList = <?php echo count($schedules); ?>; 
-</script> 
+<script>
+    const totalDatesList = <?php echo count($schedules); ?>;
+</script>
 <script src="../JavaScript/attendance_list.js"></script>

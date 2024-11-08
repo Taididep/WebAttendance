@@ -45,20 +45,22 @@ foreach ($schedules as $schedule) {
         <form method="POST" action="../Attendance/process_attendance.php">
             <!-- Các nút -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex" style="width: 40%;">
+                <div class="d-flex" style="width: 24%;">
                     <div class="input-group d-flex">
-                        <input type="number" id="attendanceInputEdit" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi (1, 2, ...)">
+                        <input type="number" id="attendanceInputEdit" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi">
                         <button type="button" id="confirmAttendanceBtnEdit" class="btn btn-primary">Xác nhận</button>
                         <button id="showAllBtnEdit" class="btn btn-dark">Hiện tất cả</button>
                     </div>
                 </div>
-
                 <div>
-                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                    <button class="btn btn-secondary btn-custom" id="listModeBtn">Hủy</button>
+                    <span class="mx-3"><strong>0:</strong> Vắng mặt</span>
+                    <span class="mx-3"><strong>1:</strong> Có mặt</span>
+                    <span class="mx-3"><strong>2:</strong> Đi trễ</span>
+                </div>
+                <div>
+                    <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-info">Thống kê điểm danh</a>
                     <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
                 </div>
-
             </div>
             <hr>
 
@@ -109,21 +111,21 @@ foreach ($schedules as $schedule) {
                     </tbody>
                     <tfoot>
                         <tr class="bg-dark-subtle">
-                            <td colspan="7" style="text-align: center;">Tổng điểm danh</td>
+                            <td colspan="7" style="text-align: center;">Tổng sinh viên có mặt</td>
                             <?php foreach ($schedules as $schedule): ?>
                                 <td class="list-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
                                     <?php
-                                    // Tính số học sinh có mặt cho ngày này
                                     $countPresent = 0;
                                     foreach ($students as $student) {
                                         if (
                                             isset($attendanceMap[$student['student_id']][$schedule['date']]) &&
-                                            $attendanceMap[$student['student_id']][$schedule['date']] === '1'
+                                            ($attendanceMap[$student['student_id']][$schedule['date']] === '1' ||
+                                                $attendanceMap[$student['student_id']][$schedule['date']] === '2')
                                         ) {
                                             $countPresent++;
                                         }
                                     }
-                                    echo $countPresent; // Hiển thị số học sinh có mặt
+                                    echo $countPresent;
                                     ?>
                                 </td>
                             <?php endforeach; ?>
@@ -133,10 +135,9 @@ foreach ($schedules as $schedule) {
             </div>
 
             <!-- Thanh nhập, nút xác nhận và nút hiện tất cả nằm ngang -->
-            <div class="d-flex align-items-center justify-content-between mt-3">
-                <div class="text-end ms-3">
-
-                </div>
+            <div class="d-flex align-items-center justify-content-end mt-3">
+                <button class="btn btn-secondary btn-custom" id="listModeBtn">Hủy</button>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
             </div>
 
         </form>
