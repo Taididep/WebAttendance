@@ -15,7 +15,6 @@ $stmt = $conn->prepare($sql);
 $stmt->execute([$class_id]);
 $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Hiển thị bảng tin
 if ($announcements) {
     foreach ($announcements as $announcement) {
 ?>
@@ -23,7 +22,9 @@ if ($announcements) {
             <div class="card-body">
                 <!-- Tiêu đề và ngày tạo -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0"><?php echo htmlspecialchars($announcement['title']); ?></h5>
+                    <h5 class="card-title mb-0" contenteditable="true" onblur="updateAnnouncementTitle(<?php echo $announcement['announcement_id']; ?>, this.innerText)">
+                        <?php echo htmlspecialchars($announcement['title']); ?>
+                    </h5>
 
                     <div class="d-flex align-items-center">
                         <small class="text-muted ms-3"><?php echo $announcement['created_at']; ?></small>
@@ -37,9 +38,9 @@ if ($announcements) {
 
                 <hr>
 
-                <!-- Nội dung thông báo -->
-                <div class="border p-3 mb-3" style="background-color: #f8f9fa;">
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($announcement['content'])); ?></p>
+                <!-- Nội dung thông báo có thể chỉnh sửa -->
+                <div class="border p-3 mb-3" style="background-color: #f8f9fa;" contenteditable="true" onblur="updateAnnouncementContent(<?php echo $announcement['announcement_id']; ?>, this.innerText)">
+                    <?php echo nl2br(htmlspecialchars($announcement['content'])); ?>
                 </div>
             </div>
 
@@ -60,7 +61,6 @@ if ($announcements) {
                     </h6>
                     <div id="commentsList_<?php echo $announcement['announcement_id']; ?>">
                         <?php
-                        // Các bình luận sẽ được hiển thị tại đây
                         $comment_sql = "
                             SELECT c.*, 
                                    COALESCE(t.lastname, s.lastname) AS lastname, 
@@ -75,7 +75,6 @@ if ($announcements) {
                         $comments = $comment_stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         if ($comments) {
-                            // Hiển thị tất cả bình luận từ cũ đến mới
                             foreach ($comments as $comment) {
                                 echo '<div class="mb-2 pb-2">';
                                 echo '<p class="mb-1"><strong>' . htmlspecialchars($comment['lastname']) . ' ' . htmlspecialchars($comment['firstname']) . '</strong> <small class="text-muted">' . $comment['created_at'] . '</small></p>';
@@ -109,9 +108,24 @@ if ($announcements) {
 }
 ?>
 
-<!-- JavaScript để bật/tắt việc hiển thị các bình luận cũ -->
 <script>
-    // Hàm để ẩn/hiện bình luận cũ
+    // Hàm để cập nhật tiêu đề
+    function updateAnnouncementTitle(announcementId, newTitle) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "update_announcement_title.php");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("announcement_id=" + announcementId + "&title=" + encodeURIComponent(newTitle));
+    }
+
+    // Hàm để cập nhật nội dung
+    function updateAnnouncementContent(announcementId, newContent) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "update_announcement_content.php");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("announcement_id=" + announcementId + "&content=" + encodeURIComponent(newContent));
+    }
+
+    // Hàm để ẩn/hiện bình luận
     function toggleComments(announcementId) {
         var commentsList = document.getElementById('commentsList_' + announcementId);
         if (commentsList.style.display === 'none') {

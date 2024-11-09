@@ -89,7 +89,7 @@ function sendEmail($toEmail, $newPassword) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
         // Nội dung email
-        $mail->setFrom('your_email@example.com', 'Tên của bạn hoặc Tên ứng dụng');
+        $mail->setFrom('your_email@example.com', 'Quên mật khẩu');
         $mail->addAddress($toEmail);
         $mail->Subject = 'Yêu cầu đặt lại mật khẩu';
         $mail->Body = "Mật khẩu mới của bạn là: $newPassword\nVui lòng đăng nhập và thay đổi mật khẩu ngay khi có thể.";

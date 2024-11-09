@@ -40,8 +40,6 @@ foreach ($attendanceData as $record) {
     $attendanceMap[$record['student_id']][$record['date']] = $record['status'];
 }
 
-
-
 // Lấy danh sách ngày điểm danh từ bảng schedules
 $sqlSchedules = "CALL GetDistinctDatesByClassId(?)";
 $stmtSchedules = $conn->prepare($sqlSchedules);
@@ -49,17 +47,13 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
 
-// Tạo mảng ánh xạ schedule_id với date
-$scheduleMap = [];
-foreach ($schedules as $schedule) {
-    $scheduleMap[$schedule['date']][] = $schedule['schedule_id'];
-}
-
 ?>
 
-<div id="attendanceTable">
+
+<!-- Bảng 1: Thông tin sinh viên -->
+<div id="studentInfoTable">
     <div class="table-responsive">
-        <table class="table table-striped" id="attendanceList" style="table-layout: fixed;">
+        <table class="table table-striped" id="studentList" style="table-layout: fixed;">
             <thead>
                 <tr>
                     <th style="width: 80px;">STT</th>
@@ -69,12 +63,6 @@ foreach ($schedules as $schedule) {
                     <th style="width: 150px;">Giới tính</th>
                     <th style="width: 150px;">Lớp</th>
                     <th style="width: 150px;">Ngày sinh</th>
-                    <?php foreach ($schedules as $index => $schedule): ?>
-                        <th style="width: 100px; text-align: center;" class="list-column" data-index="<?php echo $index; ?>">
-                            <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
-                            <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
-                        </th>
-                    <?php endforeach; ?>
                 </tr>
             </thead>
             <tbody>
@@ -87,10 +75,33 @@ foreach ($schedules as $schedule) {
                         <td><?php echo htmlspecialchars($student['gender']); ?></td>
                         <td><?php echo htmlspecialchars($student['class']); ?></td>
                         <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
-                        <?php foreach ($schedules as $schedule): ?>
-                            <td class="list-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
-                                <?php
-                                // Kiểm tra xem có trạng thái điểm danh không
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Bảng 2: Điểm danh theo các buổi (chỉ hiển thị buổi và trạng thái điểm danh) -->
+<div id="attendanceTable">
+    <div class="table-responsive">
+        <table class="table table-striped" id="attendanceList" style="table-layout: fixed;">
+            <thead>
+                <tr>
+                    <th style="width: 100px;">Buổi</th>
+                    <th style="width: 100px;">Ngày</th>
+                    <th style="width: 80px;">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($schedules as $index => $schedule): ?>
+                    <tr>
+                        <td style="text-align: center;"><?php echo 'Buổi ' . ($index + 1); ?></td>
+                        <td style="text-align: center;"><?php echo date('d/m/Y', strtotime($schedule['date'])); ?></td>
+                        <td>
+                            <?php
+                            // Kiểm tra trạng thái điểm danh của sinh viên
+                            foreach ($students as $student) {
                                 if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
                                     $status = $attendanceMap[$student['student_id']][$schedule['date']];
                                     if ($status === '1') {
@@ -100,12 +111,10 @@ foreach ($schedules as $schedule) {
                                     } else {
                                         echo '0'; // Vắng mặt
                                     }
-                                } else {
-                                    echo '0';
                                 }
-                                ?>
-                            </td>
-                        <?php endforeach; ?>
+                            }
+                            ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

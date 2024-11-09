@@ -16,7 +16,7 @@ if (isset($_POST['content']) && isset($_POST['announcement_id'])) {
         try {
             // Thực thi câu truy vấn
             $stmt->execute([$announcement_id, $user_id, $content]);
-            header("Location: class_detail.php?class_id=" . $_GET['class_id']); // Điều hướng về trang chi tiết lớp học
+            header("Location: class_detail_announcement.php?class_id=" . $_GET['class_id']); // Điều hướng về trang chi tiết lớp học
             exit();
         } catch (PDOException $e) {
             echo "Lỗi khi thêm bình luận: " . $e->getMessage();

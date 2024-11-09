@@ -87,10 +87,12 @@ CREATE TABLE classes (
 CREATE TABLE class_students (
     class_id CHAR(36) NOT NULL,
     student_id INT(11) NOT NULL,
+    status TINYINT(1) DEFAULT 1,
     CONSTRAINT fk_class_student_class_id FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE,
     CONSTRAINT fk_class_student_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
     PRIMARY KEY (class_id, student_id)
 );
+
 -- 7
 CREATE TABLE schedules (
     schedule_id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -105,7 +107,7 @@ CREATE TABLE attendances (
     attendance_id INT(11) AUTO_INCREMENT PRIMARY KEY,
     schedule_id INT(11) NOT NULL,
     student_id INT(11) NOT NULL,
-    status TINYINT(1) NOT NULL COMMENT '0: Absent, 1: Present, 2: Late',
+    status TINYINT(1) NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_schedule_id FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id) ON DELETE CASCADE,
     CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,

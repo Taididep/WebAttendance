@@ -20,25 +20,42 @@ if (isset($_POST['semester_id'])) {
         if ($classes) {
             // Hiển thị bảng lớp học
             echo '<table class="table table-striped">';
-            echo '<thead><tr"><th>STT</th><th>Tên lớp học</th><th>Tên môn học</th><th>Giáo viên</th><th style="width: 1%;"></th></tr></thead>';
+            echo '<thead><tr"><th>STT</th><th>Tên lớp học</th><th>Tên môn học</th><th>Giáo viên</th><th>Trạng thái</th><th style="width: 1%;"></th></tr></thead>';
             echo '<tbody>';
 
             // Khởi tạo biến đếm cho số thứ tự
             $counter = 1;
             foreach ($classes as $class) {
+                // Lấy thông tin điểm danh của sinh viên trong lớp
+                $sql_attendance = "SELECT total_present, total_absent, total_late FROM attendance_reports WHERE class_id = ? AND student_id = ?";
+                $stmt_attendance = $conn->prepare($sql_attendance);
+                $stmt_attendance->execute([$class['class_id'], $student_id]);
+                $attendance = $stmt_attendance->fetch(PDO::FETCH_ASSOC);
+                $stmt_attendance->closeCursor();
+
+                // Tạo trạng thái hiển thị theo dạng "total_present / total_classes"
+                $status = '-';
+                if ($attendance) {
+                    // Tính tổng số buổi học
+                    $total_classes = $attendance['total_present'] + $attendance['total_absent'] + $attendance['total_late'];
+
+                    // Hiển thị trạng thái "total_present / total_classes"
+                    $status = ($total_classes > 0) ? $attendance['total_present'] . " / " . $total_classes : "-";
+                }
+
                 echo '<tr>';
                 echo '<td style="padding-left: 17px;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
                 echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
                 echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
                 echo '<td>' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>'; // Hiển thị họ và tên giáo viên
+                echo '<td>' . $status . '</td>'; // Hiển thị trạng thái dưới dạng "total_present / total_classes"
                 echo '<td>';
                 echo '<div class="dropdown">';
                 echo '<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $counter . '" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">';
                 echo '<i class="bi bi-three-dots-vertical"></i>'; // Biểu tượng 3 chấm màu đen
                 echo '</button>';
                 echo '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $counter . '">';
-                echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy lớp học này không?\')">Hủy lớp</a></li>';
-                echo '<li><a class="dropdown-item" href="class_edit.php?class_id=' . htmlspecialchars($class['class_id']) . '">Cập nhật lớp</a></li>';
+                echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy đăng ký lớp học này không?\')">Hủy đăng ký</a></li>';
                 echo '<li><a class="dropdown-item" href="class_edit.php?class_id=' . htmlspecialchars($class['class_id']) . '">Xem lịch học</a></li>';
                 echo '</ul>';
                 echo '</div>';

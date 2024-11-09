@@ -53,7 +53,7 @@ if (!$classData) {
                 <a class="nav-link active" id="news-tab" href="#news" data-bs-toggle="tab" onclick="showTabContent('news')">Bảng tin</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="attendance-tab" href="#attendance" data-bs-toggle="tab" onclick="showTabContent('attendance')">Danh sách</a>
+                <a class="nav-link" id="attendance-tab" href="#attendance" data-bs-toggle="tab" onclick="showTabContent('attendance')">Điểm danh</a>
             </li>
         </ul>
     </div>

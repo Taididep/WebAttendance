@@ -64,8 +64,8 @@ body {
 }
 
 .modal-body {
-    text-align: center;
-    font-size: 1.5rem;
+    /* text-align: center; */
+    /* font-size: 1.5rem; */
 }
 
 /* Cố định thanh tab bên trái */
