@@ -45,3 +45,14 @@ h4 {
 .card-body {
     padding: 15px;
 }
+.past-date {
+    background-color: #cce5ff; /* Màu xanh dương nhạt cho ngày đã qua */
+}
+
+.today {
+    background-color: #d4edda; /* Màu xanh lá cho ngày hiện tại */
+}
+
+.next-day {
+    background-color: #d4edda; /* Màu xanh lá cho ngày tiếp theo */
+}

@@ -32,6 +32,9 @@ $stmt_schedules = $conn->prepare($sql_schedules);
 $stmt_schedules->execute([$classId]);
 $schedules = $stmt_schedules->fetchAll(PDO::FETCH_ASSOC);
 $stmt_schedules->closeCursor();
+
+// Ngày hiện tại
+$currentDate = date('Y-m-d');
 ?>
 
 <!DOCTYPE html>
@@ -72,9 +75,29 @@ $stmt_schedules->closeCursor();
                                 <td colspan="3" class="text-center">Không có lịch học nào.</td>
                             </tr>
                         <?php else: ?>
-                            <?php foreach ($schedules as $schedule): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($schedule['date']); ?></td>
+                            <?php 
+                            $nextDayFound = false; // Biến để kiểm tra ngày tiếp theo đã được tìm thấy chưa
+                            foreach ($schedules as $schedule): 
+                                $scheduleDate = $schedule['date'];
+                            ?>
+                                <tr class="<?php 
+                                    if ($scheduleDate < $currentDate) {
+                                        echo 'past-date text-muted'; // Ngày đã qua
+                                    } elseif ($scheduleDate === $currentDate) {
+                                        echo 'today'; // Ngày hiện tại
+                                    } elseif ($scheduleDate > $currentDate && !$nextDayFound) {
+                                        echo 'next-day'; // Ngày tiếp theo
+                                        $nextDayFound = true; // Đánh dấu là đã tìm thấy ngày tiếp theo
+                                    } 
+                                ?>">
+                                    <td>
+                                        <?php 
+                                        echo date('d/m/Y', strtotime($scheduleDate)); 
+                                        if ($scheduleDate < $currentDate) {
+                                            echo ' (pass)'; // Thêm chữ "pass" cho ngày đã qua
+                                        }
+                                        ?>
+                                    </td>
                                     <td><?php echo htmlspecialchars($schedule['start_time']); ?></td>
                                     <td><?php echo htmlspecialchars($schedule['end_time']); ?></td>
                                 </tr>
