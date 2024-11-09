@@ -12,11 +12,6 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-h2 {
-    color: #007bff;
-    font-weight: bold;
-}
-
 .alert {
     margin-top: 20px;
 }

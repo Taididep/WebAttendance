@@ -38,16 +38,32 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
 
-// Tạo mảng ánh xạ schedule_id với date
-$scheduleMap = [];
-foreach ($schedules as $schedule) {
-    $scheduleMap[$schedule['date']][] = $schedule['schedule_id'];
-}
-
 // Ngày hiện tại
 $currentDate = date('Y-m-d');
-
 ?>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin-top: 100px;
+    }
+
+    .present {
+        background-color: #d4edda; /* Màu xanh lá */
+    }
+
+    .late {
+        background-color: #fff3cd; /* Màu vàng */
+    }
+
+    .absent {
+        background-color: #f8d7da; /* Màu đỏ */
+    }
+</style>
 
 <div id="attendanceList">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -107,14 +123,14 @@ $currentDate = date('Y-m-d');
                                     if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
                                         $status = $attendanceMap[$student['student_id']][$schedule['date']];
                                         if ($status === '1') {
-                                            echo '1'; // Có mặt
+                                            echo '<span class="present">1</span>'; // Có mặt
                                         } elseif ($status === '2') {
-                                            echo '2'; // Muộn
+                                            echo '<span class="late">2</span>'; // Muộn
                                         } else {
-                                            echo '0'; // Vắng mặt
+                                            echo '<span class="absent">0</span>'; // Vắng mặt
                                         }
                                     } else {
-                                        echo '0';
+                                        echo '<span class="absent">0</span>'; // Không có dữ liệu điểm danh
                                     }
                                     ?>
                                 </td>
@@ -169,7 +185,7 @@ $currentDate = date('Y-m-d');
     });
 </script>
 
-<script> 
-    const totalDatesList = <?php echo count($schedules); ?>; 
-</script> 
+<script>
+    const totalDatesList = <?php echo count($schedules); ?>;
+</script>
 <script src="../JavaScript/attendance_list.js"></script>

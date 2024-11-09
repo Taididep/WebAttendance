@@ -1,6 +1,7 @@
 body {
     background-color: #f8f9fa;
     font-family: 'Arial', sans-serif;
+    color: #333;
 }
 
 .container {
@@ -12,48 +13,11 @@ body {
     margin: 0 auto;
 }
 
-h2 {
-    color: #007bff;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
 .schedule-item {
     cursor: pointer;
     border-radius: 8px;
     padding: 1rem;
     background-color: #d1ecf1;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.schedule-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    background-color: #a2d2e0;
-}
-
-.btn {
-    font-size: 16px;
-    padding: 10px 20px;
-    margin: 0 5px;
-}
-
-.btn-print {
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-print:hover {
-    background-color: #218838;
-}
-
-.btn-week {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-week:hover {
-    background-color: #0056b3;
 }
 
 .table th, .table td {
@@ -81,19 +45,4 @@ h2 {
 .d-flex .btn-group {
     display: flex;
     justify-content: flex-end;
-}
-
-.btn-group .btn {
-    margin-left: 5px;
-}
-
-@media (max-width: 768px) {
-    h2 {
-        font-size: 1.5rem;
-    }
-
-    .btn {
-        font-size: 14px;
-        padding: 8px 16px;
-    }
 }

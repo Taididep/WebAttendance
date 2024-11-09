@@ -2,20 +2,18 @@
 
 3GetAllSemesters
 
-
 2GetTeacherInfo
-
 
 4GetClassesBySemesterAndTeacher 	-- get_classes.php
 
 5GetClassDetailsById			-- class_detail.php
 
-6GetStudentsByClassId			-- export_excel, attendance_list, attendance_edit, 
-
+6GetStudentsByClassId			-- export_excel, attendance_list, attendance_edit,
+ 
 7GetSchedulesAndAttendanceByClassId
 
-8GetDistinctDatesByClassId
 
+8GetDistinctDatesByClassId
 
 10GetAttendanceByScheduleId
 
@@ -29,7 +27,11 @@
 
 15GetStudentsByClassIdAndStudentId 
 
+16
 
+17
+
+18GetClassInfoById
 
 
 
@@ -166,7 +168,7 @@ CREATE PROCEDURE GetSchedulesAndAttendanceByClassId(IN classId CHAR(8))
 BEGIN
     SELECT 
         sch.schedule_id,
-        sch.date, 
+        sch.date,
         a.student_id, 
         a.status 
     FROM schedules sch
@@ -401,6 +403,49 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+--18 thủ tục xem lịch học
+DELIMITER //
+
+CREATE PROCEDURE GetClassInfoById(IN classId CHAR(8))
+BEGIN
+    SELECT 
+        c.class_name, 
+        co.course_name, 
+        CONCAT(t.lastname, ' ', t.firstname) AS teacher_fullname,
+        s.semester_name 
+    FROM 
+        classes c
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    JOIN 
+        teachers t ON c.teacher_id = t.teacher_id
+    JOIN 
+        semesters s ON c.semester_id = s.semester_id
+    WHERE 
+        c.class_id = classId;
+END //
+
+DELIMITER ;
+
+
+--Fix table: GetSchedulesByClassId
+DELIMITER //
+
+CREATE PROCEDURE GetSchedulesByClassId(IN classId CHAR(36))
+BEGIN
+    SELECT 
+        sch.schedule_id,
+        sch.date,
+        sch.start_time,  -- Đảm bảo trường này có trong bảng schedules
+        sch.end_time     -- Đảm bảo trường này có trong bảng schedules
+    FROM schedules sch
+    WHERE sch.class_id = classId;
+END
+DELIMITER ;
+
+
 
 
 

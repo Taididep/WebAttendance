@@ -9,14 +9,6 @@ body {
     padding-top: 50px;
 }
 
-h2 {
-    font-size: 1.8rem; /* Reduced font size */
-    font-weight: 700;
-    color: #2c3e50;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px; /* Reduced margin */
-}
-
 .form-select {
     font-size: 1rem;
     padding: 12px;
