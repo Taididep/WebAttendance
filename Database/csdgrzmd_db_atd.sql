@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 08, 2024 lúc 09:29 PM
+-- Thời gian đã tạo: Th10 09, 2024 lúc 02:23 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.0.30
+-- Phiên bản PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -112,6 +112,24 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemesterAndTeacher` (IN
     WHERE c.semester_id = semester_id AND c.teacher_id = teacher_id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassInfoById` (IN `classId` CHAR(8))   BEGIN
+    SELECT 
+        c.class_name, 
+        co.course_name, 
+        CONCAT(t.lastname, ' ', t.firstname) AS teacher_fullname,
+        s.semester_name 
+    FROM 
+        classes c
+    JOIN 
+        courses co ON c.course_id = co.course_id
+    JOIN 
+        teachers t ON c.teacher_id = t.teacher_id
+    JOIN 
+        semesters s ON c.semester_id = s.semester_id
+    WHERE 
+        c.class_id = classId;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCoursePeriodsByClassId` (IN `p_class_id` CHAR(36))   BEGIN
     SELECT ct.theory_periods, ct.practice_periods
     FROM classes c
@@ -140,9 +158,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesAndAttendanceByClassId`
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesByClassId` (IN `classId` VARCHAR(36))   BEGIN
-    SELECT schedule_id, date 
-    FROM schedules 
-    WHERE class_id = class_id;  
+    SELECT 
+        sch.schedule_id,
+        sch.date,
+        sch.start_time,  -- Đảm bảo trường này có trong bảng schedules
+        sch.end_time     -- Đảm bảo trường này có trong bảng schedules
+    FROM schedules sch
+    WHERE sch.class_id = classId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassId` (IN `classId` CHAR(36))   BEGIN
