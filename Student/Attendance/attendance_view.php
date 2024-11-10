@@ -76,7 +76,6 @@ if (!$classInfo) {
             <form id="attendanceForm" action="process_attendance.php" method="POST">
                 <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
                 <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($schedule_id); ?>">
-                <input type="hidden" id="attendanceStatus" name="status" value="1"> <!-- Giá trị mặc định là 'đúng giờ' -->
 
                 <div class="text-center mt-3">
                     <button type="submit" class="btn btn-primary">Điểm danh</button>
@@ -101,25 +100,25 @@ if (!$classInfo) {
                 if (timer > 0) {
                     timer--;
 
-                    if (timer >= 10 * 60) { // Within the first 10 minutes
+                    if (timer >= 10 * 60) { // Từ 10 phút trở lên
                         statusMessage.className = 'status-green';
                         statusMessage.innerText = 'Đúng giờ';
-                        attendanceStatus.value = 1;
-                    } else if (timer >= 5 * 60) { // Between 5-10 minutes
+                        attendanceStatus.value = 1; // Trạng thái là đúng giờ
+                    } else if (timer >= 5 * 60) { // Từ 5 đến 10 phút
                         statusMessage.className = 'status-yellow';
                         statusMessage.innerText = 'Trễ';
-                        attendanceStatus.value = 2;
-                    } else { // Less than 5 minutes
+                        attendanceStatus.value = 2; // Trạng thái là trễ
+                    } else { // Dưới 5 phút
                         statusMessage.className = 'status-red';
                         statusMessage.innerText = 'Vắng';
-                        attendanceStatus.value = 3;
+                        attendanceStatus.value = 3; // Trạng thái là vắng
                     }
 
                 } else {
                     clearInterval(countdown);
                     statusMessage.className = 'status-red';
                     statusMessage.innerText = 'Vắng mặt';
-                    attendanceStatus.value = 3;
+                    attendanceStatus.value = 3; // Trạng thái là vắng
                     form.querySelector('button').disabled = true; // Disable button if time is up
                 }
             }, 1000);
