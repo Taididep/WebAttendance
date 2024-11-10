@@ -53,22 +53,25 @@ $currentDate = date('Y-m-d');
     }
 
     .present {
-        background-color: #d4edda; /* Màu xanh lá */
+        background-color: #d4edda;
+        /* Màu xanh lá */
     }
 
     .late {
-        background-color: #fff3cd; /* Màu vàng */
+        background-color: #fff3cd;
+        /* Màu vàng */
     }
 
     .absent {
-        background-color: #f8d7da; /* Màu đỏ */
+        background-color: #f8d7da;
+        /* Màu đỏ */
     }
 </style>
 
 <div id="attendanceList">
     <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <div class="d-flex" style="width: 24%;">
+        <div class="d-flex" style="width: 26%;">
             <div class="input-group d-flex">
                 <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi">
                 <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>

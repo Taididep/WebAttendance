@@ -438,8 +438,8 @@ BEGIN
     SELECT 
         sch.schedule_id,
         sch.date,
-        sch.start_time,  -- Đảm bảo trường này có trong bảng schedules
-        sch.end_time     -- Đảm bảo trường này có trong bảng schedules
+        sch.start_time,
+        sch.end_time
     FROM schedules sch
     WHERE sch.class_id = classId;
 END

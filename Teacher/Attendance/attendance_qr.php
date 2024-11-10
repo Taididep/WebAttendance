@@ -144,7 +144,7 @@ echo $detailUrl; // Chỉ dùng cho kiểm tra
         <div id="qrCodeContainer">
             <div id="qrCode"></div>
         </div>
-        <a href="../Class/class_detail.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-danger">Đóng</a>
+        <a href="../Class/class_detail_list.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-danger">Đóng</a>
     </div>
 
     <div class="footer text-center">

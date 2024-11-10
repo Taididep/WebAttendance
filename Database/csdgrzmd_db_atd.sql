@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 09, 2024 lúc 02:23 PM
+-- Thời gian đã tạo: Th10 10, 2024 lúc 04:06 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Phiên bản PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -161,8 +161,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesByClassId` (IN `classId
     SELECT 
         sch.schedule_id,
         sch.date,
-        sch.start_time,  -- Đảm bảo trường này có trong bảng schedules
-        sch.end_time     -- Đảm bảo trường này có trong bảng schedules
+        sch.start_time,
+        sch.end_time
     FROM schedules sch
     WHERE sch.class_id = classId;
 END$$

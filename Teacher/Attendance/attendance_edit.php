@@ -45,7 +45,7 @@ foreach ($schedules as $schedule) {
         <form method="POST" action="../Attendance/process_attendance.php">
             <!-- Các nút -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex" style="width: 24%;">
+                <div class="d-flex" style="width: 26%;">
                     <div class="input-group d-flex">
                         <input type="number" id="attendanceInputEdit" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi">
                         <button type="button" id="confirmAttendanceBtnEdit" class="btn btn-primary">Xác nhận</button>
