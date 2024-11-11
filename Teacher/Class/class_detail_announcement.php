@@ -100,7 +100,7 @@ if (!$classData) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="create_announcement.php" method="POST">
+                        <form action="../Announcement/create_announcement.php" method="POST">
                             <div class="mb-3">
                                 <label for="announcementTitle" class="form-label">Tiêu đề</label>
                                 <input type="text" class="form-control" id="announcementTitle" name="title" required>
@@ -118,7 +118,7 @@ if (!$classData) {
         </div>
 
         <!-- Bao gồm bảng tin -->
-        <?php include 'announcement.php'; ?>
+        <?php include '../Announcement/announcement.php'; ?>
     </div>
 
     <script src="../JavaScript/class_detail.js"></script>

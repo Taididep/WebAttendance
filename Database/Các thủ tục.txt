@@ -32,6 +32,8 @@
 17
 
 18GetClassInfoById
+19GetScheduleById
+
 
 
 
@@ -446,6 +448,13 @@ END
 DELIMITER ;
 
 
+--19 thủ tục QR
+DELIMITER //
+CREATE PROCEDURE GetScheduleById(IN schedule_id INT)
+BEGIN
+    SELECT * FROM schedules WHERE id = schedule_id;
+END //
+DELIMITER ;
 
 
 

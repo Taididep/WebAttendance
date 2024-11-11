@@ -144,6 +144,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetDistinctDatesByClassId` (IN `cla
     WHERE class_id = classId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetScheduleById` (IN `schedule_id` INT)   BEGIN
+    SELECT * FROM schedules WHERE id = schedule_id;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesAndAttendanceByClassId` (IN `classId` CHAR(36))   BEGIN
     SELECT 
         sch.schedule_id,
@@ -292,7 +296,8 @@ CREATE TABLE `announcements` (
 
 INSERT INTO `announcements` (`announcement_id`, `class_id`, `title`, `content`, `created_at`, `updated_at`) VALUES
 (8, 'a409fd1d', 'Báo cáo tiến độ', 'Vào lúc 8h30 sẽ báo cáo đồ án', '2024-11-06 17:26:32', '2024-11-08 16:53:57'),
-(9, 'a409fd1d', 'Thông báo khẩn', '30/11 sẽ hết hạn đồ án chuyên ngành, các em tranh thủ nha.', '2024-11-06 18:25:00', '2024-11-08 16:52:48');
+(9, 'a409fd1d', 'Thông báo khẩn', '30/11 sẽ hết hạn đồ án chuyên ngành, các em tranh thủ nha.', '2024-11-06 18:25:00', '2024-11-08 16:52:48'),
+(14, '3c1afe86', 'Ôn tập', 'Chuẩn bị thi reading', '2024-11-10 16:40:06', '2024-11-10 16:40:06');
 
 -- --------------------------------------------------------
 
@@ -462,7 +467,24 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (162, 27, 2001219012, 0, '2024-11-05 12:57:09'),
 (163, 28, 2001219012, 0, '2024-11-05 12:57:09'),
 (164, 29, 2001219012, 0, '2024-11-05 12:57:09'),
-(165, 30, 2001219012, 0, '2024-11-05 12:57:09');
+(165, 30, 2001219012, 0, '2024-11-05 12:57:09'),
+(186, 147, 2001211785, 1, '2024-11-10 16:26:44'),
+(187, 16, 2001215679, 0, '2024-11-11 03:29:37'),
+(188, 17, 2001215679, 0, '2024-11-11 03:29:37'),
+(189, 18, 2001215679, 0, '2024-11-11 03:29:37'),
+(190, 19, 2001215679, 0, '2024-11-11 03:29:37'),
+(191, 20, 2001215679, 0, '2024-11-11 03:29:37'),
+(192, 21, 2001215679, 0, '2024-11-11 03:29:37'),
+(193, 22, 2001215679, 0, '2024-11-11 03:29:37'),
+(194, 23, 2001215679, 0, '2024-11-11 03:29:37'),
+(195, 24, 2001215679, 0, '2024-11-11 03:29:37'),
+(196, 25, 2001215679, 0, '2024-11-11 03:29:37'),
+(197, 26, 2001215679, 0, '2024-11-11 03:29:37'),
+(198, 27, 2001215679, 0, '2024-11-11 03:29:37'),
+(199, 28, 2001215679, 0, '2024-11-11 03:29:37'),
+(200, 29, 2001215679, 0, '2024-11-11 03:29:37'),
+(201, 30, 2001215679, 0, '2024-11-11 03:29:37'),
+(202, 148, 2001211785, 0, '2024-11-11 03:42:19');
 
 --
 -- Bẫy `attendances`
@@ -539,7 +561,9 @@ INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_
 (7, 'a409fd1d', 2001217890, 0, 15, 0),
 (8, 'a409fd1d', 2001218902, 0, 15, 0),
 (9, 'a409fd1d', 2001219012, 0, 15, 0),
-(10, 'a409fd1d', 2001216114, 4, 11, 0);
+(10, 'a409fd1d', 2001216114, 4, 11, 0),
+(11, 'a409fd1d', 2001215679, 0, 15, 0),
+(12, '3c1afe86', 2001211785, 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -560,7 +584,7 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `teacher_id`) VALUES
-('1432cd49', 'KTMT T4 (1 - 3)', 7, 2, 1000001234),
+('3c1afe86', 'Nguyễn Nữ Như Linh', 26, 2, 1000001234),
 ('a409fd1d', 'NMLT Vân Anh (T2 1-3)', 1, 2, 1000001234);
 
 -- --------------------------------------------------------
@@ -580,6 +604,7 @@ CREATE TABLE `class_students` (
 --
 
 INSERT INTO `class_students` (`class_id`, `student_id`, `status`) VALUES
+('3c1afe86', 2001211785, 1),
 ('a409fd1d', 2001210224, 0),
 ('a409fd1d', 2001214567, 0),
 ('a409fd1d', 2001214568, 0),
@@ -756,21 +781,21 @@ INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_t
 (28, 'a409fd1d', '2025-01-28', 1, 3),
 (29, 'a409fd1d', '2025-02-04', 1, 3),
 (30, 'a409fd1d', '2025-02-11', 1, 3),
-(99, '1432cd49', '2024-11-06', 1, 3),
-(100, '1432cd49', '2024-11-13', 1, 3),
-(101, '1432cd49', '2024-11-20', 1, 3),
-(102, '1432cd49', '2024-11-27', 1, 3),
-(103, '1432cd49', '2024-12-04', 1, 3),
-(104, '1432cd49', '2024-12-11', 1, 3),
-(105, '1432cd49', '2024-12-18', 1, 3),
-(106, '1432cd49', '2024-12-25', 1, 3),
-(107, '1432cd49', '2025-01-01', 1, 3),
-(108, '1432cd49', '2025-01-08', 1, 3),
-(109, '1432cd49', '2025-01-15', 1, 3),
-(110, '1432cd49', '2025-01-22', 1, 3),
-(111, '1432cd49', '2025-01-29', 1, 3),
-(112, '1432cd49', '2025-02-05', 1, 3),
-(113, '1432cd49', '2025-02-12', 1, 3);
+(134, '3c1afe86', '2024-08-14', 4, 6),
+(135, '3c1afe86', '2024-08-21', 4, 6),
+(136, '3c1afe86', '2024-08-28', 4, 6),
+(137, '3c1afe86', '2024-09-04', 4, 6),
+(138, '3c1afe86', '2024-09-11', 4, 6),
+(139, '3c1afe86', '2024-09-18', 4, 6),
+(140, '3c1afe86', '2024-09-25', 4, 6),
+(141, '3c1afe86', '2024-10-02', 4, 6),
+(142, '3c1afe86', '2024-10-09', 4, 6),
+(143, '3c1afe86', '2024-10-16', 4, 6),
+(144, '3c1afe86', '2024-10-23', 4, 6),
+(145, '3c1afe86', '2024-10-30', 4, 6),
+(146, '3c1afe86', '2024-11-06', 4, 6),
+(147, '3c1afe86', '2024-11-13', 4, 6),
+(148, '3c1afe86', '2024-11-20', 4, 6);
 
 -- --------------------------------------------------------
 
@@ -1063,19 +1088,19 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT cho bảng `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `announcement_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `announcement_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=186;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=203;
 
 --
 -- AUTO_INCREMENT cho bảng `attendance_reports`
 --
 ALTER TABLE `attendance_reports`
-  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT cho bảng `comments`
@@ -1105,7 +1130,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT cho bảng `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=149;
 
 --
 -- AUTO_INCREMENT cho bảng `semesters`

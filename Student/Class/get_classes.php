@@ -44,11 +44,11 @@ if (isset($_POST['semester_id'])) {
                 }
 
                 echo '<tr>';
-                echo '<td style="padding-left: 17px;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
-                echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
-                echo '<td onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
-                echo '<td>' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>'; // Hiển thị họ và tên giáo viên
-                echo '<td>' . $status . '</td>'; // Hiển thị trạng thái dưới dạng "total_present / total_classes"
+                echo '<td style="padding-left: 17px; vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
+                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
+                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
+                echo '<td style="vertical-align: middle;">' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>'; // Hiển thị họ và tên giáo viên
+                echo '<td style="vertical-align: middle;">' . $status . '</td>'; // Hiển thị trạng thái dưới dạng "total_present / total_classes"
                 echo '<td>';
                 echo '<div class="dropdown">';
                 echo '<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $counter . '" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">';
@@ -56,7 +56,7 @@ if (isset($_POST['semester_id'])) {
                 echo '</button>';
                 echo '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $counter . '">';
                 echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy đăng ký lớp học này không?\')">Hủy đăng ký</a></li>';
-                echo '<li><a class="dropdown-item" href="class_edit.php?class_id=' . htmlspecialchars($class['class_id']) . '">Xem lịch học</a></li>';
+                echo '<li><a class="dropdown-item" href="class_view.php?class_id=' . htmlspecialchars($class['class_id']) . '">Xem lịch học</a></li>';
                 echo '</ul>';
                 echo '</div>';
                 echo '</td>';

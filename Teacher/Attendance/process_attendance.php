@@ -29,5 +29,5 @@ foreach ($attendanceData as $student_id => $schedules) {
     }
 }
 
-header("Location: ../Class/class_detail.php?class_id=" . urlencode($class_id) . "&message=Thay đổi đã được lưu thành công.");
+header("Location: ../Class/class_detail_list.php?class_id=" . urlencode($class_id) . "&message=Thay đổi đã được lưu thành công.");
 exit;

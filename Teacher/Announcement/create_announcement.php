@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute([$class_id, $title, $content]);
 
     if ($stmt->rowCount() > 0) {
-        header("Location: class_detail_announcement.php?class_id=" . $class_id); // Chuyển hướng về trang chi tiết lớp học
+        header("Location: Announcement/class_detail_announcement.php?class_id=" . $class_id); // Chuyển hướng về trang chi tiết lớp học
         exit;
     } else {
         echo 'Có lỗi khi tạo bảng tin.';
