@@ -38,15 +38,8 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
 
-// Ngày hiện tại
-$currentDate = date('Y-m-d');
-
-
-// Tìm buổi học kế tiếp
-$nextSchedule = null;
-if (!empty($schedules)) {
-    $nextSchedule = reset($schedules); // Buổi kế tiếp là buổi đầu tiên trong danh sách đã lọc
-}
+// Ngày giờ hiện tại
+$currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 ?>
 
 <style>
@@ -97,7 +90,6 @@ if (!empty($schedules)) {
         <?php if (empty($students)): ?>
             <div class="alert alert-warning text-center">Lớp hiện chưa có học sinh nào</div>
         <?php else: ?>
-            <!-- Danh sách -->
             <table class="table table-striped" id="attendanceTable" style="table-layout: fixed;">
                 <thead>
                     <tr>
@@ -251,21 +243,42 @@ if (!empty($schedules)) {
 </script>
 
 <script>
-    const currentDate = new Date('<?php echo $currentDate; ?>');
+    const currentDateTime = new Date('<?php echo $currentDateTime; ?>');
     const scheduleCells = document.querySelectorAll('.list-column');
 
     scheduleCells.forEach(cell => {
         const dateText = cell.querySelector('small').innerText;
         const [day, month, year] = dateText.split('/').map(Number);
-        const scheduleDate = new Date(year, month - 1, day);
+        const scheduleDate = new Date(year, month - 1, day); // Tạo đối tượng Date cho ngày điểm danh
 
-        // So sánh ngày điểm danh với ngày hiện tại
-        if (scheduleDate < currentDate || scheduleDate > currentDate) {
-            cell.classList.add('locked');
-            cell.innerHTML = `<span class="lock-icon text-black"><i class="bi bi-lock-fill"></i></span> ` + cell.innerHTML; // Thêm biểu tượng khóa trước từ "Buổi"
+        // So sánh ngày điểm danh với thời gian hiện tại
+        if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
+            // Nếu ngày là hôm nay, thêm lớp màu xanh lá
+            cell.classList.add('today');
+        } else if (scheduleDate < currentDateTime) {
+            cell.classList.add('table-secondary'); // Thay đổi màu sắc cho các buổi đã qua
+            cell.innerHTML += '<br><span class="lock-icon"><i class="bi bi-lock-fill"></i></span>'; // Thêm biểu tượng khóa
             const link = cell.querySelector('a');
             if (link) link.style.pointerEvents = 'none'; // Vô hiệu hóa liên kết
             cell.style.pointerEvents = 'none'; // Vô hiệu hóa tương tác với ô điểm danh
+        } else {
+            // Kiểm tra thời gian hiện tại so với buổi học
+            const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0); // Giả định buổi học bắt đầu lúc 00:00
+            const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000); // Thêm 24 giờ
+
+            if (currentDateTime >= scheduleStartTime && currentDateTime < endTime) {
+                // Mở khóa cho buổi học hiện tại
+                const link = cell.querySelector('a');
+                if (link) link.style.pointerEvents = ''; // Kích hoạt lại liên kết
+                cell.style.pointerEvents = ''; // Kích hoạt lại tương tác với ô điểm danh
+            } else {
+                // Khóa ô nếu đã qua 24 giờ
+                cell.classList.add('table-secondary'); // Thay đổi màu sắc cho các buổi đã qua
+                cell.innerHTML += '<br><span class="lock-icon"><i class="bi bi-lock-fill"></i></span>'; // Thêm biểu tượng khóa
+                const link = cell.querySelector('a');
+                if (link) link.style.pointerEvents = 'none'; // Vô hiệu hóa liên kết
+                cell.style.pointerEvents = 'none'; // Vô hiệu hóa tương tác với ô điểm danh
+            }
         }
     });
 </script>
