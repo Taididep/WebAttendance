@@ -52,16 +52,20 @@ $presentCount = 0;
 $lateCount = 0;
 $absentCount = 0;
 
+$currentDate = date('Y-m-d'); // Lấy ngày hiện tại
+
 foreach ($students as $student) {
     foreach ($schedules as $schedule) {
-        if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
-            $status = $attendanceMap[$student['student_id']][$schedule['date']];
-            if ($status === '1') {
-                $presentCount++;
-            } elseif ($status === '2') {
-                $lateCount++;
-            } else {
-                $absentCount++;
+        if ($schedule['date'] < $currentDate) { // Chỉ tính những buổi đã qua
+            if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
+                $status = $attendanceMap[$student['student_id']][$schedule['date']];
+                if ($status === '1') {
+                    $presentCount++;
+                } elseif ($status === '2') {
+                    $lateCount++;
+                } else {
+                    $absentCount++;
+                }
             }
         }
     }
@@ -69,7 +73,6 @@ foreach ($students as $student) {
 
 // Tính số lượng học sinh vắng mặt
 $absentCount = $totalStudents - ($presentCount + $lateCount);
-
 ?>
 
 <!DOCTYPE html>
@@ -101,7 +104,7 @@ $absentCount = $totalStudents - ($presentCount + $lateCount);
             border-radius: 0;
         }
         .highlight {
-            background-color: rgba(255, 255, 0, 0.5); /* Màu nền vàng nhạt */
+            background-color: rgba(76, 175, 80, 0.5); /* Màu nền xanh lá */
             transition: background-color 0.5s ease; /* Hiệu ứng chuyển màu */
         }
         .btn-primary {
@@ -152,13 +155,24 @@ $absentCount = $totalStudents - ($presentCount + $lateCount);
                 <thead>
                     <tr>
                         <?php foreach ($schedules as $index => $schedule): ?>
-                            <th class="schedule-header" data-index="<?php echo $index; ?>">
-                                <?php echo 'Buổi ' . ($index + 1); ?>
-                                <?php echo date('d/m', strtotime($schedule['date'])); ?>
-                            </th>
+                            <?php if ($schedule['date'] < $currentDate): // Chỉ hiển thị những buổi đã qua ?>
+                                <th class="schedule-header highlight" data-index="<?php echo $index; ?>">
+                                    <?php echo 'Buổi ' . ($index + 1) . ' - ' . date('d/m', strtotime($schedule['date'])); ?>
+                                </th>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tr>
                 </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="<?php echo count(array_filter($schedules, fn($s) => $s['date'] < $currentDate)); ?>" class="text-center">
+                            <strong>Số lượng học sinh:</strong> <?php echo $totalStudents; ?> <br>
+                            <strong>Có mặt:</strong> <?php echo $presentCount; ?> <br>
+                            <strong>Muộn:</strong> <?php echo $lateCount; ?> <br>
+                            <strong>Vắng mặt:</strong> <?php echo $absentCount; ?>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         <?php endif; ?>
     </div>
@@ -172,7 +186,11 @@ $absentCount = $totalStudents - ($presentCount + $lateCount);
             labels: ['Có mặt', 'Muộn', 'Vắng mặt'],
             datasets: [{
                 label: 'Số lượng học sinh',
-                data: [0, 0, 0], // Bắt đầu với các giá trị bằng 0
+                data: [
+                    <?php echo $presentCount; ?>, 
+                    <?php echo $lateCount; ?>, 
+                    <?php echo $absentCount; ?>
+                ],
                 backgroundColor: [
                     'rgba(76, 175, 80, 0.7)', // Có mặt
                     'rgba(255, 235, 59, 0.7)', // Muộn
