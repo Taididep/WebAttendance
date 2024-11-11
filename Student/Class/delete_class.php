@@ -17,15 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['class_id'])) {
 
     if (!empty($classId)) {
         try {
-            // Hủy đăng ký lớp học
-            $sql = "DELETE FROM student_classes WHERE class_id = :class_id AND student_id = :student_id";
+            // Cập nhật trạng thái lớp học thành 0
+            $sql = "UPDATE class_students SET status = 0 WHERE class_id = :class_id AND student_id = :student_id";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':class_id', $classId);
             $stmt->bindParam(':student_id', $studentId);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
-                header("Location: class_manage.php?message=Lớp đã được hủy đăng ký thành công.");
+                header("Location: class_manage.php?message=Cập nhật trạng thái lớp thành công.");
                 exit;
             } else {
                 header("Location: class_manage.php?message=Lớp không tồn tại hoặc bạn chưa đăng ký lớp này.");
@@ -43,4 +43,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['class_id'])) {
     header("Location: class_manage.php?message=Yêu cầu không hợp lệ.");
     exit;
 }
-?>

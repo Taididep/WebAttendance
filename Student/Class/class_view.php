@@ -2,7 +2,7 @@
 session_start();
 $basePath = '../'; // Đường dẫn gốc
 include __DIR__ . '/../../Connect/connect.php';
-include __DIR__ . '/../../LayoutPages/navbar.php';
+include __DIR__ . '/../../LayoutPages/navbar_student.php';
 include __DIR__ . '/../../Account/islogin.php';
 
 // Nhận giá trị từ URL
@@ -15,7 +15,7 @@ if (!$classId) {
 }
 
 // Gọi thủ tục để lấy thông tin lớp học
-$sql_class_info = "CALL GetClassInfoById(?)"; 
+$sql_class_info = "CALL GetClassInfoById(?)";
 $stmt_class_info = $conn->prepare($sql_class_info);
 $stmt_class_info->execute([$classId]);
 $classInfo = $stmt_class_info->fetch(PDO::FETCH_ASSOC);
@@ -60,7 +60,7 @@ $currentDate = date('Y-m-d');
                 <p><strong>Môn học:</strong> <?php echo htmlspecialchars($classInfo['course_name']); ?></p>
                 <p><strong>Giáo viên:</strong> <?php echo htmlspecialchars($classInfo['teacher_fullname']); ?></p>
                 <p><strong>Học kỳ:</strong> <?php echo htmlspecialchars($classInfo['semester_name']); ?></p>
-                
+
                 <h4 class="mt-4">Lịch học</h4>
                 <table class="table table-bordered">
                     <thead>
@@ -76,24 +76,24 @@ $currentDate = date('Y-m-d');
                                 <td colspan="3" class="text-center">Không có lịch học nào.</td>
                             </tr>
                         <?php else: ?>
-                            <?php 
+                            <?php
                             $nextDayFound = false; // Biến để kiểm tra ngày tiếp theo đã được tìm thấy chưa
-                            foreach ($schedules as $schedule): 
+                            foreach ($schedules as $schedule):
                                 $scheduleDate = $schedule['date'];
                             ?>
-                                <tr class="<?php 
-                                    if ($scheduleDate < $currentDate) {
-                                        echo 'past-date text-muted'; // Ngày đã qua
-                                    } elseif ($scheduleDate === $currentDate) {
-                                        echo 'today'; // Ngày hiện tại
-                                    } elseif ($scheduleDate > $currentDate && !$nextDayFound) {
-                                        echo 'next-day'; // Ngày tiếp theo
-                                        $nextDayFound = true; // Đánh dấu là đã tìm thấy ngày tiếp theo
-                                    } 
-                                ?>">
+                                <tr class="<?php
+                                            if ($scheduleDate < $currentDate) {
+                                                echo 'past-date text-muted'; // Ngày đã qua
+                                            } elseif ($scheduleDate === $currentDate) {
+                                                echo 'today'; // Ngày hiện tại
+                                            } elseif ($scheduleDate > $currentDate && !$nextDayFound) {
+                                                echo 'next-day'; // Ngày tiếp theo
+                                                $nextDayFound = true; // Đánh dấu là đã tìm thấy ngày tiếp theo
+                                            }
+                                            ?>">
                                     <td>
-                                        <?php 
-                                        echo date('d/m/Y', strtotime($scheduleDate)); 
+                                        <?php
+                                        echo date('d/m/Y', strtotime($scheduleDate));
                                         if ($scheduleDate < $currentDate) {
                                             echo ' (pass)'; // Thêm chữ "pass" cho ngày đã qua
                                         }

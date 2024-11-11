@@ -47,8 +47,8 @@ if (isset($_POST['semester_id'])) {
                 echo '<td style="padding-left: 17px; vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
                 echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
                 echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
-                echo '<td style="vertical-align: middle;">' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>'; // Hiển thị họ và tên giáo viên
-                echo '<td style="vertical-align: middle;">' . $status . '</td>'; // Hiển thị trạng thái dưới dạng "total_present / total_classes"
+                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>';
+                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $status . '</td>';
                 echo '<td>';
                 echo '<div class="dropdown">';
                 echo '<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $counter . '" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">';

@@ -8,8 +8,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-
-// Đây là ID lớp mà sinh viên muốn tham gia, có thể lấy từ URL hoặc nhập từ một form khác
 $class_id = $_POST['class_id'] ?? '';
 
 if ($class_id === '') {
@@ -31,13 +29,19 @@ try {
     }
 
     // Kiểm tra xem sinh viên đã tham gia lớp học này chưa
-    $stmt = $conn->prepare("SELECT * FROM class_students WHERE class_id = ? AND student_id = ?");
+    $stmt = $conn->prepare("SELECT status FROM class_students WHERE class_id = ? AND student_id = ?");
     $stmt->execute([$class_id, $user_id]);
+    $studentClass = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($stmt->rowCount() > 0) {
-        $stmt = $conn->prepare("UPDATE class_students SET status = 1 WHERE class_id = ? AND student_id = ?");
-        $stmt->execute([$class_id, $user_id]);
-        echo "Tham gia lớp học thành công.";
+    if ($studentClass) {
+        if ($studentClass['status'] == 1) {
+            echo "Bạn đã tham gia lớp này rồi.";
+        } else {
+            // Nếu chưa kích hoạt, cập nhật status thành 1
+            $stmt = $conn->prepare("UPDATE class_students SET status = 1 WHERE class_id = ? AND student_id = ?");
+            $stmt->execute([$class_id, $user_id]);
+            echo "Tham gia lớp học thành công.";
+        }
     } else {
         echo "Bạn không có trong danh sách lớp";
     }

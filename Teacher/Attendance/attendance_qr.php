@@ -54,6 +54,9 @@ $detailUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/Student/Attendance/attendance
 // Kiểm tra ngày hiện tại so với ngày buổi học
 $currentDate = new DateTime();
 $scheduleDate = new DateTime($scheduleData['date']);
+
+// In ra URL
+echo $detailUrl; // Chỉ dùng cho kiểm tra
 ?>
 
 <!DOCTYPE html>

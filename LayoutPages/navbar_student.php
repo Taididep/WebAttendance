@@ -99,7 +99,7 @@ if (!isset($_SESSION['user_id'])) {
                         <input type="text" class="form-control" id="classId" name="class_id" placeholder="Mã lớp" required>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                         <button type="submit" class="btn btn-primary">Tham gia</button>
                     </div>
                 </form>
@@ -147,9 +147,15 @@ if (!isset($_SESSION['user_id'])) {
                 joinClassMessage.innerText = "Có lỗi xảy ra. Vui lòng thử lại.";
             });
     });
+
+    // Làm mới trang khi đóng modal nếu có thông báo
+    document.getElementById("joinClassModal").addEventListener("hidden.bs.modal", function() {
+        const joinClassMessage = document.getElementById("joinClassMessage");
+        if (!joinClassMessage.classList.contains("d-none")) {
+            location.reload();
+        }
+    });
 </script>
-
-
 
 
 
