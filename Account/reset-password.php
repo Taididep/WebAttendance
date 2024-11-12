@@ -20,7 +20,7 @@ require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
+$error_message = "";  
 function resetPassword($conn, $username, $emailInput) {
     // Tạo mật khẩu ngẫu nhiên
     $newPassword = bin2hex(random_bytes(4)); // Tạo mật khẩu ngẫu nhiên dài 8 ký tự
@@ -57,15 +57,24 @@ function resetPassword($conn, $username, $emailInput) {
         if ($updateStmt->execute()) {
             // Gửi email với mật khẩu mới
             if (sendEmail($email, $newPassword)) {
-                echo "Đặt lại mật khẩu thành công. Mật khẩu mới đã được gửi đến email của bạn.";
+                $_SESSION['error_message'] = "Đặt lại mật khẩu thành công. Mật khẩu mới đã được gửi đến email của bạn.";  
+                header("Location: ../forgot-pass.php");  
+                exit();
             } else {
-                echo "Đặt lại mật khẩu thành công, nhưng gửi email thất bại.";
+                $_SESSION['error_message'] = "Đặt lại mật khẩu thành công, nhưng gửi email thất bại.";  
+                header("Location: ../forgot-pass.php");  
+                exit();
             }
         } else {
-            echo "Có lỗi xảy ra khi đặt lại mật khẩu.";
+
+            $_SESSION['error_message'] = "Đặt lại mật khẩu thành công. Mật khẩu mới đã được gửi đến email của bạn.";
+            header("Location: ../forgot-pass.php");  
+            exit();
         }
     } else {
-        echo "Không tìm thấy tài khoản với tên đăng nhập và email khớp.";
+        $_SESSION['error_message'] = "Không tìm thấy tài khoản với tên đăng nhập và email khớp.";
+        header("Location: ../forgot-pass.php");  
+        exit();
     }
     
     // Đóng câu lệnh
