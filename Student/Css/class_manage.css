@@ -51,11 +51,6 @@ body {
     font-weight: bold;
 }
 
-.class-table tr:hover {
-    background-color: #f2f2f2;
-    transform: scale(1.02);
-}
-
 .class-table td a {
     color: #007bff;
     text-decoration: none;
