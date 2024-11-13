@@ -21,6 +21,11 @@ if (!isset($_GET['schedule_id'])) {
 // Lấy schedule_id từ URL
 $schedule_id = $_GET['schedule_id'];
 
+// Cập nhật status thành 1 cho buổi học
+$updateSql = "UPDATE schedules SET status = 1 WHERE schedule_id = ?";
+$updateStmt = $conn->prepare($updateSql);
+$updateStmt->execute([$schedule_id]);
+
 // Truy vấn để lấy thông tin lớp học từ bảng classes
 $sql = "CALL GetClassDetailsById(?)";
 $stmt = $conn->prepare($sql);
@@ -125,7 +130,7 @@ echo $detailUrl; // Chỉ dùng cho kiểm tra
             <div id="qrCodeContainer">
                 <div id="qrCode"></div>
             </div>
-            <a href="../Class/class_detail_list.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-danger">Đóng</a>
+            <a href="../Attendance/reset_status.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule_id); ?>" class="btn btn-danger">Đóng</a>
         <?php else: ?>
             <p class="alert alert-warning">Chưa đến ngày điểm danh. Vui lòng quay lại sau.</p>
             <a href="../Class/class_detail_list.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-danger">Quay lại trang lớp học</a>
@@ -150,6 +155,15 @@ echo $detailUrl; // Chỉ dùng cho kiểm tra
                 correctLevel: QRCode.CorrectLevel.H
             });
         <?php endif; ?>
+    </script>
+    <script>
+        window.addEventListener('beforeunload', function() {
+            const classId = '<?php echo urlencode($class_id); ?>';
+            const scheduleId = '<?php echo urlencode($schedule_id); ?>';
+
+            // Gửi yêu cầu không đồng bộ để cập nhật status thành 0 khi đóng trang
+            navigator.sendBeacon(`../Attendance/reset_status.php?class_id=${classId}&schedule_id=${scheduleId}`);
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

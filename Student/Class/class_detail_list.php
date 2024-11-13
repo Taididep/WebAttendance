@@ -52,7 +52,7 @@ if (!$classData) {
     <div class="side-tabs">
         <ul class="nav nav-tabs flex-column" id="tabMenu">
             <li class="nav-item">
-                <a class="nav-link" id="news-tab"
+                <a class="nav-link t" id="news-tab"
                     href="class_detail_announcement.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Bảng
                     tin</a>
             </li>

@@ -27,10 +27,22 @@ if (!$classInfo) {
     exit;
 }
 
+// Kiểm tra status của lịch học
+$sqlStatus = "SELECT status FROM schedules WHERE schedule_id = ?";
+$stmtStatus = $conn->prepare($sqlStatus);
+$stmtStatus->execute([$schedule_id]);
+$scheduleStatus = $stmtStatus->fetch(PDO::FETCH_ASSOC);
+$stmtStatus->closeCursor();
+
+if (!$scheduleStatus) {
+    echo 'Không tìm thấy thông tin lịch học.';
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
@@ -68,64 +80,26 @@ if (!$classInfo) {
 <body>
     <div class="container mt-6">
         <div class="border rounded p-4 shadow">
-            <h2 class="mb-4 text-center">Điểm danh lớp: <?php echo htmlspecialchars($classInfo['class_name']); ?></h2>
+            <h2 class="mb-4 text-center"><?php echo htmlspecialchars($classInfo['class_name']); ?></h2>
 
-            <div id="statusMessage" class="mb-4 text-center">Bắt đầu điểm danh</div>
             <div id="timer" class="text-center fs-4"></div>
 
-            <form id="attendanceForm" action="process_attendance.php" method="POST">
-                <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
-                <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($schedule_id); ?>">
+            <?php if ($scheduleStatus['status'] == 1): ?>
+                <!-- Form điểm danh nếu status là 1 -->
+                <form id="attendanceForm" action="process_attendance.php" method="POST">
+                    <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+                    <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($schedule_id); ?>">
 
-                <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-primary">Điểm danh</button>
-                </div>
-            </form>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary">Điểm danh</button>
+                    </div>
+                </form>
+            <?php else: ?>
+                <!-- Thông báo nếu status không bằng 1 -->
+                <p class="alert alert-warning text-center">Không được điểm danh</p>
+            <?php endif; ?>
         </div>
     </div>
-
-    <script>
-        let timer = 15 * 60; // 15 minutes in seconds
-        const statusMessage = document.getElementById('statusMessage');
-        const timerDisplay = document.getElementById('timer');
-        const attendanceStatus = document.getElementById('attendanceStatus');
-        const form = document.getElementById('attendanceForm');
-
-        function startTimer() {
-            const countdown = setInterval(() => {
-                let minutes = Math.floor(timer / 60);
-                let seconds = timer % 60;
-                timerDisplay.innerHTML = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-                if (timer > 0) {
-                    timer--;
-
-                    if (timer >= 10 * 60) { // Từ 10 phút trở lên
-                        statusMessage.className = 'status-green';
-                        statusMessage.innerText = 'Đúng giờ';
-                        attendanceStatus.value = 1; // Trạng thái là đúng giờ
-                    } else if (timer >= 5 * 60) { // Từ 5 đến 10 phút
-                        statusMessage.className = 'status-yellow';
-                        statusMessage.innerText = 'Trễ';
-                        attendanceStatus.value = 2; // Trạng thái là trễ
-                    } else { // Dưới 5 phút
-                        statusMessage.className = 'status-red';
-                        statusMessage.innerText = 'Vắng';
-                        attendanceStatus.value = 3; // Trạng thái là vắng
-                    }
-
-                } else {
-                    clearInterval(countdown);
-                    statusMessage.className = 'status-red';
-                    statusMessage.innerText = 'Vắng mặt';
-                    attendanceStatus.value = 3; // Trạng thái là vắng
-                    form.querySelector('button').disabled = true; // Disable button if time is up
-                }
-            }, 1000);
-        }
-
-        window.onload = startTimer;
-    </script>
 </body>
 
 </html>

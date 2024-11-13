@@ -97,7 +97,8 @@ CREATE TABLE schedules (
     class_id CHAR(36) NOT NULL,
     date DATE NOT NULL,
     start_time INT NOT NULL,
-    end_time INT NOT NULL,	
+    end_time INT NOT NULL,
+    status TINYINT(1),	
     FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE
 );
 -- 8
