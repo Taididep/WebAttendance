@@ -127,7 +127,7 @@ $conn->close();
             <input type="submit" value="Đổi mật khẩu">  
         </form>  
         <?php echo $message; ?>  
-        <p><a href="../Student/index.php">Quay lại trang chủ</a></p>  
+        <p><a href="../Teacher/index.php">Quay lại trang chủ</a></p>  
     </div>  
 </body>  
 </html>

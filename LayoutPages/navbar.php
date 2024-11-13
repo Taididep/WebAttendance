@@ -60,6 +60,10 @@ if (!isset($_SESSION['user_id'])) {
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="<?php echo $basePath; ?>Information/information.php">Thông tin cá nhân</a></li>
                                 <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="<?php echo $basePath; ?>../Account/change-password-teacher.php">Đổi mật khẩu</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item" href="<?php echo $basePath; ?>../Account/logout.php">Đăng xuất</a></li>
                             </ul>
                         </div>

@@ -13,6 +13,8 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
+session_start();
+
 // Yêu cầu các thư viện PHPMailer
 require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\Exception.php';
 require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\PHPMailer.php';
@@ -22,6 +24,8 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 function resetPassword($conn, $username, $emailInput) {
+    global $_SESSION;
+    
     // Tạo mật khẩu ngẫu nhiên
     $newPassword = bin2hex(random_bytes(4)); // Tạo mật khẩu ngẫu nhiên dài 8 ký tự
     $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
@@ -57,20 +61,20 @@ function resetPassword($conn, $username, $emailInput) {
         if ($updateStmt->execute()) {
             // Gửi email với mật khẩu mới
             if (sendEmail($email, $newPassword)) {
-                echo "Đặt lại mật khẩu thành công. Mật khẩu mới đã được gửi đến email của bạn.";
+                $_SESSION['success_message'] = "Đặt lại mật khẩu thành công. Mật khẩu mới đã được gửi đến email của bạn.";
             } else {
-                echo "Đặt lại mật khẩu thành công, nhưng gửi email thất bại.";
+                $_SESSION['error_message'] = "Đặt lại mật khẩu thành công, nhưng gửi email thất bại.";
             }
         } else {
-            echo "Có lỗi xảy ra khi đặt lại mật khẩu.";
+            $_SESSION['error_message'] = "Có lỗi xảy ra khi đặt lại mật khẩu.";
         }
     } else {
-        echo "Không tìm thấy tài khoản với tên đăng nhập và email khớp.";
+        $_SESSION['error_message'] = "Usename và email không khớp. Yêu cầu nhập lại";
     }
-    
-    // Đóng câu lệnh
-    $stmt->close();
-    $updateStmt->close();
+
+    // Chuyển hướng lại trang forgot-pass.php để hiển thị thông báo
+    header("Location: ../forgot-pass.php");
+    exit();
 }
 
 // Hàm gửi email bằng PHPMailer
@@ -89,7 +93,7 @@ function sendEmail($toEmail, $newPassword) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
         // Nội dung email
-        $mail->setFrom('your_email@example.com', 'Quên mật khẩu');
+        $mail->setFrom('your_email@example.com', 'TLT cấp mật khẩu');
         $mail->addAddress($toEmail);
         $mail->Subject = 'Yêu cầu đặt lại mật khẩu';
         $mail->Body = "Mật khẩu mới của bạn là: $newPassword\nVui lòng đăng nhập và thay đổi mật khẩu ngay khi có thể.";
@@ -104,9 +108,11 @@ function sendEmail($toEmail, $newPassword) {
 }
 
 // Sử dụng hàm
-$username = $_POST['username'];
-$emailInput = $_POST['email'];
-resetPassword($conn, $username, $emailInput);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $emailInput = $_POST['email'];
+    resetPassword($conn, $username, $emailInput);
+}
 
 // Đóng kết nối cơ sở dữ liệu
 $conn->close();
