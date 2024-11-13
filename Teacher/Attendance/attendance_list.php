@@ -64,6 +64,10 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
     .absent {
         color: red;
     }
+
+    .unlocked {
+        color: #98FB98 !important;
+    }
 </style>
 
 <div id="attendanceList">
@@ -249,12 +253,12 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
     scheduleCells.forEach(cell => {
         const dateText = cell.querySelector('small').innerText;
         const [day, month, year] = dateText.split('/').map(Number);
-        const scheduleDate = new Date(year, month - 1, day); // Tạo đối tượng Date cho ngày điểm danh
+        const scheduleDate = new Date(year, month - 1, day);
 
         // So sánh ngày điểm danh với thời gian hiện tại
         if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
             // Nếu ngày là hôm nay, thêm lớp màu xanh lá
-            cell.classList.add('today');
+            cell.classList.add('today', 'unlocked');
         } else if (scheduleDate < currentDateTime) {
             cell.classList.add('table-secondary');
             cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
@@ -263,25 +267,26 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
             cell.style.pointerEvents = 'none';
         } else {
             // Kiểm tra thời gian hiện tại so với buổi học
-            const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0); // Giả định buổi học bắt đầu lúc 00:00
-            const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000); // Thêm 24 giờ
+            const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0);
+            const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000);
 
             if (currentDateTime >= scheduleStartTime && currentDateTime < endTime) {
-                // Mở khóa cho buổi học hiện tại
+                // Mở khóa cho buổi học hiện tại và thêm lớp unlocked
+                cell.classList.add('unlocked');
                 const link = cell.querySelector('a');
-                if (link) link.style.pointerEvents = ''; // Kích hoạt lại liên kết
-                cell.style.pointerEvents = ''; // Kích hoạt lại tương tác với ô điểm danh
+                if (link) link.style.pointerEvents = '';
+                cell.style.pointerEvents = '';
             } else {
-                // Khóa ô nếu đã qua 24 giờ
-                cell.classList.add('table-secondary'); // Thay đổi màu sắc cho các buổi đã qua
-                cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML; // Thêm biểu tượng khóa
+                cell.classList.add('table-secondary');
+                cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
                 const link = cell.querySelector('a');
-                if (link) link.style.pointerEvents = 'none'; // Vô hiệu hóa liên kết
-                cell.style.pointerEvents = 'none'; // Vô hiệu hóa tương tác với ô điểm danh
+                if (link) link.style.pointerEvents = 'none';
+                cell.style.pointerEvents = 'none';
             }
         }
     });
 </script>
+
 
 
 <script>
