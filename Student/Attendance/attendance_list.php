@@ -47,33 +47,8 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
 
-// Khởi tạo chuỗi điểm danh cho mỗi sinh viên
-$attendanceStreak = [];
-foreach ($students as $student) {
-    $attendanceStreak[$student['student_id']] = 0; // Bắt đầu từ 0
-}
-
-// Kiểm tra trạng thái điểm danh và cập nhật chuỗi điểm danh
-foreach ($schedules as $schedule) {
-    foreach ($students as $student) {
-        if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
-            $status = $attendanceMap[$student['student_id']][$schedule['date']];
-            if ($status === '1') {
-                // Có mặt
-                $attendanceStreak[$student['student_id']]++;
-            } elseif ($status === '2') {
-                // Muộn, tính nửa buổi
-                $attendanceStreak[$student['student_id']] += 0.5;
-            } else {
-                // Vắng, reset chuỗi điểm danh
-                $attendanceStreak[$student['student_id']] = 0;
-            }
-        } elseif (strtotime($schedule['date']) < time()) {
-            // Nếu ngày đã qua mà trạng thái còn trống, gán là "Vắng"
-            $attendanceMap[$student['student_id']][$schedule['date']] = '0'; // 0 = Vắng
-        }
-    }
-}
+// Lấy ngày hiện tại
+$currentDate = date('Y-m-d');
 ?>
 
 <!-- Bảng 1: Thông tin sinh viên -->
@@ -89,7 +64,6 @@ foreach ($schedules as $schedule) {
                     <th style="width: 150px;">Giới tính</th>
                     <th style="width: 150px;">Lớp</th>
                     <th style="width: 150px;">Ngày sinh</th>
-                    <th style="width: 150px;">Chuỗi điểm danh</th>
                 </tr>
             </thead>
             <tbody>
@@ -102,7 +76,6 @@ foreach ($schedules as $schedule) {
                         <td><?php echo htmlspecialchars($student['gender']); ?></td>
                         <td><?php echo htmlspecialchars($student['class']); ?></td>
                         <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
-                        <td><?php echo $attendanceStreak[$student['student_id']]; ?></td> <!-- Hiển thị chuỗi điểm danh -->
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -123,29 +96,29 @@ foreach ($schedules as $schedule) {
             </thead>
             <tbody>
                 <?php foreach ($schedules as $index => $schedule): ?>
-                    <?php if (strtotime($schedule['date']) < time()): // Chỉ hiển thị các buổi đã qua ?>
-                        <tr>
-                            <td style="text-align: center;"><?php echo 'Buổi ' . ($index + 1); ?></td>
-                            <td style="text-align: center;"><?php echo date('d/m/Y', strtotime($schedule['date'])); ?></td>
-                            <td>
-                                <?php
-                                // Kiểm tra trạng thái điểm danh của sinh viên
-                                foreach ($students as $student) {
-                                    if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
-                                        $status = $attendanceMap[$student['student_id']][$schedule['date']];
-                                        if ($status === '1') {
-                                            echo 'Có mặt'; // Có mặt
-                                        } elseif ($status === '2') {
-                                            echo 'Muộn'; // Muộn
-                                        } else {
-                                            echo 'Vắng'; // Vắng mặt
-                                        }
+                    <tr>
+                        <td style="text-align: center;"><?php echo 'Buổi ' . ($index + 1); ?></td>
+                        <td style="text-align: center;"><?php echo date('d/m/Y', strtotime($schedule['date'])); ?></td>
+                        <td>
+                            <?php
+                            // Kiểm tra trạng thái điểm danh của sinh viên
+                            foreach ($students as $student) {
+                                if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
+                                    $status = $attendanceMap[$student['student_id']][$schedule['date']];
+                                    if ($status === '1') {
+                                        echo 'Có mặt'; // Có mặt
+                                    } elseif ($status === '2') {
+                                        echo 'Muộn'; // Muộn
+                                    } elseif ($schedule['date'] > $currentDate) {
+                                        echo ''; // Để trống nếu ngày hiện tại chưa đến ngày điểm danh
+                                    } else {
+                                        echo 'Vắng';
                                     }
                                 }
-                                ?>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
+                            }
+                            ?>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>

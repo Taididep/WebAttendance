@@ -67,8 +67,6 @@ CREATE TABLE teachers (
     FOREIGN KEY (teacher_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-ALTER TABLE students ADD avatar VARCHAR(255);
-
 
 -- 6a
 CREATE TABLE classes (

@@ -64,25 +64,31 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
     .absent {
         color: red;
     }
+
+    .unlocked {
+        color: #98FB98 !important;
+    }
 </style>
 
 <div id="attendanceList">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="d-flex" style="width: 26%;">
+        <div class="d-flex" style="width: 13%;">
             <div class="input-group d-flex">
-                <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi">
-                <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>
-                <button type="button" id="showAllBtnList" class="btn btn-success">Hiện tất cả</button>
+                <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Hiện buổi</button>
+                <input type="number" id="attendanceInputList" min="0" max="<?php echo count($schedules); ?>"
+                    class="form-control" placeholder="0">
             </div>
         </div>
         <div>
-            <span class="mx-3"><strong>0:</strong> Vắng mặt</span>
-            <span class="mx-3"><strong>1:</strong> Có mặt</span>
-            <span class="mx-3"><strong>2:</strong> Đi trễ</span>
+            <span class="mx-3"><strong>P :</strong> Có mặt</span>
+            <span class="mx-3"><strong>L :</strong> Đi trễ</span>
+            <span class="mx-3"><strong>A :</strong> Vắng mặt</span>
         </div>
         <div>
-            <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-info">Thống kê điểm danh</a>
-            <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
+            <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
+                class="btn btn-info">Thống kê điểm danh</a>
+            <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>"
+                class="btn btn-success btn-custom">Xuất Excel</a>
         </div>
     </div>
     <hr>
@@ -101,8 +107,10 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                         <th style="width: 150px;">Lớp</th>
                         <th style="width: 150px;">Ngày sinh</th>
                         <?php foreach ($schedules as $index => $schedule): ?>
-                            <th style="width: 100px; text-align: center;" class="list-column" data-index="<?php echo $index; ?>">
-                                <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>" style="text-decoration: none; color: inherit;">
+                            <th style="width: 100px; text-align: center;" class="list-column"
+                                data-index="<?php echo $index; ?>">
+                                <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>"
+                                    style="text-decoration: none; color: inherit;">
                                     <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
                                     <small><?php echo date('d/m/Y', strtotime($schedule['date'])); ?></small>
                                 </a>
@@ -127,15 +135,17 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                                     if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
                                         $status = $attendanceMap[$student['student_id']][$schedule['date']];
                                         if ($status === '1') {
-                                            echo '<span class="present">1</span>'; // Có mặt
+                                            echo '<span class="present">P</span>'; // Có mặt
                                         } elseif ($status === '2') {
-                                            echo '<span class="late">2</span>'; // Muộn
+                                            echo '<span class="late">L</span>'; // Muộn
+                                        } elseif ($schedule['date'] > date('Y-m-d', strtotime($currentDateTime))) {
+                                            // Để trống nếu ngày điểm danh chưa đến
+                                            echo '';
                                         } else {
-                                            echo '<span class="absent">0</span>'; // Vắng mặt
+                                            echo '<span class="absent">A</span>'; // Vắng
                                         }
-                                    } else {
-                                        echo '<span class="absent">0</span>'; // Không có dữ liệu điểm danh
                                     }
+
                                     ?>
                                 </td>
                             <?php endforeach; ?>
@@ -168,7 +178,8 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
         <?php endif; ?>
     </div>
     <div class="d-flex align-items-center justify-content-between mt-3">
-        <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Thêm sinh viên</button>
+        <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Thêm sinh
+            viên</button>
         <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
     </div>
 </div>
@@ -188,7 +199,8 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 
                     <div class="mb-3">
                         <label for="studentIdInput" class="form-label">Mã sinh viên</label>
-                        <input type="text" class="form-control" id="studentIdInput" name="student_id" required maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                        <input type="text" class="form-control" id="studentIdInput" name="student_id" required
+                            maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
                     </div>
 
                     <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
@@ -203,7 +215,7 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 </div>
 
 <script>
-    document.getElementById("addStudentForm").addEventListener("submit", function(event) {
+    document.getElementById("addStudentForm").addEventListener("submit", function (event) {
         event.preventDefault(); // Ngăn chặn gửi form theo cách thông thường
 
         const classId = document.querySelector("input[name='class_id']").value;
@@ -212,12 +224,12 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 
         // Gửi yêu cầu AJAX tới add_student.php
         fetch("<?php echo $basePath; ?>Class/add_student.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: `class_id=${encodeURIComponent(classId)}&student_id=${encodeURIComponent(studentId)}`
-            })
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `class_id=${encodeURIComponent(classId)}&student_id=${encodeURIComponent(studentId)}`
+        })
             .then(response => response.json())
             .then(data => {
                 joinClassMessage.classList.remove("d-none");
@@ -249,12 +261,12 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
     scheduleCells.forEach(cell => {
         const dateText = cell.querySelector('small').innerText;
         const [day, month, year] = dateText.split('/').map(Number);
-        const scheduleDate = new Date(year, month - 1, day); // Tạo đối tượng Date cho ngày điểm danh
+        const scheduleDate = new Date(year, month - 1, day);
 
         // So sánh ngày điểm danh với thời gian hiện tại
         if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
             // Nếu ngày là hôm nay, thêm lớp màu xanh lá
-            cell.classList.add('today');
+            cell.classList.add('today', 'unlocked');
         } else if (scheduleDate < currentDateTime) {
             cell.classList.add('table-secondary');
             cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
@@ -263,25 +275,26 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
             cell.style.pointerEvents = 'none';
         } else {
             // Kiểm tra thời gian hiện tại so với buổi học
-            const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0); // Giả định buổi học bắt đầu lúc 00:00
-            const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000); // Thêm 24 giờ
+            const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0);
+            const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000);
 
             if (currentDateTime >= scheduleStartTime && currentDateTime < endTime) {
-                // Mở khóa cho buổi học hiện tại
+                // Mở khóa cho buổi học hiện tại và thêm lớp unlocked
+                cell.classList.add('unlocked');
                 const link = cell.querySelector('a');
-                if (link) link.style.pointerEvents = ''; // Kích hoạt lại liên kết
-                cell.style.pointerEvents = ''; // Kích hoạt lại tương tác với ô điểm danh
+                if (link) link.style.pointerEvents = '';
+                cell.style.pointerEvents = '';
             } else {
-                // Khóa ô nếu đã qua 24 giờ
-                cell.classList.add('table-secondary'); // Thay đổi màu sắc cho các buổi đã qua
-                cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML; // Thêm biểu tượng khóa
+                cell.classList.add('table-secondary');
+                cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
                 const link = cell.querySelector('a');
-                if (link) link.style.pointerEvents = 'none'; // Vô hiệu hóa liên kết
-                cell.style.pointerEvents = 'none'; // Vô hiệu hóa tương tác với ô điểm danh
+                if (link) link.style.pointerEvents = 'none';
+                cell.style.pointerEvents = 'none';
             }
         }
     });
 </script>
+
 
 
 <script>

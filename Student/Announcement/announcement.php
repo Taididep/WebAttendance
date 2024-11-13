@@ -18,7 +18,7 @@ $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Hiển thị bảng tin
 if ($announcements) {
     foreach ($announcements as $announcement) {
-?>
+        ?>
         <div class="card mb-3">
             <div class="card-body">
                 <!-- Tiêu đề và ngày tạo -->
@@ -48,9 +48,10 @@ if ($announcements) {
             $comment_count = $comment_stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($comment_count['comment_count'] > 0) {
-            ?>
+                ?>
                 <div class="card-body">
-                    <h6 class="mb-3" id="commentsTitle_<?php echo $announcement['announcement_id']; ?>" style="cursor: pointer;" onclick="toggleComments(<?php echo $announcement['announcement_id']; ?>)">
+                    <h6 class="mb-3" id="commentsTitle_<?php echo $announcement['announcement_id']; ?>" style="cursor: pointer;"
+                        onclick="toggleComments(<?php echo $announcement['announcement_id']; ?>)">
                         Bình luận (<?php echo $comment_count['comment_count']; ?>)
                     </h6>
                     <div id="commentsList_<?php echo $announcement['announcement_id']; ?>">
@@ -82,22 +83,25 @@ if ($announcements) {
                     </div>
                 </div>
                 <hr>
-            <?php
+                <?php
             }
             ?>
 
             <!-- Thanh nhập bình luận -->
             <div class="card-body">
-                <form action="add_comment.php?class_id=<?php echo $class_id; ?>" method="POST" class="d-flex align-items-center">
+                <form action="add_comment.php?class_id=<?php echo $class_id; ?>" method="POST"
+                    class="d-flex align-items-center">
                     <div class="flex-grow-1 me-2">
-                        <textarea class="form-control" name="content" rows="2" placeholder="Nhập bình luận của bạn..." required></textarea>
+                        <textarea class="form-control" name="content" rows="2" placeholder="Nhập bình luận của bạn..."
+                            required></textarea>
                     </div>
-                    <input type="hidden" name="announcement_id" value="<?php echo htmlspecialchars($announcement['announcement_id']); ?>">
+                    <input type="hidden" name="announcement_id"
+                        value="<?php echo htmlspecialchars($announcement['announcement_id']); ?>">
                     <button type="submit" class="btn btn-secondary">Bình luận</button>
                 </form>
             </div>
         </div>
-<?php
+        <?php
     }
 } else {
     echo '<p class="text-center">Chưa có bảng tin nào.</p>';

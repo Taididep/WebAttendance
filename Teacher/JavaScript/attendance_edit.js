@@ -1,4 +1,4 @@
-// Xác nhận buổi học
+// Xác nhận buổi học chỉnh sửa
 document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', function () {
     const input = document.getElementById('attendanceInputEdit');
     const index = parseInt(input.value); // Lấy giá trị buổi nhập vào
@@ -16,7 +16,6 @@ document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', fu
 
     // Hiện cột buổi đã nhập
     const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${index + 7})`); // Cột thứ index (cột 8 là buổi đầu tiên)
-
     cells.forEach(cell => {
         cell.style.display = ''; // Hiện cột tương ứng
     });
@@ -32,13 +31,18 @@ document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', fu
     });
 });
 
-// Nút hiện tất cả cho bảng chỉnh sửa
-document.getElementById('showAllBtnEdit').addEventListener('click', function (event) {
-    event.preventDefault(); // Ngăn chặn hành vi mặc định
-    document.querySelectorAll('#attendanceEdit .edit-data').forEach(cell => {
-        cell.style.display = '';
-    });
-    document.querySelectorAll('#attendanceEdit .edit-column').forEach(column => {
-        column.style.display = '';
-    });
+// Lấy ngày hiện tại
+var currentDate = new Date().toISOString().split('T')[0];  // Lấy định dạng 'Y-m-d'
+
+// Lấy tất cả các ô nhập liệu
+var attendanceInputs = document.querySelectorAll('.attendance-input');
+
+// Duyệt qua từng ô nhập liệu
+attendanceInputs.forEach(function (input) {
+    var scheduleDate = input.getAttribute('data-date');  // Lấy ngày điểm danh từ thuộc tính data-date
+
+    // So sánh ngày điểm danh với ngày hiện tại
+    if (scheduleDate > currentDate) {
+        input.disabled = true;  // Disable nếu ngày điểm danh chưa đến
+    }
 });

@@ -1,5 +1,3 @@
-<!-- class_detail_announcement.php -->
-
 <?php
 session_start();
 $basePath = '../';
@@ -35,7 +33,8 @@ if (!$classData) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thông tin chi tiết lớp học</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../Css/class_detail.css">
 </head>
 
@@ -43,10 +42,13 @@ if (!$classData) {
     <div class="side-tabs">
         <ul class="nav nav-tabs flex-column" id="tabMenu">
             <li class="nav-item">
-                <a class="nav-link active" id="news-tab" href="class_detail_announcement.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Bảng tin</a>
+                <a class="nav-link active" id="news-tab"
+                    href="class_detail_announcement.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Bảng
+                    tin</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="attendance-tab" href="class_detail_list.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Danh sách</a>
+                <a class="nav-link" id="attendance-tab"
+                    href="class_detail_list.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Danh sách</a>
             </li>
         </ul>
     </div>
@@ -55,7 +57,9 @@ if (!$classData) {
     <div class="container mt-5">
         <div class="card classroom-card shadow-lg">
             <div class="card-body">
-                <h2 data-bs-toggle="modal" data-bs-target="#classModal"><?php echo htmlspecialchars($classData['class_name']); ?></h2>
+                <h2 data-bs-toggle="modal" data-bs-target="#classModal">
+                    <?php echo htmlspecialchars($classData['class_name']); ?>
+                </h2>
                 <hr>
                 <div>
                     <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
@@ -92,7 +96,8 @@ if (!$classData) {
         </div>
 
         <!-- Modal tạo thông báo -->
-        <div class="modal fade" id="createAnnouncementModal" tabindex="-1" aria-labelledby="createAnnouncementModalLabel" aria-hidden="true">
+        <div class="modal fade" id="createAnnouncementModal" tabindex="-1"
+            aria-labelledby="createAnnouncementModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -107,7 +112,8 @@ if (!$classData) {
                             </div>
                             <div class="mb-3">
                                 <label for="announcementContent" class="form-label">Nội dung</label>
-                                <textarea class="form-control" id="announcementContent" name="content" rows="4" required></textarea>
+                                <textarea class="form-control" id="announcementContent" name="content" rows="4"
+                                    required></textarea>
                             </div>
                             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
                             <button type="submit" class="btn btn-primary">Tạo thông báo</button>

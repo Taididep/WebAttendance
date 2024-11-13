@@ -35,6 +35,8 @@ foreach ($schedules as $schedule) {
     }
     $stmtAttendance->closeCursor();
 }
+// Lấy ngày hiện tại
+$currentDate = date('Y-m-d');
 ?>
 
 
@@ -45,21 +47,23 @@ foreach ($schedules as $schedule) {
         <form method="POST" action="../Attendance/process_attendance.php">
             <!-- Các nút -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex" style="width: 26%;">
+                <div class="d-flex" style="width: 14%;">
                     <div class="input-group d-flex">
-                        <input type="number" id="attendanceInputEdit" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi">
-                        <button type="button" id="confirmAttendanceBtnEdit" class="btn btn-primary">Xác nhận</button>
-                        <button id="showAllBtnEdit" class="btn btn-dark">Hiện tất cả</button>
+                        <button type="button" id="confirmAttendanceBtnEdit" class="btn btn-primary">Hiện buổi</button>
+                        <input type="number" id="attendanceInputEdit" min="0" max="<?php echo count($schedules); ?>"
+                            class="form-control" placeholder="0">
                     </div>
                 </div>
                 <div>
-                    <span class="mx-3"><strong>0:</strong> Vắng mặt</span>
-                    <span class="mx-3"><strong>1:</strong> Có mặt</span>
-                    <span class="mx-3"><strong>2:</strong> Đi trễ</span>
+                    <span class="mx-3"><strong>P :</strong> Có mặt</span>
+                    <span class="mx-3"><strong>L :</strong> Đi trễ</span>
+                    <span class="mx-3"><strong>A :</strong> Vắng mặt</span>
                 </div>
                 <div>
-                    <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-info">Thống kê điểm danh</a>
-                    <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
+                    <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
+                        class="btn btn-info">Thống kê điểm danh</a>
+                    <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>"
+                        class="btn btn-success btn-custom">Xuất Excel</a>
                 </div>
             </div>
             <hr>
@@ -78,8 +82,10 @@ foreach ($schedules as $schedule) {
                             <th style="width: 150px;">Lớp</th>
                             <th style="width: 150px;">Ngày sinh</th>
                             <?php foreach ($schedules as $index => $schedule): ?>
-                                <th style="width: 100px; text-align: center;" class="edit-column" data-index="<?php echo $index; ?>">
-                                    <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>" style="text-decoration: none; color: inherit;">
+                                <th style="width: 100px; text-align: center;" class="edit-column"
+                                    data-index="<?php echo $index; ?>">
+                                    <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>"
+                                        style="text-decoration: none; color: inherit;">
                                         <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
                                         <small><?php echo date('d/m', strtotime($schedule['date'])); ?></small>
                                     </a>
@@ -103,7 +109,9 @@ foreach ($schedules as $schedule) {
                                         <input type="number" min="0" max="2" step="1"
                                             name="attendance[<?php echo htmlspecialchars($student['student_id']); ?>][<?php echo htmlspecialchars($schedule['schedule_id']); ?>]"
                                             value="<?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) ? htmlspecialchars($attendanceMap[$student['student_id']][$schedule['date']]) : 0; ?>"
-                                            class="form-control" style="height: 30px; width: 60px; display: inline-block;">
+                                            class="form-control attendance-input"
+                                            style="height: 30px; width: 60px; display: inline-block;"
+                                            data-date="<?php echo htmlspecialchars($schedule['date']); ?>">
                                     </td>
                                 <?php endforeach; ?>
                             </tr>
