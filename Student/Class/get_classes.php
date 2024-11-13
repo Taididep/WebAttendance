@@ -38,17 +38,17 @@ if (isset($_POST['semester_id'])) {
                 if ($attendance) {
                     // Tính tổng số buổi học
                     $total_classes = $attendance['total_present'] + $attendance['total_absent'] + $attendance['total_late'];
+                    $present_late = $attendance['total_present'] + $attendance['total_late'];
 
-                    // Hiển thị trạng thái "total_present / total_classes"
-                    $status = ($total_classes > 0) ? $attendance['total_present'] . " / " . $total_classes : "-";
+                    // Hiển thị trạng thái
+                    $status = ($total_classes > 0) ? $present_late . " / " . $total_classes : "-";
                 }
-
                 echo '<tr>';
-                echo '<td style="padding-left: 17px; vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
-                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
-                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
-                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>';
-                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $status . '</td>';
+                echo '<td style="padding-left: 17px; vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
+                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
+                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
+                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>';
+                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $status . '</td>';
                 echo '<td>';
                 echo '<div class="dropdown">';
                 echo '<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $counter . '" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">';

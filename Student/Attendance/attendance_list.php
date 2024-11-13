@@ -46,6 +46,9 @@ $stmtSchedules = $conn->prepare($sqlSchedules);
 $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
+
+// Lấy ngày hiện tại
+$currentDate = date('Y-m-d');
 ?>
 
 <!-- Bảng 1: Thông tin sinh viên -->
@@ -106,8 +109,10 @@ $stmtSchedules->closeCursor(); // Đóng con trỏ
                                         echo 'Có mặt'; // Có mặt
                                     } elseif ($status === '2') {
                                         echo 'Muộn'; // Muộn
+                                    } elseif ($schedule['date'] > $currentDate) {
+                                        echo ''; // Để trống nếu ngày hiện tại chưa đến ngày điểm danh
                                     } else {
-                                        echo 'Vắng'; // Vắng mặt
+                                        echo 'Vắng';
                                     }
                                 }
                             }
