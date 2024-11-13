@@ -123,27 +123,29 @@ foreach ($schedules as $schedule) {
             </thead>
             <tbody>
                 <?php foreach ($schedules as $index => $schedule): ?>
-                    <tr>
-                        <td style="text-align: center;"><?php echo 'Buổi ' . ($index + 1); ?></td>
-                        <td style="text-align: center;"><?php echo date('d/m/Y', strtotime($schedule['date'])); ?></td>
-                        <td>
-                            <?php
-                            // Kiểm tra trạng thái điểm danh của sinh viên
-                            foreach ($students as $student) {
-                                if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
-                                    $status = $attendanceMap[$student['student_id']][$schedule['date']];
-                                    if ($status === '1') {
-                                        echo 'Có mặt'; // Có mặt
-                                    } elseif ($status === '2') {
-                                        echo 'Muộn'; // Muộn
-                                    } else {
-                                        echo 'Vắng'; // Vắng mặt
+                    <?php if (strtotime($schedule['date']) < time()): // Chỉ hiển thị các buổi đã qua ?>
+                        <tr>
+                            <td style="text-align: center;"><?php echo 'Buổi ' . ($index + 1); ?></td>
+                            <td style="text-align: center;"><?php echo date('d/m/Y', strtotime($schedule['date'])); ?></td>
+                            <td>
+                                <?php
+                                // Kiểm tra trạng thái điểm danh của sinh viên
+                                foreach ($students as $student) {
+                                    if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
+                                        $status = $attendanceMap[$student['student_id']][$schedule['date']];
+                                        if ($status === '1') {
+                                            echo 'Có mặt'; // Có mặt
+                                        } elseif ($status === '2') {
+                                            echo 'Muộn'; // Muộn
+                                        } else {
+                                            echo 'Vắng'; // Vắng mặt
+                                        }
                                     }
                                 }
-                            }
-                            ?>
-                        </td>
-                    </tr>
+                                ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </tbody>
         </table>

@@ -146,6 +146,9 @@ CREATE TABLE comments (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+-- 12
+ALTER TABLE schedules ADD COLUMN expiry_time DATETIME;
+
 
 
 
