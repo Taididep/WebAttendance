@@ -31,18 +31,21 @@
                         <h1 class="text-center" id="form-title">Quên Mật Khẩu</h1>  
                     </div>  
                     <div class="card-body"> 
-                                <?php
-                                session_start();
-                                if (isset($_SESSION['error_message'])) {
-                                    echo '<div class="alert alert-danger" role="alert">'.$_SESSION['error_message'].'</div>';
-                                    unset($_SESSION['error_message']);
-                                }
+                        <!-- Hiển thị thông báo từ Session -->
+                        <?php
+                        session_start(); // Khởi động session
+                        
+                        if (isset($_SESSION['error_message'])) {
+                            echo '<div class="alert alert-danger" role="alert">'.$_SESSION['error_message'].'</div>';
+                            unset($_SESSION['error_message']); // Xóa thông báo sau khi hiển thị
+                        }
 
-                                if (isset($_SESSION['success_message'])) {
-                                    echo '<div class="alert alert-success" role="alert">'.$_SESSION['success_message'].'</div>';
-                                    unset($_SESSION['success_message']);
-                                }
-                                ?> 
+                        if (isset($_SESSION['success_message'])) {
+                            echo '<div class="alert alert-success" role="alert">'.$_SESSION['success_message'].'</div>';
+                            unset($_SESSION['success_message']); // Xóa thông báo sau khi hiển thị
+                        }
+                        ?> 
+
                         <div id="forgot-password-form">  
                             <form action="Account/reset-password.php" method="post">  
                                 <div class="form-group">  
