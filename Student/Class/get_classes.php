@@ -75,19 +75,4 @@ if (isset($_POST['semester_id'])) {
 }
 ?>
 
-<style>
-    tbody tr:hover {
-        background-color: #f0f8ff;
-        cursor: pointer;
-    }
-
-    tbody .dropdown-toggle::after {
-        display: none;
-        /* Ẩn mũi tên mặc định của Bootstrap */
-    }
-
-    thead tr {
-        background-color: inherit;
-        cursor: default;
-    }
-</style>
+<link rel="stylesheet" href="../Css/get_classes.css">

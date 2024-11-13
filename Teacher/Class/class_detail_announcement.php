@@ -47,7 +47,7 @@ if (!$classData) {
                     tin</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="attendance-tab"
+                <a style="color: black;" class="nav-link" id="attendance-tab"
                     href="class_detail_list.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Danh sách</a>
             </li>
         </ul>

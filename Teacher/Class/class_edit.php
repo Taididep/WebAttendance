@@ -79,15 +79,7 @@ $semesters = $conn->query("SELECT * FROM semesters")->fetchAll(PDO::FETCH_ASSOC)
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('editBtn').addEventListener('click', function() {
-            document.getElementById('class_name').readOnly = false;
-            document.getElementById('course_id').disabled = false;
-            document.getElementById('semester_id').disabled = false;
-            document.getElementById('updateBtn').style.display = 'inline-block'; // Hiển thị nút cập nhật
-            this.style.display = 'none'; // Ẩn nút chỉnh sửa
-        });
-    </script>
+    <script src="../JavaScript/class_edit.js"></script>
 </body>
 
 </html>

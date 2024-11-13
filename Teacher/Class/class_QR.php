@@ -57,22 +57,9 @@ $detailUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/Teacher/index.php?class_id=' 
         <p>© 2024 Hệ thống điểm danh lớp học</p>
     </div>
 
-    <script>
-        // Tạo mã QR với URL chuyển hướng
-        const detailUrl = '<?php echo $detailUrl; ?>';
-        const qrCodeContainer = document.getElementById('qrCode');
-        new QRCode(qrCodeContainer, {
-            text: detailUrl,
-            width: 300,
-            height: 300,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-        });
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="../JavaScript/class_QR.js"></script>
 
 </body>
 

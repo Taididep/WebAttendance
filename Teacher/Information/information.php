@@ -127,24 +127,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['avatar'])) {
                         </label>
                     </form>
                 </div>
-
-
-
             </div>
         </div>
     </div>
 
-    <script>
-        function handleFileSelect(event) {
-            // Kích hoạt gửi biểu mẫu chỉ khi tệp đã được chọn
-            if (event.target.files.length > 0) {
-                document.getElementById('avatarForm').submit(); // Gửi biểu mẫu
-            }
-        }
-    </script>
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../JavaScript/information.js"></script>
 </body>
 
 </html>

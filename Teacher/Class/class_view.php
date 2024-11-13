@@ -166,21 +166,8 @@ $currentDate = date('Y-m-d');
         </div>
     </div>
 
-
-
-
-    <script>
-        function openEditModal(schedule_id, date, start_time, end_time) {
-            document.getElementById('schedule_id').value = schedule_id;
-            document.getElementById('date').value = date;
-            document.getElementById('start_time').value = start_time;
-            document.getElementById('end_time').value = end_time;
-            new bootstrap.Modal(document.getElementById('editScheduleModal')).show();
-        }
-    </script>
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../JavaScript/class_view.js"></script>
 </body>
 
 </html>

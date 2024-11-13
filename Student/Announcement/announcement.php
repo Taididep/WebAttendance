@@ -109,14 +109,4 @@ if ($announcements) {
 ?>
 
 <!-- JavaScript để bật/tắt việc hiển thị các bình luận cũ -->
-<script>
-    // Hàm để ẩn/hiện bình luận cũ
-    function toggleComments(announcementId) {
-        var commentsList = document.getElementById('commentsList_' + announcementId);
-        if (commentsList.style.display === 'none') {
-            commentsList.style.display = 'block';
-        } else {
-            commentsList.style.display = 'none';
-        }
-    }
-</script>
+<script src="../JavaScript/announcement.js"></script>

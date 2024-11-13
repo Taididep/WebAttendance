@@ -26,7 +26,7 @@ body {
 }
 
 .nav-tabs .nav-link.active {
-    background-color: #007bff;
+    background-color: black;
     color: white;
     border: none;
 }
@@ -39,7 +39,7 @@ body {
 }
 
 .table th {
-    background-color: #007bff;
+    background-color: #343a40;
     color: white;
 }
 
