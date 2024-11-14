@@ -74,52 +74,7 @@ echo $detailUrl; // Chỉ dùng cho kiểm tra
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
-        body {
-            background: linear-gradient(to right, #e0f7fa, #80deea);
-            font-family: 'Arial', sans-serif;
-        }
-
-        .container {
-            margin-top: 50px;
-            border-radius: 15px;
-            padding: 30px;
-            background-color: white;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        h2 {
-            color: #00796b;
-            margin-bottom: 20px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        #qrCodeContainer {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        #qrCode {
-            width: 300px;
-            height: 300px;
-            margin: 0 auto;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            background-color: #ffffff;
-            padding: 10px;
-        }
-
-        .btn-danger {
-            margin-top: 20px;
-        }
-
-        .footer {
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-    </style>
+    <link rel="stylesheet" href="../Css/attendance_qr.css">
 </head>
 
 <body>
@@ -156,18 +111,10 @@ echo $detailUrl; // Chỉ dùng cho kiểm tra
             });
         <?php endif; ?>
     </script>
-    <script>
-        window.addEventListener('beforeunload', function() {
-            const classId = '<?php echo urlencode($class_id); ?>';
-            const scheduleId = '<?php echo urlencode($schedule_id); ?>';
-
-            // Gửi yêu cầu không đồng bộ để cập nhật status thành 0 khi đóng trang
-            navigator.sendBeacon(`../Attendance/reset_status.php?class_id=${classId}&schedule_id=${scheduleId}`);
-        });
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="../JavaScript/attendance_qr.js"></script>
 
 </body>
 

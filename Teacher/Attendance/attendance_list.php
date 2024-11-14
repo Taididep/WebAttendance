@@ -42,33 +42,7 @@ $stmtSchedules->closeCursor(); // Đóng con trỏ
 $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 ?>
 
-<style>
-    body {
-        background-color: #f8f9fa;
-    }
-
-    .container {
-        max-width: 1200px;
-        margin-top: 100px;
-    }
-
-    .present {
-        color: black;
-    }
-
-    .late {
-        color: black;
-
-    }
-
-    .absent {
-        color: red;
-    }
-
-    .unlocked {
-        color: #98FB98 !important;
-    }
-</style>
+<link rel="stylesheet" href="../Css/attendance_list.css">
 
 <div id="attendanceList">
     <div class="d-flex justify-content-between align-items-center mb-3">

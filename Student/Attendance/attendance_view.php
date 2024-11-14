@@ -49,32 +49,7 @@ if (!$scheduleStatus) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Điểm danh - <?php echo htmlspecialchars($classInfo['class_name']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .container {
-            max-width: 600px;
-            margin-top: 100px;
-        }
-
-        .btn-primary {
-            width: 100%;
-        }
-
-        .status-green {
-            background-color: #d4edda;
-        }
-
-        .status-yellow {
-            background-color: #fff3cd;
-        }
-
-        .status-red {
-            background-color: #f8d7da;
-        }
-    </style>
+    <link rel="stylesheet" href="../Css/attendance_view.css">
 </head>
 
 <body>

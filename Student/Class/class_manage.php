@@ -32,29 +32,32 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
 <body>
 
     <div class="container">
-        <!-- Tiêu đề -->
-        <h2 class="text-center">Danh sách lớp học</h2>
+            <div class="card p-4">
+                <!-- Title -->
+                <h2 class="mb-4 text-center">Quản lý danh sách lớp học</h2>
 
-        <!-- Form chọn học kỳ -->
-        <form id="semesterForm" class="d-flex justify-content-between align-items-center mb-3">
-            <div class="mb-0 me-2" style="flex: 1;">
-                <select class="form-select" id="semester" name="semester_id" required>
-                    <option value="" disabled selected>Chọn học kỳ</option>
-                    <?php foreach ($semesters as $semester): ?>
-                        <option value="<?php echo $semester['semester_id']; ?>" <?php echo $semester['semester_id'] == $defaultSemesterId ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($semester['semester_name']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+            <!-- Semester Selection Form -->
+            <form id="semesterForm" class="d-flex justify-content-between align-items-center mb-4">
+                <div class="mb-0 me-2" style="flex: 1;">
+                    <select class="form-select" id="semester" name="semester_id" required>
+                        <option value="" disabled selected>Chọn học kỳ</option>
+                        <?php foreach ($semesters as $semester): ?>
+                            <option value="<?php echo $semester['semester_id']; ?>" <?php echo $semester['semester_id'] == $defaultSemesterId ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($semester['semester_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </form>
+
+            <!-- Class List Table -->
+            <div id="classList" class="class-table">
+                <!-- Class list will be loaded here -->
             </div>
-        </form>
-
-        <!-- Bảng lớp học -->
-        <div id="classList" class="mt-4">
-            <!-- Danh sách lớp sẽ được tải ở đây -->
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../JavaScript/class_manage.js"></script>
 </body>
