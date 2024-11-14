@@ -47,7 +47,7 @@ $currentDate = date('Y-m-d');
         <form method="POST" action="../Attendance/process_attendance.php">
             <!-- Các nút -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex" style="width: 14%;">
+                <div class="d-flex" style="width: 13%;">
                     <div class="input-group d-flex">
                         <button type="button" id="confirmAttendanceBtnEdit" class="btn btn-primary">Hiện buổi</button>
                         <input type="number" id="attendanceInputEdit" min="0" max="<?php echo count($schedules); ?>"
@@ -55,9 +55,9 @@ $currentDate = date('Y-m-d');
                     </div>
                 </div>
                 <div>
-                    <span class="mx-3"><strong>P :</strong> Có mặt</span>
-                    <span class="mx-3"><strong>L :</strong> Đi trễ</span>
-                    <span class="mx-3"><strong>A :</strong> Vắng mặt</span>
+                    <span class="mx-3"><strong>1 :</strong> Có mặt</span>
+                    <span class="mx-3"><strong>2 :</strong> Đi trễ</span>
+                    <span class="mx-3"><strong>0 :</strong> Vắng mặt</span>
                 </div>
                 <div>
                     <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"

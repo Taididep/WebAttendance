@@ -1,79 +1,79 @@
 document.getElementById("addStudentForm").addEventListener("submit", function (event) {
-        event.preventDefault(); // Ngăn chặn gửi form theo cách thông thường
+    event.preventDefault(); // Ngăn chặn gửi form theo cách thông thường
 
-        const classId = document.querySelector("input[name='class_id']").value;
-        const studentId = document.getElementById("studentIdInput").value;
-        const joinClassMessage = document.getElementById("joinClassMessage");
+    const classId = document.querySelector("input[name='class_id']").value;
+    const studentId = document.getElementById("studentIdInput").value;
+    const joinClassMessage = document.getElementById("joinClassMessage");
 
-        // Gửi yêu cầu AJAX tới add_student.php
-        fetch("<?php echo $basePath; ?>Class/add_student.php", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: `class_id=${encodeURIComponent(classId)}&student_id=${encodeURIComponent(studentId)}`
-        })
-            .then(response => response.json())
-            .then(data => {
-                joinClassMessage.classList.remove("d-none");
-                if (data.success) {
-                    joinClassMessage.classList.add("alert-success");
-                    joinClassMessage.classList.remove("alert-danger");
-                    joinClassMessage.innerText = data.message;
-                    // Reset form sau khi thêm sinh viên thành công
-                    document.getElementById("addStudentForm").reset();
-                } else {
-                    joinClassMessage.classList.add("alert-danger");
-                    joinClassMessage.classList.remove("alert-success");
-                    joinClassMessage.innerText = data.message;
-                }
-            })
-            .catch(error => {
-                joinClassMessage.classList.remove("d-none");
+    // Gửi yêu cầu AJAX tới add_student.php
+    fetch("<?php echo $basePath; ?>Class/add_student.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `class_id=${encodeURIComponent(classId)}&student_id=${encodeURIComponent(studentId)}`
+    })
+        .then(response => response.json())
+        .then(data => {
+            joinClassMessage.classList.remove("d-none");
+            if (data.success) {
+                joinClassMessage.classList.add("alert-success");
+                joinClassMessage.classList.remove("alert-danger");
+                joinClassMessage.innerText = data.message;
+                // Reset form sau khi thêm sinh viên thành công
+                document.getElementById("addStudentForm").reset();
+            } else {
                 joinClassMessage.classList.add("alert-danger");
                 joinClassMessage.classList.remove("alert-success");
-                joinClassMessage.innerText = "Có lỗi xảy ra. Vui lòng thử lại.";
-            });
-    });
+                joinClassMessage.innerText = data.message;
+            }
+        })
+        .catch(error => {
+            joinClassMessage.classList.remove("d-none");
+            joinClassMessage.classList.add("alert-danger");
+            joinClassMessage.classList.remove("alert-success");
+            joinClassMessage.innerText = "Có lỗi xảy ra. Vui lòng thử lại.";
+        });
+});
 
 const currentDateTime = new Date('<?php echo $currentDateTime; ?>');
-    const scheduleCells = document.querySelectorAll('.list-column');
+const scheduleCells = document.querySelectorAll('.list-column');
 
-    scheduleCells.forEach(cell => {
-        const dateText = cell.querySelector('small').innerText;
-        const [day, month, year] = dateText.split('/').map(Number);
-        const scheduleDate = new Date(year, month - 1, day);
+scheduleCells.forEach(cell => {
+    const dateText = cell.querySelector('small').innerText;
+    const [day, month, year] = dateText.split('/').map(Number);
+    const scheduleDate = new Date(year, month - 1, day);
 
-        // So sánh ngày điểm danh với thời gian hiện tại
-        if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
-            // Nếu ngày là hôm nay, thêm lớp màu xanh lá
-            cell.classList.add('today', 'unlocked');
-        } else if (scheduleDate < currentDateTime) {
+    // So sánh ngày điểm danh với thời gian hiện tại
+    if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
+        // Nếu ngày là hôm nay, thêm lớp màu xanh lá
+        cell.classList.add('today', 'unlocked');
+    } else if (scheduleDate < currentDateTime) {
+        cell.classList.add('table-secondary');
+        cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
+        const link = cell.querySelector('a');
+        if (link) link.style.pointerEvents = 'none';
+        cell.style.pointerEvents = 'none';
+    } else {
+        // Kiểm tra thời gian hiện tại so với buổi học
+        const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0);
+        const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000);
+
+        if (currentDateTime >= scheduleStartTime && currentDateTime < endTime) {
+            // Mở khóa cho buổi học hiện tại và thêm lớp unlocked
+            cell.classList.add('unlocked');
+            const link = cell.querySelector('a');
+            if (link) link.style.pointerEvents = '';
+            cell.style.pointerEvents = '';
+        } else {
             cell.classList.add('table-secondary');
             cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
             const link = cell.querySelector('a');
             if (link) link.style.pointerEvents = 'none';
             cell.style.pointerEvents = 'none';
-        } else {
-            // Kiểm tra thời gian hiện tại so với buổi học
-            const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0);
-            const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000);
-
-            if (currentDateTime >= scheduleStartTime && currentDateTime < endTime) {
-                // Mở khóa cho buổi học hiện tại và thêm lớp unlocked
-                cell.classList.add('unlocked');
-                const link = cell.querySelector('a');
-                if (link) link.style.pointerEvents = '';
-                cell.style.pointerEvents = '';
-            } else {
-                cell.classList.add('table-secondary');
-                cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
-                const link = cell.querySelector('a');
-                if (link) link.style.pointerEvents = 'none';
-                cell.style.pointerEvents = 'none';
-            }
         }
-    });
+    }
+});
 
 document.getElementById('confirmAttendanceBtnList').addEventListener('click', function () {
     const input = document.getElementById('attendanceInputList');
