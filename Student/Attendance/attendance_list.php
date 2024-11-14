@@ -109,6 +109,8 @@ $currentDate = date('Y-m-d');
                                         echo 'Có mặt'; // Có mặt
                                     } elseif ($status === '2') {
                                         echo 'Muộn'; // Muộn
+                                    } elseif ($status === '-1') {
+                                        echo '';
                                     } elseif ($schedule['date'] > $currentDate) {
                                         echo ''; // Để trống nếu ngày hiện tại chưa đến ngày điểm danh
                                     } else {

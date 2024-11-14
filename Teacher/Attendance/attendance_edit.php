@@ -35,6 +35,24 @@ foreach ($schedules as $schedule) {
     }
     $stmtAttendance->closeCursor();
 }
+
+// Lấy thống kê điểm danh cho tất cả sinh viên (cùng một lúc)
+$sqlReport = "SELECT student_id, total_present, total_late, total_absent FROM attendance_reports WHERE class_id = ?";
+$stmtReport = $conn->prepare($sqlReport);
+$stmtReport->execute([$class_id]);
+$attendanceReports = $stmtReport->fetchAll(PDO::FETCH_ASSOC);
+$stmtReport->closeCursor(); // Đóng con trỏ
+
+// Chuyển đổi kết quả thống kê thành mảng để dễ truy xuất
+$attendanceStats = [];
+foreach ($attendanceReports as $report) {
+    $attendanceStats[$report['student_id']] = [
+        'total_present' => $report['total_present'] ?? 0,
+        'total_late' => $report['total_late'] ?? 0,
+        'total_absent' => $report['total_absent'] ?? 0,
+    ];
+}
+
 // Lấy ngày hiện tại
 $currentDate = date('Y-m-d');
 ?>
@@ -55,9 +73,9 @@ $currentDate = date('Y-m-d');
                     </div>
                 </div>
                 <div>
-                    <span class="mx-3"><strong>1 :</strong> Có mặt</span>
-                    <span class="mx-3"><strong>2 :</strong> Đi trễ</span>
-                    <span class="mx-3"><strong>0 :</strong> Vắng mặt</span>
+                    <span class="mx-3"><strong>P :</strong> Có mặt</span>
+                    <span class="mx-3"><strong>L :</strong> Đi trễ</span>
+                    <span class="mx-3"><strong>A :</strong> Vắng mặt</span>
                 </div>
                 <div>
                     <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
@@ -81,6 +99,9 @@ $currentDate = date('Y-m-d');
                             <th style="width: 150px;">Giới tính</th>
                             <th style="width: 150px;">Lớp</th>
                             <th style="width: 150px;">Ngày sinh</th>
+                            <th style="width: 50px;">P</th>
+                            <th style="width: 50px;">L</th>
+                            <th style="width: 50px;">A</th>
                             <?php foreach ($schedules as $index => $schedule): ?>
                                 <th style="width: 100px; text-align: center;" class="edit-column"
                                     data-index="<?php echo $index; ?>">
@@ -96,7 +117,7 @@ $currentDate = date('Y-m-d');
                     </thead>
                     <tbody>
                         <?php foreach ($students as $index => $student): ?>
-                            <tr style="height: 50px">
+                            <tr style="height: 60px">
                                 <td style="padding-left: 10px;"><?php echo $index + 1; ?></td>
                                 <td><?php echo htmlspecialchars($student['student_id']); ?></td>
                                 <td><?php echo htmlspecialchars($student['lastname']); ?></td>
@@ -104,14 +125,20 @@ $currentDate = date('Y-m-d');
                                 <td><?php echo htmlspecialchars($student['gender']); ?></td>
                                 <td><?php echo htmlspecialchars($student['class']); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
+                                <td><?php echo $attendanceStats[$student['student_id']]['total_present'] ?? 0; ?></td>
+                                <td><?php echo $attendanceStats[$student['student_id']]['total_late'] ?? 0; ?></td>
+                                <td><?php echo $attendanceStats[$student['student_id']]['total_absent'] ?? 0; ?></td>
                                 <?php foreach ($schedules as $schedule): ?>
                                     <td class="edit-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
-                                        <input type="number" min="0" max="2" step="1"
-                                            name="attendance[<?php echo htmlspecialchars($student['student_id']); ?>][<?php echo htmlspecialchars($schedule['schedule_id']); ?>]"
-                                            value="<?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) ? htmlspecialchars($attendanceMap[$student['student_id']][$schedule['date']]) : 0; ?>"
-                                            class="form-control attendance-input"
-                                            style="height: 30px; width: 60px; display: inline-block;"
+                                        <select name="attendance[<?php echo htmlspecialchars($student['student_id']); ?>][<?php echo htmlspecialchars($schedule['schedule_id']); ?>]"
+                                            class="form-control attendance-select"
+                                            style="width: 37px; display: inline-block; padding-top: 8px"
                                             data-date="<?php echo htmlspecialchars($schedule['date']); ?>">
+                                            <option value="-1" <?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) && $attendanceMap[$student['student_id']][$schedule['date']] === '0' ? 'selected' : ''; ?>></option>
+                                            <option value="0" <?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) && $attendanceMap[$student['student_id']][$schedule['date']] === '0' ? 'selected' : ''; ?>>A</option>
+                                            <option value="1" <?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) && $attendanceMap[$student['student_id']][$schedule['date']] === '1' ? 'selected' : ''; ?>>P</option>
+                                            <option value="2" <?php echo isset($attendanceMap[$student['student_id']][$schedule['date']]) && $attendanceMap[$student['student_id']][$schedule['date']] === '2' ? 'selected' : ''; ?>>L</option>
+                                        </select>
                                     </td>
                                 <?php endforeach; ?>
                             </tr>
@@ -119,9 +146,9 @@ $currentDate = date('Y-m-d');
                     </tbody>
                     <tfoot>
                         <tr class="bg-dark-subtle">
-                            <td colspan="7" style="text-align: center;">Tổng sinh viên có mặt</td>
+                            <td colspan="10" style="text-align: center;">Tổng sinh viên có mặt</td>
                             <?php foreach ($schedules as $schedule): ?>
-                                <td class="list-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
+                                <td class="edit-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
                                     <?php
                                     $countPresent = 0;
                                     foreach ($students as $student) {

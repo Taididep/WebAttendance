@@ -6,7 +6,7 @@ document.getElementById("addStudentForm").addEventListener("submit", function (e
     const joinClassMessage = document.getElementById("joinClassMessage");
 
     // Gửi yêu cầu AJAX tới add_student.php
-    fetch("<?php echo $basePath; ?>Class/add_student.php", {
+    fetch(basePath + "Class/add_student.php", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
@@ -36,6 +36,12 @@ document.getElementById("addStudentForm").addEventListener("submit", function (e
         });
 });
 
+// Lắng nghe sự kiện 'hidden.bs.modal' để tải lại trang khi modal đóng
+document.querySelector('#addStudentModal').addEventListener('hidden.bs.modal', function () {
+    location.reload(); // Tải lại trang khi modal đóng
+});
+
+// 
 const currentDateTime = new Date('<?php echo $currentDateTime; ?>');
 const scheduleCells = document.querySelectorAll('.list-column');
 
@@ -97,7 +103,7 @@ document.getElementById('confirmAttendanceBtnList').addEventListener('click', fu
     });
 
     // Hiện cột buổi đã nhập
-    const cells = document.querySelectorAll(`#attendanceList td:nth-child(${index + 7})`); // Cột thứ index (cột 8 là buổi đầu tiên)
+    const cells = document.querySelectorAll(`#attendanceList td:nth-child(${index + 10})`); // Cột thứ index (cột 11 là buổi đầu tiên)
     cells.forEach(cell => {
         cell.style.display = ''; // Hiện cột tương ứng
     });

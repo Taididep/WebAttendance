@@ -27,7 +27,7 @@ if (isset($_POST['semester_id'])) {
             $counter = 1;
             foreach ($classes as $class) {
                 echo '<tr>';
-                echo '<td style="padding-left: 17px; vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
+                echo '<td style="padding-left: 25px; vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
                 echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_announcement.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
                 echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_announcement.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
                 echo '<td>';

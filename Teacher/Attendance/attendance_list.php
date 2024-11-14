@@ -38,6 +38,23 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
 
+// Lấy thống kê điểm danh cho tất cả sinh viên (cùng một lúc)
+$sqlReport = "SELECT student_id, total_present, total_late, total_absent FROM attendance_reports WHERE class_id = ?";
+$stmtReport = $conn->prepare($sqlReport);
+$stmtReport->execute([$class_id]);
+$attendanceReports = $stmtReport->fetchAll(PDO::FETCH_ASSOC);
+$stmtReport->closeCursor(); // Đóng con trỏ
+
+// Chuyển đổi kết quả thống kê thành mảng để dễ truy xuất
+$attendanceStats = [];
+foreach ($attendanceReports as $report) {
+    $attendanceStats[$report['student_id']] = [
+        'total_present' => $report['total_present'] ?? 0,
+        'total_late' => $report['total_late'] ?? 0,
+        'total_absent' => $report['total_absent'] ?? 0,
+    ];
+}
+
 // Ngày giờ hiện tại
 $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 ?>
@@ -80,9 +97,11 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                         <th style="width: 150px;">Giới tính</th>
                         <th style="width: 150px;">Lớp</th>
                         <th style="width: 150px;">Ngày sinh</th>
+                        <th style="width: 50px;">P</th>
+                        <th style="width: 50px;">L</th>
+                        <th style="width: 50px;">A</th>
                         <?php foreach ($schedules as $index => $schedule): ?>
-                            <th style="width: 100px; text-align: center;" class="list-column"
-                                data-index="<?php echo $index; ?>">
+                            <th style="width: 100px; text-align: center;" class="list-column" data-index="<?php echo $index; ?>">
                                 <a href="../Attendance/attendance_qr.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>"
                                     style="text-decoration: none; color: inherit;">
                                     <span><?php echo 'Buổi ' . ($index + 1); ?></span><br>
@@ -92,9 +111,10 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                         <?php endforeach; ?>
                     </tr>
                 </thead>
+
                 <tbody>
                     <?php foreach ($students as $index => $student): ?>
-                        <tr style="height: 50px">
+                        <tr style="height: 60px">
                             <td style="padding-left: 10px;"><?php echo $index + 1; ?></td>
                             <td><?php echo htmlspecialchars($student['student_id']); ?></td>
                             <td><?php echo htmlspecialchars($student['lastname']); ?></td>
@@ -102,6 +122,9 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                             <td><?php echo htmlspecialchars($student['gender']); ?></td>
                             <td><?php echo htmlspecialchars($student['class']); ?></td>
                             <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
+                            <td><?php echo $attendanceStats[$student['student_id']]['total_present'] ?? 0; ?></td>
+                            <td><?php echo $attendanceStats[$student['student_id']]['total_late'] ?? 0; ?></td>
+                            <td><?php echo $attendanceStats[$student['student_id']]['total_absent'] ?? 0; ?></td>
                             <?php foreach ($schedules as $schedule): ?>
                                 <td class="list-data" style="height: 22px; width: 80px; padding-bottom: 10px; text-align: center;">
                                     <?php
@@ -112,23 +135,24 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                                             echo '<span class="present">P</span>'; // Có mặt
                                         } elseif ($status === '2') {
                                             echo '<span class="late">L</span>'; // Muộn
+                                        } elseif ($status === '-1') {
+                                            echo ''; // Chưa điểm danh
                                         } elseif ($schedule['date'] > date('Y-m-d', strtotime($currentDateTime))) {
-                                            // Để trống nếu ngày điểm danh chưa đến
-                                            echo '';
+                                            echo ''; // Chưa đến ngày
                                         } else {
                                             echo '<span class="absent">A</span>'; // Vắng
                                         }
                                     }
-
                                     ?>
                                 </td>
                             <?php endforeach; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
+
                 <tfoot>
                     <tr class="bg-dark-subtle">
-                        <td colspan="7" style="text-align: center;">Tổng sinh viên có mặt</td>
+                        <td colspan="10" style="text-align: center;">Tổng sinh viên có mặt</td>
                         <?php foreach ($schedules as $schedule): ?>
                             <td class="list-data" style="width: 80px; padding-bottom: 10px; text-align: center;">
                                 <?php
@@ -158,13 +182,13 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
     </div>
 </div>
 
-<!-- Modal Nhập Mã Lớp Học -->
+<!-- Modal thêm sinh viên -->
+<!-- Modal -->
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addStudentModalLabel">Thêm sinh viên vào lớp</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <form id="addStudentForm" method="post">
@@ -188,48 +212,9 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
     </div>
 </div>
 
-<script>
-    document.getElementById("addStudentForm").addEventListener("submit", function(event) {
-        event.preventDefault(); // Ngăn chặn gửi form theo cách thông thường
-
-        const classId = document.querySelector("input[name='class_id']").value;
-        const studentId = document.getElementById("studentIdInput").value;
-        const joinClassMessage = document.getElementById("joinClassMessage");
-
-        // Gửi yêu cầu AJAX tới add_student.php
-        fetch("<?php echo $basePath; ?>Class/add_student.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: `class_id=${encodeURIComponent(classId)}&student_id=${encodeURIComponent(studentId)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                joinClassMessage.classList.remove("d-none");
-                if (data.success) {
-                    joinClassMessage.classList.add("alert-success");
-                    joinClassMessage.classList.remove("alert-danger");
-                    joinClassMessage.innerText = data.message;
-                    // Reset form sau khi thêm sinh viên thành công
-                    document.getElementById("addStudentForm").reset();
-                } else {
-                    joinClassMessage.classList.add("alert-danger");
-                    joinClassMessage.classList.remove("alert-success");
-                    joinClassMessage.innerText = data.message;
-                }
-            })
-            .catch(error => {
-                joinClassMessage.classList.remove("d-none");
-                joinClassMessage.classList.add("alert-danger");
-                joinClassMessage.classList.remove("alert-success");
-                joinClassMessage.innerText = "Có lỗi xảy ra. Vui lòng thử lại.";
-            });
-    });
-</script>
-
 
 <script>
     const totalDatesList = <?php echo count($schedules); ?>;
+    const basePath = "<?php echo $basePath; ?>";
 </script>
 <script src="../JavaScript/attendance_list.js"></script>

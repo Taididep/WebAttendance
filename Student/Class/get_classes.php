@@ -27,28 +27,28 @@ if (isset($_POST['semester_id'])) {
             $counter = 1;
             foreach ($classes as $class) {
                 // Lấy thông tin điểm danh của sinh viên trong lớp
-                $sql_attendance = "SELECT total_present, total_absent, total_late FROM attendance_reports WHERE class_id = ? AND student_id = ?";
+                $sql_attendance = "SELECT total_present, total_absent, total_late, total FROM attendance_reports WHERE class_id = ? AND student_id = ?";
                 $stmt_attendance = $conn->prepare($sql_attendance);
                 $stmt_attendance->execute([$class['class_id'], $student_id]);
                 $attendance = $stmt_attendance->fetch(PDO::FETCH_ASSOC);
                 $stmt_attendance->closeCursor();
 
-                // Tạo trạng thái hiển thị theo dạng "total_present / total_classes"
+                // Tạo trạng thái hiển thị theo dạng "total_present / total"
                 $status = '-';
                 if ($attendance) {
-                    // Tính tổng số buổi học
-                    $total_classes = $attendance['total_present'] + $attendance['total_absent'] + $attendance['total_late'];
+                    // Lấy tổng số buổi học từ cột total
+                    $total_classes = $attendance['total'];
                     $present_late = $attendance['total_present'] + $attendance['total_late'];
 
-                    // Hiển thị trạng thái
+                    // Hiển thị trạng thái theo dạng "total_present + total_late / total"
                     $status = ($total_classes > 0) ? $present_late . " / " . $total_classes : "-";
                 }
                 echo '<tr>';
-                echo '<td style="padding-left: 17px; vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
+                echo '<td style="padding-left: 25px; vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
                 echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
                 echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
                 echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>';
-                echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $status . '</td>';
+                echo '<td style="padding-left: 35px; vertical-align: middle;" onclick="window.location.href=\'class_detail_list.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $status . '</td>';
                 echo '<td>';
                 echo '<div class="dropdown">';
                 echo '<button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $counter . '" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">';

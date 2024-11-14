@@ -34,10 +34,12 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor();
 
-$attendanceMap = [];
-foreach ($attendanceData as $record) {
-    $attendanceMap[$record['student_id']][$record['date']] = $record['status'];
-}
+// Lấy thống kê điểm danh
+$sqlReport = "SELECT student_id, total_present, total_late, total_absent FROM attendance_reports WHERE class_id = ?";
+$stmtReport = $conn->prepare($sqlReport);
+$stmtReport->execute([$class_id]);
+$attendanceReports = $stmtReport->fetchAll(PDO::FETCH_ASSOC);
+$stmtReport->closeCursor();
 
 // Tạo file Excel mới
 $spreadsheet = new Spreadsheet();
@@ -45,13 +47,29 @@ $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("Attendance");
 
 // Tiêu đề cột
-$headers = ["STT", "Mã sinh viên", "Họ đệm", "Tên", "Lớp", "Ngày sinh"];
+$headers = ["STT", "Mã sinh viên", "Họ đệm", "Tên", "Lớp", "Ngày sinh", "P", "L", "A"];
 foreach ($schedules as $index => $schedule) {
     $headers[] = 'Buổi ' . ($index + 1) . ' (' . date('d/m', strtotime($schedule['date'])) . ')';
 }
 
 // Thêm tiêu đề vào hàng đầu tiên
 $sheet->fromArray($headers, NULL, 'A1');
+
+// Tạo mảng thống kê điểm danh cho từng sinh viên
+$attendanceMap = [];
+foreach ($attendanceData as $record) {
+    $attendanceMap[$record['student_id']][$record['date']] = $record['status'];
+}
+
+// Chuyển đổi thống kê điểm danh thành mảng dễ sử dụng
+$attendanceStats = [];
+foreach ($attendanceReports as $report) {
+    $attendanceStats[$report['student_id']] = [
+        'total_present' => $report['total_present'] ?? 0,
+        'total_late' => $report['total_late'] ?? 0,
+        'total_absent' => $report['total_absent'] ?? 0,
+    ];
+}
 
 // Thêm dữ liệu sinh viên và trạng thái điểm danh
 $rowIndex = 2;
@@ -62,7 +80,10 @@ foreach ($students as $index => $student) {
         $student['lastname'],
         $student['firstname'],
         $student['class'],
-        date('d/m/Y', strtotime($student['birthday']))
+        date('d/m/Y', strtotime($student['birthday'])),
+        $attendanceStats[$student['student_id']]['total_present'], // P
+        $attendanceStats[$student['student_id']]['total_late'],    // L
+        $attendanceStats[$student['student_id']]['total_absent'],  // A
     ];
 
     // Điểm danh từng buổi
@@ -90,7 +111,7 @@ foreach ($schedules as $schedule) {
 }
 
 // Thêm số lượng học sinh có mặt vào hàng tiếp theo
-$attendanceCountsRow = ['Tổng điểm danh', '', '', '', '', '']; // Đặt giá trị cho 6 cột đầu tiên
+$attendanceCountsRow = ['Tổng điểm danh', '', '', '', '', '', '', '']; // Đặt giá trị cho 8 cột đầu tiên
 foreach ($attendanceCounts as $count) {
     $attendanceCountsRow[] = $count;
 }
@@ -99,8 +120,8 @@ foreach ($attendanceCounts as $count) {
 $sheet->fromArray($attendanceCountsRow, NULL, 'A' . $rowIndex);
 
 // Hợp nhất ô cho dòng "Số học sinh có mặt"
-$sheet->mergeCells("A{$rowIndex}:F{$rowIndex}"); // Hợp nhất từ cột A đến cột F ở hàng số $rowIndex
-$sheet->getStyle("A{$rowIndex}:F{$rowIndex}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER); // Canh giữa
+$sheet->mergeCells("A{$rowIndex}:I{$rowIndex}"); // Hợp nhất từ cột A đến cột I ở hàng số $rowIndex
+$sheet->getStyle("A{$rowIndex}:I{$rowIndex}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER); // Canh giữa
 
 // Xuất file Excel
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

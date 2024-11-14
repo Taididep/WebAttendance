@@ -19,7 +19,7 @@ $attendanceData = $_POST['attendance'];
 foreach ($attendanceData as $student_id => $schedules) {
     foreach ($schedules as $schedule_id => $status) {
 
-        if ($status != 0 && $status != 1 && $status != 2) {
+        if ($status != -1 && $status != 0 && $status != 1 && $status != 2) {
             continue;
         }
 

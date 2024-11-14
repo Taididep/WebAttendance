@@ -4,8 +4,14 @@ document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', fu
     const index = parseInt(input.value); // Lấy giá trị buổi nhập vào
     const totalSchedules = totalDatesEdit; // Sử dụng biến truyền từ PHP
 
-    if (index < 1 || index > totalSchedules) {
-        alert('Vui lòng nhập buổi hợp lệ (từ 1 đến ' + totalSchedules + ').');
+    // Kiểm tra nếu không nhập giá trị hoặc nhập "0", hiển thị tất cả
+    if (!input.value || index === 0) {
+        document.querySelectorAll('#attendanceEdit .edit-data').forEach(cell => {
+            cell.style.display = ''; // Hiện tất cả các dữ liệu
+        });
+        document.querySelectorAll('#attendanceEditt .edit-column').forEach(column => {
+            column.style.display = ''; // Hiện tất cả các cột
+        });
         return;
     }
 
@@ -15,7 +21,7 @@ document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', fu
     });
 
     // Hiện cột buổi đã nhập
-    const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${index + 7})`); // Cột thứ index (cột 8 là buổi đầu tiên)
+    const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${index + 10})`); // Cột thứ index (cột 11 là buổi đầu tiên)
     cells.forEach(cell => {
         cell.style.display = ''; // Hiện cột tương ứng
     });
@@ -34,15 +40,20 @@ document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', fu
 // Lấy ngày hiện tại
 var currentDate = new Date().toISOString().split('T')[0];  // Lấy định dạng 'Y-m-d'
 
-// Lấy tất cả các ô nhập liệu
-var attendanceInputs = document.querySelectorAll('.attendance-input');
+// Lấy tất cả các dropdown attendance
+var attendanceSelects = document.querySelectorAll('.attendance-select');
 
-// Duyệt qua từng ô nhập liệu
-attendanceInputs.forEach(function (input) {
-    var scheduleDate = input.getAttribute('data-date');  // Lấy ngày điểm danh từ thuộc tính data-date
+// Duyệt qua từng ô nhập liệu (dropdown)
+attendanceSelects.forEach(function (select) {
+    var scheduleDate = select.getAttribute('data-date');  // Lấy ngày điểm danh từ thuộc tính data-date
 
     // So sánh ngày điểm danh với ngày hiện tại
     if (scheduleDate > currentDate) {
-        input.disabled = true;  // Disable nếu ngày điểm danh chưa đến
+        // Đặt giá trị của select thành rỗng
+        select.value = '';
+
+        // Disable select nếu ngày điểm danh chưa đến
+        select.disabled = true;
     }
 });
+
