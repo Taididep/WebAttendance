@@ -41,10 +41,10 @@ if (!$scheduleData) {
     exit;
 }
 
+$defaultTime = (new DateTime($scheduleData['date']))->format('H:i:s');
 $detailUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/Student/Attendance/attendance_view.php?class_id=' . urlencode($class_id) . '&schedule_id=' . urlencode($schedule_id);
 
-$currentDate = new DateTime();
-$scheduleDate = new DateTime($scheduleData['date']);
+echo $detailUrl;
 ?>
 
 <!DOCTYPE html>
@@ -68,78 +68,46 @@ $scheduleDate = new DateTime($scheduleData['date']);
         <!-- Hàng chứa input và nút xác nhận thời gian -->
         <div class="form-group my-3 d-flex justify-content-center align-items-center gap-3">
             <label for="timeInput" class="form-label m-0">Chọn thời gian điểm danh:</label>
-            <input type="time" id="timeInput" class="form-control w-auto" step="1">
+            <input type="time" id="timeInput" class="form-control w-auto" step="1" value="<?php echo htmlspecialchars($defaultTime); ?>">
             <button id="confirmTimeButton" class="btn btn-primary">Xác nhận thời gian</button>
         </div>
 
-        <?php if ($currentDate >= $scheduleDate): ?>
-            <div id="qrCodeContainer">
-                <div id="qrCode"></div>
-            </div>
-            <a href="../Attendance/reset_status.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule_id); ?>"
-                class="btn btn-danger">Đóng</a>
-        <?php else: ?>
-            <p class="alert alert-warning">Chưa đến ngày điểm danh. Vui lòng quay lại sau.</p>
-            <a href="../Class/class_detail_list.php?class_id=<?php echo urlencode($class_id); ?>"
-                class="btn btn-danger">Quay lại trang lớp học</a>
-        <?php endif; ?>
-    </div>
+        <div id="qrCodeContainer">
+            <div id="qrCode"></div>
+        </div>
 
+        <a href="../Attendance/reset_status.php?class_id=<?php echo urlencode($class_id); ?>&schedule_id=<?php echo urlencode($schedule_id); ?>" class="btn btn-danger">Đóng</a>
+    </div>
 
     <div class="footer text-center">
         <p>© 2024 Hệ thống điểm danh lớp học</p>
     </div>
 
     <script>
-        <?php if ($currentDate >= $scheduleDate): ?>
-            const detailUrl = '<?php echo $detailUrl; ?>';
-            const qrCodeContainer = document.getElementById('qrCode');
-            new QRCode(qrCodeContainer, {
-                text: detailUrl,
-                width: 300,
-                height: 300,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        <?php endif; ?>
-
-        document.getElementById('confirmTimeButton').addEventListener('click', function () {
-            const time = document.getElementById('timeInput').value;
-
-            if (!time) {
-                alert('Vui lòng chọn thời gian!');
-                return;
-            }
-
-            const scheduleId = '<?php echo urlencode($schedule_id); ?>';
-
-            $.ajax({
-                url: '../Attendance/save_time.php',
-                method: 'POST',
-                data: {
-                    schedule_id: scheduleId,
-                    time: time
-                },
-                success: function (response) {
-                    alert(response);
-                    location.reload(); // Tải lại trang để hiển thị cập nhật
-                },
-                error: function () {
-                    alert('Có lỗi xảy ra khi lưu thời gian.');
-                }
-            });
+        const detailUrl = '<?php echo $detailUrl; ?>';
+        const qrCodeContainer = document.getElementById('qrCode');
+        new QRCode(qrCodeContainer, {
+            text: detailUrl,
+            width: 300,
+            height: 300,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
         });
     </script>
+
+    <script>
+        const classId = '<?php echo urlencode($class_id); ?>';
+        const scheduleId = '<?php echo urlencode($schedule_id); ?>';
+    </script>
+    <script src="../JavaScript/attendance_qr.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-    <script>
-        window.addEventListener('beforeunload', function () {
-            // Gửi yêu cầu không đồng bộ để cập nhật status thành 0 khi đóng trang
-            navigator.sendBeacon(`../Attendance/reset_status.php?class_id=${classId}&schedule_id=${scheduleId}`);
-        });
-    </script>
+
+
+
+
 </body>
 
 </html>

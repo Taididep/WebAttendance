@@ -214,50 +214,6 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 </div>
 
 
-<!-- <script>
-    const currentDateTime = new Date('<?php echo $currentDateTime; ?>');
-    const scheduleCells = document.querySelectorAll('.list-column');
-
-    scheduleCells.forEach(cell => {
-        const dateText = cell.querySelector('small').innerText;
-        const [day, month, year] = dateText.split('/').map(Number);
-        const scheduleDate = new Date(year, month - 1, day);
-
-        // So sánh ngày điểm danh với thời gian hiện tại
-        if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
-            // Nếu ngày là hôm nay
-            cell.classList.add('today', 'unlocked');
-        }
-        else if (scheduleDate < currentDateTime) {
-            cell.classList.add('table-secondary');
-            cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
-            const link = cell.querySelector('a');
-            if (link) link.style.pointerEvents = 'none';
-            cell.style.pointerEvents = 'none';
-        }
-        else {
-            // Kiểm tra thời gian hiện tại so với buổi học
-            const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0);
-            const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000);
-
-            if (currentDateTime >= scheduleStartTime && currentDateTime < endTime) {
-                // Mở khóa cho buổi học hiện tại và thêm lớp unlocked
-                cell.classList.add('unlocked');
-                const link = cell.querySelector('a');
-                if (link) link.style.pointerEvents = '';
-                cell.style.pointerEvents = '';
-            } else {
-                cell.classList.add('table-secondary');
-                cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
-                const link = cell.querySelector('a');
-                if (link) link.style.pointerEvents = 'none';
-                cell.style.pointerEvents = 'none';
-            }
-        }
-    });
-</script> -->
-
-
 <script>
     const totalDatesList = <?php echo count($schedules); ?>;
     const basePath = "<?php echo $basePath; ?>";

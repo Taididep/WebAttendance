@@ -58,7 +58,7 @@ if (!$scheduleData) {
 
             <div id="timer" class="text-center fs-4">
                 <!-- Hiển thị thông tin ngày học -->
-                <p>Ngày buổi học:
+                <p>Hạn điểm danh:
                     <?php echo htmlspecialchars((new DateTime($scheduleData['date']))->format('d/m/Y H:i:s')); ?>
                 </p>
             </div>
