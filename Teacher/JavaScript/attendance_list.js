@@ -41,46 +41,6 @@ document.querySelector('#addStudentModal').addEventListener('hidden.bs.modal', f
     location.reload(); // Tải lại trang khi modal đóng
 });
 
-// 
-const currentDateTime = new Date('<?php echo $currentDateTime; ?>');
-const scheduleCells = document.querySelectorAll('.list-column');
-
-scheduleCells.forEach(cell => {
-    const dateText = cell.querySelector('small').innerText;
-    const [day, month, year] = dateText.split('/').map(Number);
-    const scheduleDate = new Date(year, month - 1, day);
-
-    // So sánh ngày điểm danh với thời gian hiện tại
-    if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
-        // Nếu ngày là hôm nay, thêm lớp màu xanh lá
-        cell.classList.add('today', 'unlocked');
-    } else if (scheduleDate < currentDateTime) {
-        cell.classList.add('table-secondary');
-        cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
-        const link = cell.querySelector('a');
-        if (link) link.style.pointerEvents = 'none';
-        cell.style.pointerEvents = 'none';
-    } else {
-        // Kiểm tra thời gian hiện tại so với buổi học
-        const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0);
-        const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000);
-
-        if (currentDateTime >= scheduleStartTime && currentDateTime < endTime) {
-            // Mở khóa cho buổi học hiện tại và thêm lớp unlocked
-            cell.classList.add('unlocked');
-            const link = cell.querySelector('a');
-            if (link) link.style.pointerEvents = '';
-            cell.style.pointerEvents = '';
-        } else {
-            cell.classList.add('table-secondary');
-            cell.innerHTML = '<span class="lock-icon"><i class="bi bi-lock-fill"></i></span> ' + cell.innerHTML;
-            const link = cell.querySelector('a');
-            if (link) link.style.pointerEvents = 'none';
-            cell.style.pointerEvents = 'none';
-        }
-    }
-});
-
 document.getElementById('confirmAttendanceBtnList').addEventListener('click', function () {
     const input = document.getElementById('attendanceInputList');
     const index = parseInt(input.value); // Lấy giá trị buổi nhập vào
@@ -117,4 +77,52 @@ document.getElementById('confirmAttendanceBtnList').addEventListener('click', fu
             headerCell.style.display = 'none'; // Ẩn các tiêu đề cột khác
         }
     });
+});
+
+
+
+
+
+
+// khoa
+const scheduleCells = document.querySelectorAll('.list-column');
+
+scheduleCells.forEach(cell => {
+    const dateText = cell.querySelector('small').innerText;  // Lấy ngày tháng từ ô điểm danh
+    const [day, month, year] = dateText.split('/').map(Number);  // Tách ngày, tháng, năm
+    const scheduleDate = new Date(year, month - 1, day);  // Tạo đối tượng Date từ ngày, tháng, năm
+
+    // So sánh ngày điểm danh với thời gian hiện tại
+    if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
+        // Nếu ngày là hôm nay
+        cell.classList.add('today', 'unlocked');
+    }
+    else if (scheduleDate < currentDateTime) {
+        // Nếu ngày đã qua
+        cell.classList.add('table-secondary');
+        cell.innerHTML = cell.innerHTML;  // Không thêm icon ổ khóa
+        const link = cell.querySelector('a');
+        if (link) link.style.pointerEvents = 'none';  // Tắt link
+        cell.style.pointerEvents = 'none';  // Tắt ô điểm danh
+    }
+    else {
+        // Kiểm tra nếu buổi học chưa diễn ra
+        const scheduleStartTime = new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), scheduleDate.getDate(), 0, 0, 0);
+        const endTime = new Date(scheduleStartTime.getTime() + 24 * 60 * 60 * 1000); // Cộng 24 giờ để tính giờ kết thúc
+
+        if (currentDateTime >= scheduleStartTime && currentDateTime < endTime) {
+            // Mở khóa cho buổi học hiện tại
+            cell.classList.add('unlocked');
+            const link = cell.querySelector('a');
+            if (link) link.style.pointerEvents = '';  // Bật link
+            cell.style.pointerEvents = '';  // Bật ô điểm danh
+        } else {
+            // Nếu buổi học chưa tới hoặc đã qua
+            cell.classList.add('table-secondary');
+            cell.innerHTML = cell.innerHTML;  // Không thêm icon ổ khóa
+            const link = cell.querySelector('a');
+            if (link) link.style.pointerEvents = 'none';  // Tắt link
+            cell.style.pointerEvents = 'none';  // Tắt ô điểm danh
+        }
+    }
 });

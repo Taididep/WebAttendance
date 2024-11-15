@@ -27,18 +27,17 @@ if (!$classInfo) {
     exit;
 }
 
-// Kiểm tra status của lịch học
-$sqlStatus = "SELECT status FROM schedules WHERE schedule_id = ?";
+// Lấy thông tin status và date của lịch học
+$sqlStatus = "SELECT status, date FROM schedules WHERE schedule_id = ?";
 $stmtStatus = $conn->prepare($sqlStatus);
 $stmtStatus->execute([$schedule_id]);
-$scheduleStatus = $stmtStatus->fetch(PDO::FETCH_ASSOC);
+$scheduleData = $stmtStatus->fetch(PDO::FETCH_ASSOC);
 $stmtStatus->closeCursor();
 
-if (!$scheduleStatus) {
+if (!$scheduleData) {
     echo 'Không tìm thấy thông tin lịch học.';
     exit;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -57,13 +56,20 @@ if (!$scheduleStatus) {
         <div class="border rounded p-4 shadow">
             <h2 class="mb-4 text-center"><?php echo htmlspecialchars($classInfo['class_name']); ?></h2>
 
-            <div id="timer" class="text-center fs-4"></div>
+            <div id="timer" class="text-center fs-4">
+                <!-- Hiển thị thông tin ngày học -->
+                <p>Ngày buổi học:
+                    <?php echo htmlspecialchars((new DateTime($scheduleData['date']))->format('d/m/Y H:i:s')); ?>
+                </p>
+            </div>
 
-            <?php if ($scheduleStatus['status'] == 1): ?>
+            <?php if ($scheduleData['status'] == 1): ?>
                 <!-- Form điểm danh nếu status là 1 -->
                 <form id="attendanceForm" action="process_attendance.php" method="POST">
                     <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
                     <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($schedule_id); ?>">
+                    <input type="hidden" name="schedule_date"
+                        value="<?php echo htmlspecialchars($scheduleData['date']); ?>">
 
                     <div class="text-center mt-3">
                         <button type="submit" class="btn btn-primary">Điểm danh</button>
