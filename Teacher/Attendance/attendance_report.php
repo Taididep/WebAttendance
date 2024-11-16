@@ -98,6 +98,8 @@ $absentCount = $totalStudents - ($presentCount + $lateCount);
                 <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>
                 <button type="button" id="showAllBtnList" class="btn btn-success">Hiện tất cả</button>
                 <button type="button" id="resetAttendanceBtnList" class="btn btn-danger">Xóa bỏ</button>
+                <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>"
+                    class="btn btn-success btn-custom">Xuất Excel</a>
             </div>
         </div>
     </div>

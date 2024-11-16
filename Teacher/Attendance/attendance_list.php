@@ -177,47 +177,107 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
         <?php endif; ?>
     </div>
     <div class="d-flex align-items-center justify-content-between mt-3">
-        <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Thêm sinh
+        <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Quản lý sinh
             viên</button>
         <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
     </div>
 </div>
 
-<!-- Modal thêm sinh viên -->
-<!-- Modal -->
+<!-- Modal Quản lý sinh viên -->
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addStudentModalLabel">Thêm sinh viên vào lớp</h5>
+                <h5 class="modal-title" id="addStudentModalLabel">Quản lý sinh viên trong lớp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form id="addStudentForm" method="post">
-                <div class="modal-body">
-                    <div id="joinClassMessage" class="alert d-none"></div>
+            <div class="modal-body">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="add-tab" data-bs-toggle="tab" href="#addStudent" role="tab">Thêm sinh viên</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="remove-tab" data-bs-toggle="tab" href="#removeStudent" role="tab">Đá sinh viên</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="upload-tab" data-bs-toggle="tab" href="#uploadStudent" role="tab">Tải lên Excel</a>
+                    </li>
+                </ul>
 
-                    <div class="mb-3">
-                        <label for="studentIdInput" class="form-label">Mã sinh viên</label>
-                        <input type="text" class="form-control" id="studentIdInput" name="student_id" required
-                            maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                <div class="tab-content" id="myTabContent">
+                    <!-- Tab Thêm Sinh Viên -->
+                    <div class="tab-pane fade show active" id="addStudent" role="tabpanel">
+                        <form id="addStudentForm" method="post">
+                            <div id="joinClassMessage" class="alert d-none"></div>
+
+                            <div class="mb-3">
+                                <label for="studentIdInput" class="form-label">Mã sinh viên</label>
+                                <input type="text" class="form-control" id="studentIdInput" name="student_id" required
+                                    maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                            </div>
+
+                            <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-primary">Thêm sinh viên</button>
+                            </div>
+                        </form>
                     </div>
 
-                    <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+                    <!-- Tab Xóa Sinh Viên -->
+                    <div class="tab-pane fade" id="removeStudent" role="tabpanel">
+                        <form id="removeStudentForm" method="post">
+                            <div id="removeClassMessage" class="alert d-none"></div>
+
+                            <div class="mb-3">
+                                <label for="removeStudentIdInput" class="form-label">Mã sinh viên</label>
+                                <input type="text" class="form-control" id="removeStudentIdInput" name="student_id" required
+                                    maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                            </div>
+
+                            <!-- Hiện thông tin sinh viên -->
+                            <div id="studentInfo" class="d-none mb-3">
+                                <h6>Thông tin sinh viên:</h6>
+                                <p id="studentDetails"></p>
+                            </div>
+
+                            <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="button" class="btn btn-danger d-none" id="removeStudentButton">Đá sinh viên</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tab Tải lên Excel -->
+                    <div class="tab-pane fade" id="uploadStudent" role="tabpanel">
+                        <form id="uploadStudentForm" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="excelFileInput" class="form-label">Chọn file Excel</label>
+                                <input type="file" class="form-control" id="excelFileInput" name="excel_file" accept=".xls,.xlsx" required>
+                            </div>
+                            <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-primary">Tải lên</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="submit" class="btn btn-primary">Thêm sinh viên</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
-
 
 <script>
     const totalDatesList = <?php echo count($schedules); ?>;
     const basePath = "<?php echo $basePath; ?>";
     //
     const currentDateTime = new Date('<?php echo $currentDateTime; ?>');
+
+    // Danh sách sinh viên được truyền từ PHP sang JavaScript
+    const students = <?php echo json_encode($students); ?>;
 </script>
 <script src="../JavaScript/attendance_list.js"></script>

@@ -79,11 +79,6 @@ document.getElementById('confirmAttendanceBtnList').addEventListener('click', fu
     });
 });
 
-
-
-
-
-
 // khoa
 const scheduleCells = document.querySelectorAll('.list-column');
 
@@ -125,4 +120,97 @@ scheduleCells.forEach(cell => {
             cell.style.pointerEvents = 'none';  // Tắt ô điểm danh
         }
     }
+});
+
+// Lắng nghe sự kiện khi người dùng nhập mã sinh viên
+document.getElementById('removeStudentIdInput').addEventListener('input', function() {
+    const studentId = this.value;
+    const studentInfo = document.getElementById('studentInfo');
+    const studentDetails = document.getElementById('studentDetails');
+    const removeStudentButton = document.getElementById('removeStudentButton');
+
+    // Tìm sinh viên theo mã
+    const student = students.find(s => s.student_id.toString() === studentId.toString());
+
+    if (student) {
+        // Hiển thị thông tin sinh viên
+        studentDetails.innerHTML = `
+            <strong>Mã sinh viên:</strong> ${student.student_id}<br>
+            <strong>Họ đệm:</strong> ${student.lastname}<br>
+            <strong>Tên:</strong> ${student.firstname}<br>
+            <strong>Giới tính:</strong> ${student.gender}<br>
+            <strong>Lớp:</strong> ${student.class}<br>
+            <strong>Ngày sinh:</strong> ${student.birthday}
+        `;
+        studentInfo.classList.remove('d-none'); // Hiện phần thông tin
+        removeStudentButton.classList.remove('d-none'); // Hiện nút "Đá sinh viên"
+    } else {
+        // Ẩn phần thông tin và nút nếu không tìm thấy sinh viên
+        studentInfo.classList.add('d-none');
+        removeStudentButton.classList.add('d-none');
+    }
+});
+
+// Cài đặt sự kiện cho nút "Đá sinh viên"
+document.getElementById('removeStudentButton').addEventListener('click', function() {
+    const studentId = document.getElementById('removeStudentIdInput').value;
+
+    // Xác nhận trước khi đá sinh viên
+    if (confirm(`Bạn có chắc chắn muốn đá sinh viên với mã ${studentId}?`)) {
+        const form = document.getElementById('removeStudentForm');
+        const classId = form.class_id.value;
+
+        // Gửi yêu cầu xóa sinh viên qua AJAX
+        fetch('remove_student.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                student_id: studentId,
+                class_id: classId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.success) {
+                alert(data.message);
+                // Cập nhật giao diện hoặc làm mới danh sách sinh viên
+                location.reload(); // Tải lại trang để làm mới danh sách
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra, vui lòng thử lại!');
+        });
+    }
+});
+
+// Xử lý tải lên excel
+document.getElementById('uploadStudentForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+
+    const formData = new FormData(this); // Lấy dữ liệu từ form
+    console.log([...formData]); // In ra dữ liệu form để kiểm tra
+
+    fetch('upload_students.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload(); // Tải lại danh sách sinh viên
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi tải lên!');
+    });
 });
