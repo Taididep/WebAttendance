@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_student->execute();  
 
             $_SESSION['success_message'] = "Chúc mừng bạn đã đăng ký thành công!";  
-            header("Location: ./login_view.php");  
+            header("Location: ./register.php");  
             exit();  
         } catch (PDOException $e) {  
             $_SESSION['error_message'] = "Có lỗi xảy ra: " . $e->getMessage();  
