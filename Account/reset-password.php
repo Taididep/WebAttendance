@@ -1,18 +1,5 @@
 <?php
-// Kết nối cơ sở dữ liệu MySQL
-$servername = "localhost";
-$db_username = "root"; // Thay thế bằng tên người dùng của cơ sở dữ liệu
-$db_password = ""; // Thay thế bằng mật khẩu của cơ sở dữ liệu
-$dbname = "db_atd"; // Tên cơ sở dữ liệu
-
-// Tạo kết nối
-$conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
-
+include '../Connect/connect.php';
 session_start();
 
 // Yêu cầu các thư viện PHPMailer
@@ -24,52 +11,56 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 function resetPassword($conn, $username, $emailInput) {
-    global $_SESSION;
-    
     // Tạo mật khẩu ngẫu nhiên
     $newPassword = bin2hex(random_bytes(4)); // Tạo mật khẩu ngẫu nhiên dài 8 ký tự
     $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-    // SQL để kiểm tra nếu username (tên đăng nhập) và email tồn tại và khớp trong bảng sinh viên hoặc giáo viên
-    $sql = "
-        SELECT 'student' AS user_type, student_id AS id, email 
-        FROM db_atd.students 
-        WHERE email = ? AND student_id = (SELECT user_id FROM db_atd.users WHERE username = ?)
-        UNION
-        SELECT 'teacher' AS user_type, teacher_id AS id, email 
-        FROM db_atd.teachers 
-        WHERE email = ? AND teacher_id = (SELECT user_id FROM db_atd.users WHERE username = ?)
-    ";
+    try {
+        // SQL để kiểm tra nếu username (tên đăng nhập) và email tồn tại và khớp trong bảng sinh viên hoặc giáo viên
+        $sql = "
+            SELECT 'student' AS user_type, student_id AS id, email 
+            FROM db_atd.students 
+            WHERE email = :email AND student_id = (SELECT user_id FROM db_atd.users WHERE username = :username)
+            UNION
+            SELECT 'teacher' AS user_type, teacher_id AS id, email 
+            FROM db_atd.teachers 
+            WHERE email = :email AND teacher_id = (SELECT user_id FROM db_atd.users WHERE username = :username)
+        ";
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssss", $emailInput, $username, $emailInput, $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        
-        // Lấy user ID và email từ kết quả
-        $userId = $row['id'];
-        $email = $row['email'];
-        
-        // Cập nhật mật khẩu trong bảng users
-        $updateSql = "UPDATE db_atd.users SET password = ? WHERE user_id = ?";
-        $updateStmt = $conn->prepare($updateSql);
-        $updateStmt->bind_param("si", $hashedPassword, $userId);
-        
-        if ($updateStmt->execute()) {
-            // Gửi email với mật khẩu mới
-            if (sendEmail($email, $newPassword)) {
-                $_SESSION['success_message'] = "Đặt lại mật khẩu thành công. Mật khẩu mới đã được gửi đến email của bạn.";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $emailInput, PDO::PARAM_STR);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // Kiểm tra nếu tồn tại user
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Lấy user ID và email từ kết quả
+            $userId = $row['id'];
+            $userEmail = $row['email'];
+            
+            // Cập nhật mật khẩu trong bảng users
+            $updateSql = "UPDATE db_atd.users SET password = :new_password WHERE user_id = :user_id";
+            $updateStmt = $conn->prepare($updateSql);
+            $updateStmt->bindParam(':new_password', $hashedPassword, PDO::PARAM_STR);
+            $updateStmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+
+            if ($updateStmt->execute()) {
+                // Gửi email với mật khẩu mới
+                if (sendEmail($userEmail, $newPassword)) {
+                    $_SESSION['success_message'] = "Đặt lại mật khẩu thành công. Mật khẩu mới đã được gửi đến email của bạn.";
+                } else {
+                    $_SESSION['error_message'] = "Đặt lại mật khẩu thành công, nhưng gửi email thất bại.";
+                }
             } else {
-                $_SESSION['error_message'] = "Đặt lại mật khẩu thành công, nhưng gửi email thất bại.";
+                $_SESSION['error_message'] = "Có lỗi xảy ra khi đặt lại mật khẩu.";
             }
         } else {
-            $_SESSION['error_message'] = "Có lỗi xảy ra khi đặt lại mật khẩu.";
+            $_SESSION['error_message'] = "Username và email không khớp. Vui lòng nhập lại.";
         }
-    } else {
-        $_SESSION['error_message'] = "Usename và email không khớp. Yêu cầu nhập lại";
+    } catch (PDOException $e) {
+        $_SESSION['error_message'] = "Lỗi cơ sở dữ liệu: " . $e->getMessage();
     }
 
     // Chuyển hướng lại trang forgot-pass.php để hiển thị thông báo
@@ -115,5 +106,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Đóng kết nối cơ sở dữ liệu
-$conn->close();
+$conn = null;
 ?>

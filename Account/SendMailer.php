@@ -7,34 +7,29 @@ require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\PHPMailer.php';
 require 'D:\Nam4\DoAnTN\WebAttendance\Mailer\SMTP.php';
 
 // Kết nối tới CSDL
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "db_atd";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
+include '../Connect/connect.php';
+session_start();
 
 // Lấy lịch học cho ngày mai
 $tomorrow = date("Y-m-d", strtotime('+1 day'));
 
-// Lấy danh sách lịch học theo sinh viên
+// SQL query để lấy danh sách lịch học của sinh viên vào ngày mai
 $sql = "SELECT students.email, students.firstname, schedules.date, schedules.start_time, schedules.end_time 
-        FROM students 
-        JOIN attendances ON students.student_id = attendances.student_id 
-        JOIN schedules ON schedules.schedule_id = attendances.schedule_id 
-        WHERE schedules.date = '$tomorrow'
+        FROM students
+        JOIN attendances ON students.student_id = attendances.student_id
+        JOIN schedules ON schedules.schedule_id = attendances.schedule_id
+        WHERE schedules.date = :tomorrow
         ORDER BY students.email, schedules.start_time";
 
-$result = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':tomorrow', $tomorrow, PDO::PARAM_STR);
+$stmt->execute();
 
 // Tạo danh sách email
 $emails = [];
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if ($stmt->rowCount() > 0) {
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $email = $row['email'];
         $firstname = $row['firstname'];
         $date = $row['date'];
@@ -73,13 +68,13 @@ if ($result->num_rows > 0) {
             $mail->CharSet = 'UTF-8';
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'thongnguyen@ittc.edu.vn';
-            $mail->Password = 'xeiq offy nftu upep';
+            $mail->Username = 'thongnguyen@ittc.edu.vn';  // Thay bằng email của bạn
+            $mail->Password = 'xeiq offy nftu upep';      // Thay bằng mật khẩu email của bạn
             $mail->Port = 587;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
             // Người gửi
-            $mail->setFrom('thongnguyen@ittc.edu.vn', 'Remind');
+            $mail->setFrom('thongnguyen@ittc.edu.vn', 'Lịch học nhắc nhở');
 
             // Người nhận
             $mail->addAddress($email, $firstname);
@@ -93,12 +88,12 @@ if ($result->num_rows > 0) {
             $mail->send();
             echo "Đã gửi email cho $email<br>";
         } catch (Exception $e) {
-            echo "Không thể gửi email: {$mail->ErrorInfo}<br>";
+            echo "Không thể gửi email cho $email: {$mail->ErrorInfo}<br>";
         }
     }
 } else {
     echo "Không có lịch học vào ngày mai.";
 }
 
-$conn->close();
+$conn = null;  // Đóng kết nối cơ sở dữ liệu
 ?>

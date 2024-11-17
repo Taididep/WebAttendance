@@ -1,58 +1,43 @@
 <?php  
-$servername = "localhost";   
-$username = "root";   
-$password = "";   
-$dbname = "db_atd";   
+include '../Connect/connect.php';  
+session_start();  
 
-$conn = new mysqli($servername, $username, $password, $dbname);  
+$message = ""; // Variable for the message
 
-// Kiểm tra kết nối  
-if ($conn->connect_error) {  
-    die("Kết nối thất bại: " . $conn->connect_error);  
-}  
-
-$message = ""; // Biến chứa thông báo
-
-// Xử lý yêu cầu đổi mật khẩu  
+// Process password change request  
 if ($_SERVER["REQUEST_METHOD"] == "POST") {  
     $current_password = $_POST['current_password'];  
     $new_password = $_POST['new_password'];  
     $username = $_POST['username'];  
 
-    // Kiểm tra mật khẩu hiện tại  
-    $stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");  
-    if (!$stmt) {  
-        die("Lỗi câu lệnh: " . $conn->error);  
-    }  
+    try {
+        // Check current password
+        $stmt = $conn->prepare("SELECT password FROM users WHERE username = :username");
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();  
+        $hashed_password = $stmt->fetchColumn(); // Fetch the password column
 
-    $stmt->bind_param("s", $username);  
-    $stmt->execute();  
-    $stmt->bind_result($hashed_password);  
-    $stmt->fetch();  
+        if ($hashed_password && password_verify($current_password, $hashed_password)) {  
+            // Update new password  
+            $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);  
 
-    if (password_verify($current_password, $hashed_password)) {  
-        // Cập nhật mật khẩu mới  
-        $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);  
-        $stmt->close(); // Đóng câu lệnh trước khi chuẩn bị lại  
+            $stmt = $conn->prepare("UPDATE users SET password = :new_password WHERE username = :username");
+            $stmt->bindParam(':new_password', $new_hashed_password, PDO::PARAM_STR);
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
 
-        $stmt = $conn->prepare("UPDATE users SET password = ? WHERE username = ?");  
-        if (!$stmt) {  
-            die("Lỗi câu lệnh cập nhật: " . $conn->error);  
-        }  
-
-        $stmt->bind_param("ss", $new_hashed_password, $username);  
-        
-        if ($stmt->execute()) {  
-            $message = "<p style='color:green;'>Mật khẩu đã được đổi thành công.</p>";  
+            if ($stmt->execute()) {  
+                $message = "<p style='color:green;'>Password changed successfully.</p>";  
+            } else {  
+                $message = "<p style='color:red;'>Error updating password: " . $stmt->errorInfo()[2] . "</p>";  
+            }  
         } else {  
-            $message = "<p style='color:red;'>Đã xảy ra lỗi trong quá trình cập nhật: " . $stmt->error . "</p>";  
+            $message = "<p style='color:red;'>Current password is incorrect.</p>";  
         }  
-    } else {  
-        $message = "<p style='color:red;'>Mật khẩu hiện tại không đúng.</p>";  
-    }  
-    $stmt->close();  
+    } catch (PDOException $e) {
+        $message = "<p style='color:red;'>Database error: " . $e->getMessage() . "</p>";
+    }
 }  
-$conn->close();  
+
 ?>
 
 <!DOCTYPE html>  
@@ -64,7 +49,7 @@ $conn->close();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  
     <style>  
         body {  
-            background: url('../Image/Index.jpg') no-repeat center center fixed; /* Đường dẫn đúng từ vị trí file */
+            background: url('../Image/Index.jpg') no-repeat center center fixed; /* Correct path from current file */
             background-size: cover;  
             display: flex;  
             justify-content: center;  
@@ -130,4 +115,4 @@ $conn->close();
         <p><a href="../Student/index.php">Quay lại trang chủ</a></p>  
     </div>  
 </body>  
-</html>
+</html>  
