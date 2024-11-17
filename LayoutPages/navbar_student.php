@@ -1,4 +1,6 @@
 <?php
+ob_start(); // Bật bộ đệm đầu ra
+
 // Kiểm tra xem người dùng đã đăng nhập chưa
 if (!isset($_SESSION['user_id'])) {
     $isLoggedIn = false;

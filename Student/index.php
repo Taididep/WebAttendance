@@ -1,13 +1,10 @@
 <?php
 session_start();
-$basePath = ''; // Đường dẫn gốc từ index.php đến thư mục gốc
+$basePath = '';
 include __DIR__ . '/../Connect/connect.php';
 include __DIR__ . '/../LayoutPages/navbar_student.php';
 include __DIR__ . '/../Account/islogin.php';
 ?>
-
-<!DOCTYPE html>
-<html lang="vi">
 
 <!DOCTYPE html>
 <html lang="vi">

@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
     // Kiểm tra xem file có lỗi không
     if ($file['error'] !== UPLOAD_ERR_OK) {
         error_log("Upload error: " . $file['error']); // Ghi log lỗi
-        echo json_encode(['success' => false, 'message' => 'Có lỗi khi tải lên file. Mã lỗi: ' . $file['error']]);
+        echo json_encode(['success' => false, 'message' => 'Có lỗi khi tải lên file.']);
         exit;
     }
 
