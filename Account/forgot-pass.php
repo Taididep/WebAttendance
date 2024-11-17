@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">  
     <style>  
         body {  
-            background: url('Image/Index.jpg') no-repeat center center fixed;   
+            background: url('../Image/Index.jpg') no-repeat center center fixed;   
             background-size: cover;   
         }  
 
@@ -47,7 +47,7 @@
                         ?> 
 
                         <div id="forgot-password-form">  
-                            <form action="Account/reset-password.php" method="post">  
+                            <form action="./reset-password.php" method="post">  
                                 <div class="form-group">  
                                     <label for="forgot-username">Username:</label>  
                                     <input type="text" class="form-control" name="username" id="forgot-username" required>  
@@ -59,7 +59,7 @@
                                 
                                 <button type="submit" class="btn btn-primary btn-block">Gửi yêu cầu đặt lại mật khẩu</button>  
                                 
-                                <p align="center"><a href="login_view.php" class="form-toggle text-center mt-3">Quay lại đăng nhập</a></p>
+                                <p align="center"><a href="/login_view.php" class="form-toggle text-center mt-3">Quay lại đăng nhập</a></p>
                             </form>  
                         </div>  
                     </div>  

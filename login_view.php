@@ -53,8 +53,8 @@
                                     </div>  
                                 </div>  
                                 <button type="submit" class="btn btn-primary btn-block">Đăng Nhập</button>  
-                                <p class="text-center mt-3"><a href="register.php">Bạn chưa có tài khoản? Đăng ký</a></p>
-                                <p class="text-center mt-3"><a href="forgot-pass.php" class="form-toggle text-center mt-3" id="toggle-to-forgot-password">Quên mật khẩu?</a>  </p>
+                                <p class="text-center mt-3"><a href="Account/register.php">Bạn chưa có tài khoản? Đăng ký</a></p>
+                                <p class="text-center mt-3"><a href="Account/forgot-pass.php" class="form-toggle text-center mt-3" id="toggle-to-forgot-password">Quên mật khẩu?</a>  </p>
                             </form>  
                         </div>  
 
@@ -62,20 +62,7 @@
                              
                         
 
-                        <div id="forgot-password-form" style="display:none;">  
-                            <form action="Account/reset-password.php" method="post">  
-                                <div class="form-group">  
-                                    <label for="forgot-username">Username:</label>  
-                                    <input type="text" class="form-control" name="username" id="forgot-username" required>  
-                                </div>  
-                                <div class="form-group">  
-                                    <label for="forgot-password-email">Email:</label>  
-                                    <input type="email" class="form-control" name="email" id="forgot-password-email" required>  
-                                </div>  
-                                <button type="submit" class="btn btn-primary btn-block">Gửi yêu cầu đặt lại mật khẩu</button>  
-                                <p align="center"> <a href="login_view.php" class="form-toggle text-center mt-3" id="toggle-to-login-from-forgot">Quay lại đăng nhập</a>  </p>
-                            </form>  
-                        </div>  
+                         
                     </div>  
                 </div>  
             </div>  

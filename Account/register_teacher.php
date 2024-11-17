@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Kiểm tra xem username đã tồn tại chưa  
     if (checkUsernameExists($conn, $username)) {  
         $_SESSION['error_message'] = "Username đã tồn tại.";  
-        header("Location: ../register.php");  
+        header("Location: ./register.php");  
         exit();  
     }  
 
@@ -75,11 +75,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_teacher->execute();  
 
         $_SESSION['success_message'] = "Chúc mừng bạn đã đăng ký thành công!";  
-        header("Location: ../register.php"); 
+        header("Location: ./register.php"); 
         exit();  
     } catch (PDOException $e) {  
         $_SESSION['error_message'] = "Có lỗi xảy ra khi đăng ký tài khoản: " . $e->getMessage();  
-        header("Location: ../register.php"); 
+        header("Location: ./register.php"); 
         exit();  
     }  
 }  

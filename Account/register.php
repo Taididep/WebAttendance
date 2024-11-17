@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <style>
         body {
-            background: url('Image/Index.jpg') no-repeat center center fixed;
+            background: url('../Image/Index.jpg') no-repeat center center fixed;
             background-size: cover;
         }
 
@@ -54,7 +54,7 @@
                         <div class="tab-content" id="register-tab-content">
                             <!-- Đăng ký Giáo viên -->
                             <div class="tab-pane fade show active" id="teacher" role="tabpanel">
-                            <form action="Account/register_teacher.php" method="post">
+                            <form action="./register_teacher.php" method="post">
                                         <div class="form-group">
                                             <label for="teacher_id">Mã số giáo viên:</label>
                                             <input type="text" class="form-control" name="teacher_id" id="teacher_id" required>
@@ -105,7 +105,7 @@
 
                             <!-- Đăng ký Sinh viên -->
                             <div class="tab-pane fade" id="student" role="tabpanel">
-                                <form action="Account/register_student.php" method="post">
+                                <form action="./register_student.php" method="post">
                                         <div class="form-group">
                                             <label for="student_id">Mã số sinh viên:</label>
                                             <input type="text" class="form-control" name="student_id" id="student_id" required>
@@ -158,7 +158,7 @@
                                     </form>
                             </div>
                         </div>
-                        <p align="center"><a href="login_view.php" class="form-toggle text-center mt-3" id="toggle-to-login-from-forgot">Quay lại đăng nhập</a> </p>
+                        <p align="center"><a href="/login_view.php" class="form-toggle text-center mt-3" id="toggle-to-login-from-forgot">Quay lại đăng nhập</a> </p>
                     </div>
                 </div>
             </div>

@@ -32,14 +32,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt_check_student->fetchColumn() > 0) {  
         $_SESSION['error_message'] = "Mã sinh viên đã tồn tại. Vui lòng nhập lại.";  
-        header("Location: ../register.php");  
+        header("Location: ./register.php");  
         exit();  
     }  
 
     // Kiểm tra username
     if (checkUsernameExists($conn, $username)) {  
         $_SESSION['error_message'] = "Username đã tồn tại. Vui lòng nhập lại.";  
-        header("Location: ../register.php");  
+        header("Location: ./register.php");  
         exit();  
     }  
 
@@ -80,11 +80,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_student->execute();  
 
             $_SESSION['success_message'] = "Chúc mừng bạn đã đăng ký thành công!";  
-            header("Location: ../login_view.php");  
+            header("Location: ./login_view.php");  
             exit();  
         } catch (PDOException $e) {  
             $_SESSION['error_message'] = "Có lỗi xảy ra: " . $e->getMessage();  
-            header("Location: ../register.php");  
+            header("Location: ./register.php");  
             exit();  
         }  
     }  
