@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 15, 2024 lúc 03:38 PM
+-- Thời gian đã tạo: Th10 17, 2024 lúc 06:26 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -339,7 +339,8 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (19, 16, 2001219012, 0, '2024-11-14 10:04:28'),
 (20, 17, 2001219012, 0, '2024-11-14 10:04:28'),
 (21, 99, 2001216114, 0, '2024-11-14 10:12:32'),
-(22, 100, 2001216114, 1, '2024-11-14 10:12:38');
+(22, 100, 2001216114, 1, '2024-11-14 10:12:38'),
+(23, 18, 2001216114, 2, '2024-11-15 16:06:53');
 
 --
 -- Bẫy `attendances`
@@ -527,7 +528,7 @@ INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_
 (7, 'a409fd1d', 2001217890, 0, 2, 0, 15),
 (8, 'a409fd1d', 2001218902, 0, 15, 0, 0),
 (9, 'a409fd1d', 2001219012, 0, 2, 0, 15),
-(10, 'a409fd1d', 2001216114, 1, 0, 1, 15),
+(10, 'a409fd1d', 2001216114, 1, 0, 2, 15),
 (11, '1432cd49', 2001216114, 1, 1, 0, 15),
 (12, 'a409fd1d', 2001215679, 0, 2, 0, 15);
 
@@ -732,9 +733,9 @@ CREATE TABLE `schedules` (
 --
 
 INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_time`, `status`) VALUES
-(16, 'a409fd1d', '2024-11-05 20:56:28', 1, 3, 0),
+(16, 'a409fd1d', '2024-11-05 00:00:00', 1, 3, 0),
 (17, 'a409fd1d', '2024-11-11 00:00:00', 1, 3, 0),
-(18, 'a409fd1d', '2024-11-15 00:00:00', 1, 3, 1),
+(18, 'a409fd1d', '2024-11-15 00:00:00', 1, 3, 0),
 (19, 'a409fd1d', '2024-11-25 00:00:00', 1, 3, 0),
 (20, 'a409fd1d', '2024-12-03 00:00:00', 1, 3, 0),
 (21, 'a409fd1d', '2024-12-10 00:00:00', 1, 3, 0),
@@ -1060,7 +1061,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT cho bảng `attendance_reports`
