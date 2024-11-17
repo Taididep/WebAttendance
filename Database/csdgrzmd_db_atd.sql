@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 17, 2024 lúc 06:26 AM
+-- Thời gian đã tạo: Th10 17, 2024 lúc 06:54 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -185,7 +185,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassIdAndStudentId` (
     WHERE cs.class_id = classId AND s.student_id = studentId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate` DATE, IN `endDate` DATE, IN `semesterId` INT, IN `student_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate` DATETIME, IN `endDate` DATETIME, IN `semesterId` INT, IN `student_id` INT)   BEGIN
     SELECT 
         c.class_name,
         co.course_name,
@@ -206,7 +206,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate
     JOIN 
         class_students cs ON c.class_id = cs.class_id
     WHERE 
-        s.date BETWEEN startDate AND endDate
+        DATE(s.date) BETWEEN DATE(startDate) AND DATE(endDate)
         AND c.semester_id = semesterId
         AND cs.student_id = student_id
     ORDER BY 
@@ -219,7 +219,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_par
     WHERE teacher_id = teacher_id_param;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate` DATE, IN `endDate` DATE, IN `semesterId` INT, IN `teacher_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate` DATETIME, IN `endDate` DATETIME, IN `semesterId` INT, IN `teacher_id` INT)   BEGIN
     SELECT 
         c.class_name,
         co.course_name,
@@ -238,11 +238,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate
     JOIN 
         courses co ON c.course_id = co.course_id
     WHERE 
-        s.date BETWEEN startDate AND endDate
+        DATE(s.date) BETWEEN DATE(startDate) AND DATE(endDate)  -- So sánh ngày
         AND c.semester_id = semesterId
-        AND c.teacher_id = teacher_id
+        AND c.teacher_id = teacher_id  -- Lọc theo teacher_id
     ORDER BY 
-        s.date, s.start_time;
+        s.date, s.start_time;  -- Sắp xếp theo start_time (tăng dần)
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_username` VARCHAR(255))   BEGIN

@@ -36,10 +36,19 @@ $stmt->execute([$startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $semeste
 $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor(); // Đóng con trỏ
 
+// Kiểm tra xem có lịch nào không
+if (empty($schedules)) {
+    echo "Không có lịch học trong khoảng thời gian này.";
+}
+
 // Tạo mảng để tổ chức lịch học theo ngày
 $weeklySchedules = [];
 foreach ($schedules as $schedule) {
-    $weeklySchedules[$schedule['date']][] = $schedule;
+    $date = date('Y-m-d', strtotime($schedule['date']));  // Đảm bảo định dạng ngày là 'Y-m-d'
+    if (!isset($weeklySchedules[$date])) {
+        $weeklySchedules[$date] = [];
+    }
+    $weeklySchedules[$date][] = $schedule;
 }
 
 // Tạo một mảng chứa tên ngày trong tuần
