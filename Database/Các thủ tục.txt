@@ -258,8 +258,8 @@ DELIMITER ;
 DELIMITER //
 
 CREATE PROCEDURE GetStudentSchedules(
-    IN startDate DATE,
-    IN endDate DATE,
+    IN startDate DATETIME,
+    IN endDate DATETIME,
     IN semesterId INT,
     IN student_id INT
 )
@@ -284,7 +284,7 @@ BEGIN
     JOIN 
         class_students cs ON c.class_id = cs.class_id
     WHERE 
-        s.date BETWEEN startDate AND endDate
+        DATE(s.date) BETWEEN DATE(startDate) AND DATE(endDate)
         AND c.semester_id = semesterId
         AND cs.student_id = student_id
     ORDER BY 
@@ -297,8 +297,8 @@ DELIMITER ;
 DELIMITER //
 
 CREATE PROCEDURE GetTeacherSchedules(
-    IN startDate DATE,
-    IN endDate DATE,
+    IN startDate DATETIME,
+    IN endDate DATETIME,
     IN semesterId INT,
     IN teacher_id INT
 )
@@ -321,11 +321,11 @@ BEGIN
     JOIN 
         courses co ON c.course_id = co.course_id
     WHERE 
-        s.date BETWEEN startDate AND endDate
+        DATE(s.date) BETWEEN DATE(startDate) AND DATE(endDate)  -- So sánh ngày
         AND c.semester_id = semesterId
-        AND c.teacher_id = teacher_id -- lọc theo teacher_id
+        AND c.teacher_id = teacher_id  -- Lọc theo teacher_id
     ORDER BY 
-        s.date, s.start_time; -- Sắp xếp theo start_time (tăng dần)
+        s.date, s.start_time;  -- Sắp xếp theo start_time (tăng dần)
 END //
 
 DELIMITER ;

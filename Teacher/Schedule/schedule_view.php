@@ -32,14 +32,33 @@ $teacher_id = $_SESSION['user_id'];
 // Truy vấn để lấy lịch học
 $sql = "CALL GetTeacherSchedules(?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
-$stmt->execute([$startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $semesterId, $teacher_id]);
+
+// Chuyển startDate và endDate thành định dạng DATETIME để truyền vào SQL
+$stmt->execute([
+    $startDate->format('Y-m-d 00:00:00'),  // Start date at the beginning of the day
+    $endDate->format('Y-m-d 23:59:59'),    // End date at the end of the day
+    $semesterId,
+    $teacher_id
+]);
+
 $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor(); // Đóng con trỏ
+
+// Kiểm tra xem có lịch nào không
+if (empty($schedules)) {
+    echo "Không có lịch học trong khoảng thời gian này.";
+} else {
+    echo "Số lượng lịch học: " . count($schedules);
+}
 
 // Tạo mảng để tổ chức lịch học theo ngày
 $weeklySchedules = [];
 foreach ($schedules as $schedule) {
-    $weeklySchedules[$schedule['date']][] = $schedule;
+    $date = date('Y-m-d', strtotime($schedule['date']));  // Đảm bảo định dạng ngày là 'Y-m-d'
+    if (!isset($weeklySchedules[$date])) {
+        $weeklySchedules[$date] = [];
+    }
+    $weeklySchedules[$date][] = $schedule;
 }
 
 // Tạo một mảng chứa tên ngày trong tuần
