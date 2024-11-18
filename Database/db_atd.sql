@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 17, 2024 lúc 06:54 AM
+-- Thời gian đã tạo: Th10 18, 2024 lúc 02:32 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -67,6 +67,18 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByScheduleId` (IN `sch
     FROM attendances a
     JOIN schedules s ON a.schedule_id = s.schedule_id
     WHERE a.schedule_id = scheduleId AND s.class_id = class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceReportByClassId` (IN `input_class_id` CHAR(36))   BEGIN
+    SELECT 
+        ar.student_id,
+        ar.total_present,
+        ar.total_absent,
+        ar.total_late
+    FROM 
+        attendance_reports ar
+    WHERE 
+        ar.class_id = input_class_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassDetailsById` (IN `classId` CHAR(36))   BEGIN
@@ -185,7 +197,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassIdAndStudentId` (
     WHERE cs.class_id = classId AND s.student_id = studentId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate` DATETIME, IN `endDate` DATETIME, IN `semesterId` INT, IN `student_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate` DATE, IN `endDate` DATE, IN `semesterId` INT, IN `student_id` INT)   BEGIN
     SELECT 
         c.class_name,
         co.course_name,
@@ -206,7 +218,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate
     JOIN 
         class_students cs ON c.class_id = cs.class_id
     WHERE 
-        DATE(s.date) BETWEEN DATE(startDate) AND DATE(endDate)
+        s.date BETWEEN startDate AND endDate
         AND c.semester_id = semesterId
         AND cs.student_id = student_id
     ORDER BY 
@@ -219,7 +231,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_par
     WHERE teacher_id = teacher_id_param;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate` DATETIME, IN `endDate` DATETIME, IN `semesterId` INT, IN `teacher_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate` DATE, IN `endDate` DATE, IN `semesterId` INT, IN `teacher_id` INT)   BEGIN
     SELECT 
         c.class_name,
         co.course_name,
@@ -238,11 +250,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate
     JOIN 
         courses co ON c.course_id = co.course_id
     WHERE 
-        DATE(s.date) BETWEEN DATE(startDate) AND DATE(endDate)  -- So sánh ngày
+        s.date BETWEEN startDate AND endDate
         AND c.semester_id = semesterId
-        AND c.teacher_id = teacher_id  -- Lọc theo teacher_id
+        AND c.teacher_id = teacher_id
     ORDER BY 
-        s.date, s.start_time;  -- Sắp xếp theo start_time (tăng dần)
+        s.date, s.start_time;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_username` VARCHAR(255))   BEGIN
@@ -339,8 +351,7 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (19, 16, 2001219012, 0, '2024-11-14 10:04:28'),
 (20, 17, 2001219012, 0, '2024-11-14 10:04:28'),
 (21, 99, 2001216114, 0, '2024-11-14 10:12:32'),
-(22, 100, 2001216114, 1, '2024-11-14 10:12:38'),
-(23, 18, 2001216114, 2, '2024-11-15 16:06:53');
+(22, 100, 2001216114, 1, '2024-11-14 10:12:38');
 
 --
 -- Bẫy `attendances`
@@ -528,7 +539,7 @@ INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_
 (7, 'a409fd1d', 2001217890, 0, 2, 0, 15),
 (8, 'a409fd1d', 2001218902, 0, 15, 0, 0),
 (9, 'a409fd1d', 2001219012, 0, 2, 0, 15),
-(10, 'a409fd1d', 2001216114, 1, 0, 2, 15),
+(10, 'a409fd1d', 2001216114, 1, 0, 1, 15),
 (11, '1432cd49', 2001216114, 1, 1, 0, 15),
 (12, 'a409fd1d', 2001215679, 0, 2, 0, 15);
 
@@ -580,8 +591,7 @@ INSERT INTO `class_students` (`class_id`, `student_id`, `status`) VALUES
 ('a409fd1d', 2001216114, 1),
 ('a409fd1d', 2001216780, 1),
 ('a409fd1d', 2001216789, 1),
-('a409fd1d', 2001217890, 1),
-('a409fd1d', 2001219012, 0);
+('a409fd1d', 2001217890, 1);
 
 -- --------------------------------------------------------
 
@@ -733,9 +743,9 @@ CREATE TABLE `schedules` (
 --
 
 INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_time`, `status`) VALUES
-(16, 'a409fd1d', '2024-11-05 00:00:00', 1, 3, 0),
+(16, 'a409fd1d', '2024-11-05 20:56:28', 1, 3, 0),
 (17, 'a409fd1d', '2024-11-11 00:00:00', 1, 3, 0),
-(18, 'a409fd1d', '2024-11-15 00:00:00', 1, 3, 0),
+(18, 'a409fd1d', '2024-11-15 00:00:00', 1, 3, 1),
 (19, 'a409fd1d', '2024-11-25 00:00:00', 1, 3, 0),
 (20, 'a409fd1d', '2024-12-03 00:00:00', 1, 3, 0),
 (21, 'a409fd1d', '2024-12-10 00:00:00', 1, 3, 0),
@@ -1061,7 +1071,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT cho bảng `attendance_reports`

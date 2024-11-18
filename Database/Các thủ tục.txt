@@ -34,7 +34,7 @@
 18GetClassInfoById
 19GetScheduleById
 
-
+20GetAttendanceReportByClassId
 
 
 -- 1. Thủ tục trong login.php
@@ -457,4 +457,21 @@ END //
 DELIMITER ;
 
 
+--20
+DELIMITER $$
+
+CREATE PROCEDURE GetAttendanceReportByClassId(IN input_class_id CHAR(36))
+BEGIN
+    SELECT 
+        ar.student_id,
+        ar.total_present,
+        ar.total_absent,
+        ar.total_late
+    FROM 
+        attendance_reports ar
+    WHERE 
+        ar.class_id = input_class_id;
+END $$
+
+DELIMITER ;
 

@@ -177,7 +177,8 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
         <?php endif; ?>
     </div>
     <div class="d-flex align-items-center justify-content-between mt-3">
-        <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Quản lý sinh
+        <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Quản lý
+            sinh
             viên</button>
         <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
     </div>
@@ -196,13 +197,16 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="add-tab" data-bs-toggle="tab" href="#addStudent" role="tab">Thêm sinh viên</a>
+                        <a class="nav-link active" id="add-tab" data-bs-toggle="tab" href="#addStudent" role="tab">Thêm
+                            sinh viên</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="remove-tab" data-bs-toggle="tab" href="#removeStudent" role="tab">Đá sinh viên</a>
+                        <a class="nav-link" id="remove-tab" data-bs-toggle="tab" href="#removeStudent" role="tab">Đá
+                            sinh viên</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="upload-tab" data-bs-toggle="tab" href="#uploadStudent" role="tab">Tải lên Excel</a>
+                        <a class="nav-link" id="upload-tab" data-bs-toggle="tab" href="#uploadStudent" role="tab">Tải
+                            lên Excel</a>
                     </li>
                 </ul>
 
@@ -233,8 +237,8 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 
                             <div class="mb-3">
                                 <label for="removeStudentIdInput" class="form-label">Mã sinh viên</label>
-                                <input type="text" class="form-control" id="removeStudentIdInput" name="student_id" required
-                                    maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                                <input type="text" class="form-control" id="removeStudentIdInput" name="student_id"
+                                    required maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
                             </div>
 
                             <!-- Hiện thông tin sinh viên -->
@@ -246,7 +250,8 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                <button type="button" class="btn btn-danger d-none" id="removeStudentButton">Đá sinh viên</button>
+                                <button type="button" class="btn btn-danger d-none" id="removeStudentButton">Đá sinh
+                                    viên</button>
                             </div>
                         </form>
                     </div>
@@ -256,7 +261,8 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                         <form id="uploadStudentForm" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="excelFileInput" class="form-label">Chọn file Excel</label>
-                                <input type="file" class="form-control" id="excelFileInput" name="excel_file" accept=".xls,.xlsx" required>
+                                <input type="file" class="form-control" id="excelFileInput" name="excel_file"
+                                    accept=".xls,.xlsx" required>
                             </div>
                             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
                             <div class="modal-footer">

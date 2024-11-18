@@ -47,6 +47,23 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
 
+// Lấy dữ liệu tổng hợp điểm danh của sinh viên từ bảng attendance_reports
+$sqlAttendanceReport = "CALL GetAttendanceReportByClassId(?)";
+$stmtReport = $conn->prepare($sqlAttendanceReport);
+$stmtReport->execute([$class_id]);
+$attendanceReport = $stmtReport->fetchAll(PDO::FETCH_ASSOC);
+$stmtReport->closeCursor(); // Đóng con trỏ
+
+// Biến đổi dữ liệu tổng hợp điểm danh thành mảng dễ truy xuất
+$reportMap = [];
+foreach ($attendanceReport as $report) {
+    $reportMap[$report['student_id']] = [
+        'total_present' => $report['total_present'],
+        'total_absent' => $report['total_absent'],
+        'total_late' => $report['total_late']
+    ];
+}
+
 // Lấy ngày hiện tại
 $currentDate = date('Y-m-d');
 ?>
@@ -64,6 +81,9 @@ $currentDate = date('Y-m-d');
                     <th style="width: 150px;">Giới tính</th>
                     <th style="width: 150px;">Lớp</th>
                     <th style="width: 150px;">Ngày sinh</th>
+                    <th style="width: 80px;">Có mặt</th>
+                    <th style="width: 80px;">Vắng</th>
+                    <th style="width: 80px;">Đi trễ</th>
                 </tr>
             </thead>
             <tbody>
@@ -76,6 +96,15 @@ $currentDate = date('Y-m-d');
                         <td><?php echo htmlspecialchars($student['gender']); ?></td>
                         <td><?php echo htmlspecialchars($student['class']); ?></td>
                         <td><?php echo date('d/m/Y', strtotime($student['birthday'])); ?></td>
+                        <td>
+                            <?php echo $reportMap[$student['student_id']]['total_present'] ?? 0; ?>
+                        </td>
+                        <td>
+                            <?php echo $reportMap[$student['student_id']]['total_absent'] ?? 0; ?>
+                        </td>
+                        <td>
+                            <?php echo $reportMap[$student['student_id']]['total_late'] ?? 0; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -109,8 +138,6 @@ $currentDate = date('Y-m-d');
                                         echo 'Có mặt'; // Có mặt
                                     } elseif ($status === '2') {
                                         echo 'Muộn'; // Muộn
-                                    } elseif ($status === '-1') {
-                                        echo '';
                                     } elseif ($schedule['date'] > $currentDate) {
                                         echo ''; // Để trống nếu ngày hiện tại chưa đến ngày điểm danh
                                     } else {
