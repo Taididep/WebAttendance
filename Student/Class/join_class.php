@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: {$basePath}login_view.php");

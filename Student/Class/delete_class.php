@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 // Kết nối đến cơ sở dữ liệu
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem có gửi class_id qua GET không
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['class_id'])) {

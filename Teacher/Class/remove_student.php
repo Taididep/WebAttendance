@@ -1,6 +1,7 @@
 <?php
 $basePath = '../'; // Đường dẫn gốc
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem student_id và class_id có được gửi qua POST hay không
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['student_id']) && isset($_POST['class_id'])) {

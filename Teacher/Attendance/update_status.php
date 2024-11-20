@@ -2,6 +2,7 @@
 session_start();
 $basePath = '../';
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 if (!isset($_GET['class_id']) || !isset($_GET['schedule_id']) || !isset($_GET['status'])) {
     echo 'Thiếu thông tin.';

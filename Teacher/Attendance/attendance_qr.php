@@ -2,6 +2,7 @@
 session_start();
 $basePath = '../';
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra class_id và schedule_id từ URL
 if (!isset($_GET['class_id']) || !isset($_GET['schedule_id'])) {

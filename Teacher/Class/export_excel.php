@@ -97,35 +97,50 @@ foreach ($students as $index => $student) {
     $rowIndex++;
 }
 
-// Tính số lượng học sinh có mặt cho mỗi buổi
+// Tính số lượng học sinh có mặt (1) và đi trễ (2) cho mỗi buổi
 $attendanceCounts = [];
 foreach ($schedules as $schedule) {
     $date = $schedule['date'];
-    $countPresent = 0;
+    $countPresentAndLate = 0;
     foreach ($students as $student) {
-        if (isset($attendanceMap[$student['student_id']][$date]) && $attendanceMap[$student['student_id']][$date] === '1') {
-            $countPresent++;
+        if (isset($attendanceMap[$student['student_id']][$date])) {
+            $status = $attendanceMap[$student['student_id']][$date];
+            // Nếu học sinh có mặt (1) hoặc đi trễ (2), cộng vào tổng điểm danh
+            if ($status === '1' || $status === '2') {
+                $countPresentAndLate++;
+            }
         }
     }
-    $attendanceCounts[] = $countPresent;
+    $attendanceCounts[] = $countPresentAndLate; // Cộng học sinh có mặt và đi trễ
 }
 
-// Thêm số lượng học sinh có mặt vào hàng tiếp theo
+// Thêm số lượng học sinh có mặt và đi trễ vào hàng tiếp theo (Tổng điểm danh)
 $attendanceCountsRow = ['Tổng điểm danh', '', '', '', '', '', '', '']; // Đặt giá trị cho 8 cột đầu tiên
 foreach ($attendanceCounts as $count) {
     $attendanceCountsRow[] = $count;
 }
 
-// Ghi dữ liệu số lượng học sinh có mặt vào hàng
+// Ghi dữ liệu số lượng học sinh có mặt và đi trễ vào hàng
 $sheet->fromArray($attendanceCountsRow, NULL, 'A' . $rowIndex);
 
-// Hợp nhất ô cho dòng "Số học sinh có mặt"
+// Hợp nhất ô cho dòng "Tổng điểm danh"
 $sheet->mergeCells("A{$rowIndex}:I{$rowIndex}"); // Hợp nhất từ cột A đến cột I ở hàng số $rowIndex
 $sheet->getStyle("A{$rowIndex}:I{$rowIndex}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER); // Canh giữa
 
-// Xuất file Excel
+// Debug: Kiểm tra giá trị của attendanceCountsRow
+echo '<pre>';
+print_r($attendanceCountsRow);
+echo '</pre>';
+
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment; filename="attendance.xlsx"');
+header('Content-Disposition: attachment; filename="attendance_report_class_' . $class_id . '.xlsx"');
+header('Cache-Control: max-age=0'); // Đảm bảo không lưu lại file trong cache
+
+// Xuất file Excel
 $writer = new Xlsx($spreadsheet);
-$writer->save("php://output");
+
+// Dùng ob_clean() và flush() để đảm bảo xuất file đúng cách
+ob_clean();
+flush();
+$writer->save('php://output');
 exit;

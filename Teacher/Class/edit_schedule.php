@@ -1,5 +1,6 @@
 <?php
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $scheduleId = $_POST['schedule_id'];
