@@ -123,7 +123,7 @@ scheduleCells.forEach(cell => {
 });
 
 // Lắng nghe sự kiện khi người dùng nhập mã sinh viên
-document.getElementById('removeStudentIdInput').addEventListener('input', function() {
+document.getElementById('removeStudentIdInput').addEventListener('input', function () {
     const studentId = this.value;
     const studentInfo = document.getElementById('studentInfo');
     const studentDetails = document.getElementById('studentDetails');
@@ -152,7 +152,7 @@ document.getElementById('removeStudentIdInput').addEventListener('input', functi
 });
 
 // Cài đặt sự kiện cho nút "Đá sinh viên"
-document.getElementById('removeStudentButton').addEventListener('click', function() {
+document.getElementById('removeStudentButton').addEventListener('click', function () {
     const studentId = document.getElementById('removeStudentIdInput').value;
 
     // Xác nhận trước khi đá sinh viên
@@ -171,46 +171,56 @@ document.getElementById('removeStudentButton').addEventListener('click', functio
                 class_id: classId
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            if (data.success) {
-                alert(data.message);
-                // Cập nhật giao diện hoặc làm mới danh sách sinh viên
-                location.reload(); // Tải lại trang để làm mới danh sách
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra, vui lòng thử lại!');
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.success) {
+                    alert(data.message);
+                    // Cập nhật giao diện hoặc làm mới danh sách sinh viên
+                    location.reload(); // Tải lại trang để làm mới danh sách
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra, vui lòng thử lại!');
+            });
     }
 });
 
-// Xử lý tải lên excel
-document.getElementById('uploadStudentForm').addEventListener('submit', function(event) {
+document.getElementById('uploadStudentForm').addEventListener('submit', function (event) {
     event.preventDefault(); // Ngăn chặn hành vi mặc định của form
 
     const formData = new FormData(this); // Lấy dữ liệu từ form
-    console.log([...formData]); // In ra dữ liệu form để kiểm tra
+    console.log([...formData]); // In dữ liệu form để debug (có thể xóa dòng này khi hoàn thiện)
 
-    fetch('upload_students.php', {
+    fetch('import_excel.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            location.reload(); // Tải lại danh sách sinh viên
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Có lỗi xảy ra khi tải lên!');
-    });
+        .then(response => {
+            // Kiểm tra phản hồi thô
+            return response.text();  // Lấy phản hồi dưới dạng text thay vì JSON
+        })
+        .then(text => {
+            console.log('Phản hồi từ server:', text);  // In ra phản hồi thô từ server
+            try {
+                const data = JSON.parse(text);  // Thử phân tích JSON từ phản hồi
+                if (data.success) {
+                    alert(data.message);  // Hiển thị thông báo thành công
+                    location.reload();  // Tải lại danh sách sinh viên
+                } else {
+                    alert(`Thất bại: ${data.message}`);  // Hiển thị thông báo lỗi
+                }
+            } catch (error) {
+                console.error('Lỗi khi phân tích JSON:', error);
+                alert('Phản hồi từ server không hợp lệ. Kiểm tra console.');
+            }
+        })
+        .catch(error => {  // Xử lý lỗi trong quá trình gọi fetch
+            console.error('Lỗi:', error);
+            alert('Đã xảy ra lỗi trong quá trình tải lên. Vui lòng thử lại.');
+        });
 });
+

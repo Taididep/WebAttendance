@@ -44,12 +44,6 @@ $stmt->execute([
 $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor(); // Đóng con trỏ
 
-// Kiểm tra xem có lịch nào không
-if (empty($schedules)) {
-    echo "Không có lịch học trong khoảng thời gian này.";
-} else {
-    echo "Số lượng lịch học: " . count($schedules);
-}
 
 // Tạo mảng để tổ chức lịch học theo ngày
 $weeklySchedules = [];

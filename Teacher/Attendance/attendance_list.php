@@ -258,19 +258,14 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
 
                     <!-- Tab Tải lên Excel -->
                     <div class="tab-pane fade" id="uploadStudent" role="tabpanel">
-                        <form id="uploadStudentForm" method="post" enctype="multipart/form-data">
-                            <div class="mb-3">
-                                <label for="excelFileInput" class="form-label">Chọn file Excel</label>
-                                <input type="file" class="form-control" id="excelFileInput" name="excel_file"
-                                    accept=".xls,.xlsx" required>
-                            </div>
+                        <form id="uploadStudentForm" method="post" enctype="multipart/form-data" action="import_excel.php">
                             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                <button type="submit" class="btn btn-primary">Tải lên</button>
-                            </div>
+                            <input type="file" class="form-control" id="excelFileInput" name="excel_file" accept=".xls,.xlsx" required>
+                            <button type="submit" class="btn btn-primary">Tải lên</button>
                         </form>
+
                     </div>
+
                 </div>
             </div>
         </div>
