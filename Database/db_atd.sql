@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 20, 2024 lúc 03:49 PM
+-- Thời gian đã tạo: Th10 20, 2024 lúc 07:51 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -57,9 +57,21 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `AddSchedules` (IN `p_class_id` CHAR
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
-    SELECT *
-    FROM semesters
-    ORDER BY semester_id DESC;
+    SELECT 
+        s.semester_id,
+        s.semester_name,
+        s.start_date,
+        s.end_date,
+        s.is_active,
+        COUNT(c.class_id) AS total_classes
+    FROM 
+        semesters s
+    LEFT JOIN 
+        classes c ON s.semester_id = c.semester_id
+    GROUP BY 
+        s.semester_id, s.semester_name, s.start_date, s.end_date, s.is_active
+    ORDER BY 
+        s.start_date DESC; -- Sắp xếp theo ngày bắt đầu mới nhất
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByScheduleId` (IN `scheduleId` INT, IN `class_id` CHAR(36))   BEGIN
@@ -703,7 +715,9 @@ INSERT INTO `courses` (`course_id`, `course_name`, `course_type_id`) VALUES
 (38, 'Công nghệ phần mềm nâng cao', 3),
 (39, 'Kiểm định phần mềm', 3),
 (40, 'Thực hành kiểm định phần mềm', 4),
-(41, 'Phát triển phần mềm ứng dụng thông minh', 6);
+(41, 'Phát triển phần mềm ứng dụng thông minh', 6),
+(42, 'taidz', 1),
+(43, 'mon hoc', 3);
 
 -- --------------------------------------------------------
 
@@ -823,7 +837,7 @@ CREATE TABLE `semesters` (
 INSERT INTO `semesters` (`semester_id`, `semester_name`, `is_active`, `start_date`, `end_date`) VALUES
 (1, 'HK3 (Hè 2023 - 2024)', 0, '2024-07-10', '2024-08-07'),
 (2, 'HK1 (2024 - 2025)', 1, '2024-08-15', '2025-12-17'),
-(3, 'HK2 (2024)', 1, '2013-03-30', '2005-08-09'),
+(3, 'HK2 (2021)', 1, '2013-03-30', '2005-08-09'),
 (4, 'HK2 (2024)', 1, '2013-03-30', '2019-08-09'),
 (5, 'HK2 (2024)', 1, '2013-03-30', '2019-08-09');
 
@@ -1136,7 +1150,7 @@ ALTER TABLE `comments`
 -- AUTO_INCREMENT cho bảng `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000199;
 
 --
 -- AUTO_INCREMENT cho bảng `course_types`
@@ -1160,7 +1174,7 @@ ALTER TABLE `schedules`
 -- AUTO_INCREMENT cho bảng `semesters`
 --
 ALTER TABLE `semesters`
-  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT cho bảng `students`

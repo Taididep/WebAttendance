@@ -48,4 +48,34 @@ $(document).ready(function () {
 });
 
 
+$(document).ready(function () {
+    $('#editCourseForm').on('submit', function (e) {
+        e.preventDefault(); // Ngừng hành động mặc định của form
+
+        // Lấy dữ liệu từ form
+        var formData = $(this).serialize();
+
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'), // Lấy URL từ thuộc tính action của form
+            data: formData,
+            success: function (response) {
+                // Xử lý phản hồi từ server
+                if (response.includes("Cập nhật khóa học thành công")) {
+                    alert("Cập nhật khóa học thành công!");
+                    $('#editCourseModal').modal('hide'); // Đóng modal
+                    location.reload(); // Tải lại trang để hiển thị dữ liệu mới
+                } else {
+                    alert(response); // Hiển thị thông báo lỗi từ PHP
+                }
+            },
+            error: function () {
+                alert("Có lỗi xảy ra khi gửi dữ liệu.");
+            }
+        });
+    });
+});
+
+
+
 

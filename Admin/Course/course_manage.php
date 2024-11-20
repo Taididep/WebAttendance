@@ -118,8 +118,8 @@ $stmt_courses->closeCursor();
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <li><a class="dropdown-item"
-                                                    href="course_edit.php?course_id=<?php echo urlencode($course['course_id']); ?>">Sửa</a>
+                                            <li>
+                                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editCourseModal">Sửa</a>
                                             </li>
                                             <li>
                                                 <a class="dropdown-item"
@@ -207,6 +207,45 @@ $stmt_courses->closeCursor();
 
                         </div>
                         <button type="submit" class="btn btn-primary">Thêm môn học</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sửa khóa học -->
+    <div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCourseModalLabel">Sửa khóa học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form sửa khóa học -->
+                    <form id="editCourseForm" method="POST" action="edit_course.php?course_id=<?php echo urlencode($course['course_id']); ?>">
+                        <div class="mb-3">
+                            <label for="course_name" class="form-label">Tên khóa học</label>
+                            <input type="text" class="form-control" id="course_name" name="course_name" value="<?php echo htmlspecialchars($course['course_name']); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="course_type_id" class="form-label">Loại khóa học</label>
+                            <select class="form-select" id="course_type_id" name="course_type_id" required>
+                                <option value="">Chọn loại khóa học</option>
+                                <?php
+                                // Lấy tất cả loại khóa học từ cơ sở dữ liệu
+                                $sql = "SELECT * FROM course_types";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->execute();
+                                $course_types = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                foreach ($course_types as $type) {
+                                    $selected = ($type['course_type_id'] == $course['course_type_id']) ? 'selected' : '';
+                                    echo "<option value='{$type['course_type_id']}' {$selected}>{$type['course_type_name']} (Credits: {$type['credits']}, Theory: {$type['theory_periods']}, Practice: {$type['practice_periods']})</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Cập nhật khóa học</button>
                     </form>
                 </div>
             </div>
