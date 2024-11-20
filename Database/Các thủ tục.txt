@@ -36,6 +36,7 @@
 
 20GetAttendanceReportByClassId
 
+21 GetClassesBySemester
 
 -- 1. Thủ tục trong login.php
 DELIMITER //
@@ -473,5 +474,22 @@ BEGIN
         ar.class_id = input_class_id;
 END $$
 
+DELIMITER ;
+
+-- 21
+DELIMITER //
+CREATE PROCEDURE GetClassesBySemester(IN semester_id INT)
+BEGIN
+    SELECT 
+        c.class_id, 
+        c.class_name,
+        co.course_name,
+        t.lastname, 
+        t.firstname
+    FROM classes c
+    JOIN courses co ON c.course_id = co.course_id
+    JOIN teachers t ON c.teacher_id = t.teacher_id
+    WHERE c.semester_id = semester_id;
+END //
 DELIMITER ;
 

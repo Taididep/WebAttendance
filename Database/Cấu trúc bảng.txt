@@ -1,4 +1,14 @@
 ----------------------------------------------------------------------------------------------
+-- 0
+CREATE TABLE admins (
+    admin_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    lastname VARCHAR(50),
+    firstname VARCHAR(50) NOT NULL,
+    email VARCHAR(100),
+    phone VARCHAR(15),
+    FOREIGN KEY (admin_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
 -- 1a
 CREATE TABLE users (
     user_id INT(11) PRIMARY KEY AUTO_INCREMENT,
@@ -109,7 +119,7 @@ CREATE TABLE attendances (
     status TINYINT(1) NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_attendance_schedule_id FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id) ON DELETE CASCADE,
-    CONSTRAINT fk_attendance_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    CONSTRAINT fk_attendance_student_class FOREIGN KEY (student_id) REFERENCES class_students(student_id) ON DELETE CASCADE,
     CONSTRAINT unique_attendance UNIQUE (schedule_id, student_id)
 );
 
@@ -150,8 +160,6 @@ CREATE TABLE comments (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- 12
-ALTER TABLE schedules ADD COLUMN expiry_time DATETIME;
 
 
 
@@ -290,3 +298,18 @@ VALUES
 (1000001234, 'Trần Thị Vân', 'Anh', 'vanAnh123@example.com', '0903456789', '1995-01-01', 'Nữ'),
 (1000001235, 'Trần Văn', 'Hùng', 'HungTV@example.com', '0903456790', '1990-01-01', 'Nam'),
 (1000001236, 'Nguyễn Văn', 'Tùng', 'NguyenVT@example.com', '0904567890', '1992-01-01', 'Nam');
+
+
+
+-- 0
+INSERT INTO users (username, password) VALUES
+('admin1', 'password'),
+('admin2', 'password');
+
+INSERT INTO user_roles (user_id, role_id) VALUES
+(1, 1),
+(2, 1);
+
+INSERT INTO admins (admin_id, lastname, firstname, email, phone) VALUES
+(1, 'Nguyen', 'An', 'an.nguyen@example.com', '0123456789'),
+(2, 'Tran', 'Binh', 'binh.tran@example.com', '0987654321');

@@ -20,7 +20,7 @@ if (isset($_POST['semester_id'])) {
         if ($classes) {
             // Hiển thị bảng lớp học
             echo '<table class="table table-striped">';
-            echo '<thead><tr"><th>STT</th><th>Tên lớp học</th><th>Tên môn học</th><th>Giáo viên</th><th>Trạng thái</th><th style="width: 1%;"></th></tr></thead>';
+            echo '<thead><tr"><th>STT</th><th>Tên lớp học</th><th>Tên môn học</th><th>Giảng viên</th><th>Trạng thái</th><th style="width: 1%;"></th></tr></thead>';
             echo '<tbody>';
 
             // Khởi tạo biến đếm cho số thứ tự

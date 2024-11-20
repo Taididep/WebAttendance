@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 18, 2024 lúc 02:32 PM
+-- Thời gian đã tạo: Th10 20, 2024 lúc 12:43 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -330,28 +330,27 @@ CREATE TABLE `attendances` (
 --
 
 INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status`, `updated_at`) VALUES
-(1, 16, 2001210224, 0, '2024-11-14 10:04:27'),
-(2, 17, 2001210224, 0, '2024-11-14 10:04:27'),
-(3, 16, 2001214567, 0, '2024-11-14 10:04:27'),
-(4, 17, 2001214567, 0, '2024-11-14 10:04:27'),
-(5, 16, 2001214568, 0, '2024-11-14 10:04:27'),
-(6, 17, 2001214568, 0, '2024-11-14 10:04:27'),
-(7, 16, 2001215678, 0, '2024-11-14 10:04:27'),
-(8, 17, 2001215678, 0, '2024-11-14 10:04:27'),
-(9, 16, 2001215679, 0, '2024-11-14 10:04:27'),
-(10, 17, 2001215679, 0, '2024-11-14 10:04:27'),
-(11, 16, 2001216114, 1, '2024-11-15 14:08:30'),
-(12, 17, 2001216114, 2, '2024-11-14 10:07:57'),
-(13, 16, 2001216780, 0, '2024-11-14 10:04:28'),
-(14, 17, 2001216780, 0, '2024-11-14 10:04:28'),
-(15, 16, 2001216789, 0, '2024-11-14 10:04:28'),
-(16, 17, 2001216789, 0, '2024-11-14 10:04:28'),
-(17, 16, 2001217890, 0, '2024-11-14 10:04:28'),
-(18, 17, 2001217890, 0, '2024-11-14 10:04:28'),
-(19, 16, 2001219012, 0, '2024-11-14 10:04:28'),
-(20, 17, 2001219012, 0, '2024-11-14 10:04:28'),
-(21, 99, 2001216114, 0, '2024-11-14 10:12:32'),
-(22, 100, 2001216114, 1, '2024-11-14 10:12:38');
+(1, 16, 2001210224, 0, '2024-11-20 11:39:50'),
+(2, 17, 2001210224, 0, '2024-11-20 11:39:50'),
+(3, 18, 2001210224, 0, '2024-11-20 11:39:50'),
+(4, 16, 2001214567, 0, '2024-11-20 11:39:50'),
+(5, 17, 2001214567, 0, '2024-11-20 11:39:50'),
+(6, 18, 2001214567, 0, '2024-11-20 11:39:50'),
+(7, 16, 2001214568, 0, '2024-11-20 11:39:50'),
+(8, 17, 2001214568, 0, '2024-11-20 11:39:50'),
+(9, 18, 2001214568, 0, '2024-11-20 11:39:50'),
+(10, 16, 2001215678, 0, '2024-11-20 11:39:50'),
+(11, 17, 2001215678, 0, '2024-11-20 11:39:50'),
+(12, 18, 2001215678, 0, '2024-11-20 11:39:50'),
+(13, 16, 2001215679, 0, '2024-11-20 11:39:51'),
+(14, 17, 2001215679, 0, '2024-11-20 11:39:51'),
+(15, 18, 2001215679, 0, '2024-11-20 11:39:51'),
+(16, 16, 2001216114, 0, '2024-11-20 11:39:51'),
+(17, 17, 2001216114, 2, '2024-11-20 11:39:51'),
+(18, 18, 2001216114, 2, '2024-11-20 11:39:51'),
+(19, 16, 2001216780, 0, '2024-11-20 11:39:51'),
+(20, 17, 2001216780, 0, '2024-11-20 11:39:51'),
+(21, 18, 2001216780, 0, '2024-11-20 11:39:51');
 
 --
 -- Bẫy `attendances`
@@ -530,18 +529,13 @@ CREATE TABLE `attendance_reports` (
 --
 
 INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_present`, `total_absent`, `total_late`, `total`) VALUES
-(1, 'a409fd1d', 2001210224, 0, 2, 0, 15),
-(2, 'a409fd1d', 2001214567, 0, 2, 0, 15),
-(3, 'a409fd1d', 2001214568, 0, 2, 0, 15),
-(4, 'a409fd1d', 2001215678, 0, 2, 0, 15),
-(5, 'a409fd1d', 2001216780, 0, 2, 0, 15),
-(6, 'a409fd1d', 2001216789, 0, 2, 0, 15),
-(7, 'a409fd1d', 2001217890, 0, 2, 0, 15),
-(8, 'a409fd1d', 2001218902, 0, 15, 0, 0),
-(9, 'a409fd1d', 2001219012, 0, 2, 0, 15),
-(10, 'a409fd1d', 2001216114, 1, 0, 1, 15),
-(11, '1432cd49', 2001216114, 1, 1, 0, 15),
-(12, 'a409fd1d', 2001215679, 0, 2, 0, 15);
+(1, 'a409fd1d', 2001210224, 0, 3, 0, 15),
+(2, 'a409fd1d', 2001214567, 0, 3, 0, 15),
+(3, 'a409fd1d', 2001214568, 0, 3, 0, 15),
+(4, 'a409fd1d', 2001215678, 0, 3, 0, 15),
+(5, 'a409fd1d', 2001215679, 0, 3, 0, 15),
+(6, 'a409fd1d', 2001216114, 0, 1, 2, 15),
+(7, 'a409fd1d', 2001216780, 0, 3, 0, 15);
 
 -- --------------------------------------------------------
 
@@ -590,8 +584,7 @@ INSERT INTO `class_students` (`class_id`, `student_id`, `status`) VALUES
 ('a409fd1d', 2001215679, 0),
 ('a409fd1d', 2001216114, 1),
 ('a409fd1d', 2001216780, 1),
-('a409fd1d', 2001216789, 1),
-('a409fd1d', 2001217890, 1);
+('a409fd1d', 2001216789, 0);
 
 -- --------------------------------------------------------
 
@@ -964,14 +957,14 @@ ALTER TABLE `announcements`
 ALTER TABLE `attendances`
   ADD PRIMARY KEY (`attendance_id`),
   ADD UNIQUE KEY `unique_attendance` (`schedule_id`,`student_id`),
-  ADD KEY `fk_student_id` (`student_id`);
+  ADD KEY `fk_attendance_student_class` (`student_id`);
 
 --
 -- Chỉ mục cho bảng `attendance_reports`
 --
 ALTER TABLE `attendance_reports`
   ADD PRIMARY KEY (`report_id`),
-  ADD KEY `fk_attendance_report_class_id` (`class_id`),
+  ADD UNIQUE KEY `unique_report` (`class_id`,`student_id`),
   ADD KEY `fk_attendance_report_student_id` (`student_id`);
 
 --
@@ -1071,13 +1064,13 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT cho bảng `attendance_reports`
 --
 ALTER TABLE `attendance_reports`
-  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT cho bảng `comments`
@@ -1147,14 +1140,15 @@ ALTER TABLE `announcements`
 -- Các ràng buộc cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  ADD CONSTRAINT `fk_schedule_id` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`schedule_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_attendance_schedule_id` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`schedule_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_attendance_student_class` FOREIGN KEY (`student_id`) REFERENCES `class_students` (`student_id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `attendance_reports`
 --
 ALTER TABLE `attendance_reports`
   ADD CONSTRAINT `fk_attendance_report_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_attendance_report_class_student` FOREIGN KEY (`class_id`,`student_id`) REFERENCES `class_students` (`class_id`, `student_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_attendance_report_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE;
 
 --
