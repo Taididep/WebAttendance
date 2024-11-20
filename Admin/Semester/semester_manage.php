@@ -63,6 +63,7 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
                             <th>Ngày bắt đầu</th>
                             <th>Ngày kết thúc</th>
                             <th>Trạng thái</th>
+                            <th>Số lớp</th> <!-- Thêm cột Số lớp -->
                             <th style="width: 1%;"></th>
                         </tr>
                     </thead>
@@ -72,13 +73,11 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
                         foreach ($semesters as $semester): ?>
                             <tr>
                                 <td style="padding-left: 25px;"><?php echo $stt++; ?></td>
-                                <!-- Hiển thị số thứ tự -->
                                 <td><?php echo htmlspecialchars($semester['semester_name']); ?></td>
                                 <td><?php echo htmlspecialchars($semester['start_date']); ?></td>
                                 <td><?php echo htmlspecialchars($semester['end_date']); ?></td>
-                                <td>
-                                    <?php echo $semester['is_active'] == 1 ? 'Hoạt động' : 'Không hoạt động'; ?>
-                                </td>
+                                <td><?php echo $semester['is_active'] == 1 ? 'Hoạt động' : 'Không hoạt động'; ?></td>
+                                <td style="padding-left: 33px;"><?php echo htmlspecialchars($semester['total_classes']); ?></td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton"
@@ -86,11 +85,12 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <li><a class="dropdown-item"
-                                                    href="semester_edit.php?semester_id=<?php echo $semester['semester_id']; ?>">Sửa</a>
+                                            <li>
+                                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editSemesterModal">Sửa</a>
                                             </li>
-                                            <li><a class="dropdown-item"
-                                                    href="semester_delete.php?semester_id=<?php echo $semester['semester_id']; ?>"
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="delete_semester.php?semester_id=<?php echo $semester['semester_id']; ?>"
                                                     onclick="return confirm('Bạn có chắc chắn muốn xóa học kỳ này không?')">Xóa</a>
                                             </li>
                                         </ul>
@@ -99,6 +99,7 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
+
                 </table>
             </div>
         </div>
@@ -138,6 +139,41 @@ $stmt_semesters->closeCursor(); // Đóng kết quả của truy vấn trước
             </div>
         </div>
     </div>
+
+    <!-- Modal Sửa học kỳ -->
+    <div class="modal fade" id="editSemesterModal" tabindex="-1" aria-labelledby="editSemesterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSemesterModalLabel">Sửa học kỳ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form sửa học kỳ -->
+                    <form id="editSemesterForm" method="POST" action="edit_semester.php?semester_id=<?php echo $semester['semester_id']; ?>">
+                        <div class="mb-3">
+                            <label for="semester_name" class="form-label">Tên học kỳ</label>
+                            <input type="text" class="form-control" id="semester_name" name="semester_name" value="<?php echo htmlspecialchars($semester['semester_name']); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Ngày bắt đầu</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($semester['start_date']); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">Ngày kết thúc</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($semester['end_date']); ?>" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" <?php echo $semester['is_active'] == 1 ? 'checked' : ''; ?>>
+                            <label class="form-check-label" for="is_active">Trạng thái hoạt động</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Cập nhật học kỳ</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

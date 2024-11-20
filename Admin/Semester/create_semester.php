@@ -16,19 +16,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Kiểm tra thông tin
     if (empty($semesterName) || empty($startDate) || empty($endDate)) {
-        $errorMessage = "Vui lòng điền đầy đủ thông tin.";
+        echo "Vui lòng điền đầy đủ thông tin.";
+        exit();
     } else {
         // Thực hiện truy vấn để thêm học kỳ
         $sql = "INSERT INTO semesters (semester_name, start_date, end_date, is_active) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
 
         if ($stmt->execute([$semesterName, $startDate, $endDate, $isActive])) {
-            $successMessage = "Thêm học kỳ thành công!";
-            header("Location: {$basePath}Class/class_manage.php"); // Chuyển hướng sau khi thêm thành công
+            echo "Thêm học kỳ thành công!";
             exit();
         } else {
-            $errorMessage = "Có lỗi xảy ra, vui lòng thử lại.";
+            echo "Có lỗi xảy ra, vui lòng thử lại.";
+            exit();
         }
     }
 }
-?>

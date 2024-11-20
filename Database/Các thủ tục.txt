@@ -61,13 +61,25 @@ END //
 DELIMITER ;
 
 -- 3. Thủ tục lấy tất cả học kỳ
-DELIMITER //
-CREATE PROCEDURE GetAllSemesters()
+DELIMITER $$
+
+CREATE OR REPLACE PROCEDURE GetAllSemesters()
 BEGIN
-    SELECT * 
-    FROM semesters
-    ORDER BY semester_id DESC;
-END //
+    SELECT 
+        s.semester_id,
+        s.semester_name,
+        s.start_date,
+        s.end_date,
+        s.is_active,
+        COUNT(c.class_id) AS total_classes
+    FROM 
+        semesters s
+    LEFT JOIN 
+        classes c ON s.semester_id = c.semester_id
+    GROUP BY 
+        s.semester_id, s.semester_name, s.start_date, s.end_date, s.is_active;
+END$$
+
 DELIMITER ;
 
 
