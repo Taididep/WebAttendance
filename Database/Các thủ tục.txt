@@ -60,11 +60,11 @@ BEGIN
 END //
 DELIMITER ;
 
--- 3. Thủ tục lấy tất cả học kỳ trong teacher.php
+-- 3. Thủ tục lấy tất cả học kỳ
 DELIMITER //
 CREATE PROCEDURE GetAllSemesters()
 BEGIN
-    SELECT semester_id, semester_name 
+    SELECT * 
     FROM semesters
     ORDER BY semester_id DESC;
 END //

@@ -55,3 +55,9 @@ $(document).on('click', '.btn-cancel', function (e) {
         });
     }
 });
+
+
+// Đảm bảo rằng modal đóng sau khi form được gửi thành công
+$('#addSemesterModal').on('hidden.bs.modal', function () {
+    location.reload(); // Tải lại trang sau khi đóng modal (nếu cần)
+});

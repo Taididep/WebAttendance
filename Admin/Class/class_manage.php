@@ -35,7 +35,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
     <div class="container">
         <div class="card p-4">
             <!-- Title -->
-            <h2 class="mb-4 text-center">Quản lý danh sách lớp học</h2>
+            <h2 class="mb-4 text-center">Danh sách lớp học</h2>
 
             <!-- Semester Selection Form -->
             <form id="semesterForm" class="d-flex justify-content-between align-items-center mb-4">
@@ -48,8 +48,6 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <!-- Nút thêm học kỳ -->
-                    <button type="button" class="btn btn-primary ms-2 btn-lg" id="addSemesterBtn">Thêm</button>
                 </div>
             </form>
 
@@ -64,6 +62,8 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../JavaScript/class_manage.js"></script>
+
+
 </body>
 
 </html>

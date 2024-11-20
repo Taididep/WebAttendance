@@ -42,10 +42,10 @@ if (!isset($_SESSION['user_id'])) {
                     <a class="nav-link" href="<?php echo $basePath; ?>index.php">Trang Chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo $basePath; ?>Class/class_manage.php">Quản lý Lớp Học</a>
+                    <a class="nav-link" href="<?php echo $basePath; ?>Class/class_manage.php">Lớp Học</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo $basePath; ?>Schedule/schedule_view.php">Quản lý Lịch Học</a>
+                    <a class="nav-link" href="<?php echo $basePath; ?>Semester/semester_manage.php">Học Kỳ</a>
                 </li>
             </ul>
 
@@ -84,3 +84,10 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </div>
 </nav>
+
+<style>
+    nav .dropdown-toggle::after {
+        display: none;
+        /* Ẩn mũi tên mặc định của Bootstrap */
+    }
+</style>

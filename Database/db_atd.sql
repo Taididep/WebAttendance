@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 20, 2024 lúc 12:43 PM
+-- Thời gian đã tạo: Th10 20, 2024 lúc 03:49 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -57,7 +57,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `AddSchedules` (IN `p_class_id` CHAR
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
-    SELECT semester_id, semester_name 
+    SELECT *
     FROM semesters
     ORDER BY semester_id DESC;
 END$$
@@ -98,6 +98,19 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassDetailsById` (IN `classId` 
         teachers t ON c.teacher_id = t.teacher_id
     WHERE 
         c.class_id = classId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemester` (IN `semester_id` INT)   BEGIN
+    SELECT 
+        c.class_id, 
+        c.class_name,
+        co.course_name,
+        t.lastname, 
+        t.firstname
+    FROM classes c
+    JOIN courses co ON c.course_id = co.course_id
+    JOIN teachers t ON c.teacher_id = t.teacher_id
+    WHERE c.semester_id = semester_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassesBySemesterAndStudent` (IN `semester_id` INT, IN `student_id` INT)   BEGIN
@@ -286,6 +299,28 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateOrInsertAttendance` (IN `p_sc
 END$$
 
 DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `admins`
+--
+
+CREATE TABLE `admins` (
+  `admin_id` int(11) NOT NULL,
+  `lastname` varchar(50) DEFAULT NULL,
+  `firstname` varchar(50) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `phone` varchar(15) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `admins`
+--
+
+INSERT INTO `admins` (`admin_id`, `lastname`, `firstname`, `email`, `phone`) VALUES
+(1, '', 'Admin', 'an.nguyen@example.com', '0123456789'),
+(2, 'Tran', 'Binh', 'binh.tran@example.com', '0987654321');
 
 -- --------------------------------------------------------
 
@@ -787,7 +822,10 @@ CREATE TABLE `semesters` (
 
 INSERT INTO `semesters` (`semester_id`, `semester_name`, `is_active`, `start_date`, `end_date`) VALUES
 (1, 'HK3 (Hè 2023 - 2024)', 0, '2024-07-10', '2024-08-07'),
-(2, 'HK1 (2024 - 2025)', 1, '2024-08-15', '2025-12-17');
+(2, 'HK1 (2024 - 2025)', 1, '2024-08-15', '2025-12-17'),
+(3, 'HK2 (2024)', 1, '2013-03-30', '2005-08-09'),
+(4, 'HK2 (2024)', 1, '2013-03-30', '2019-08-09'),
+(5, 'HK2 (2024)', 1, '2013-03-30', '2019-08-09');
 
 -- --------------------------------------------------------
 
@@ -876,6 +914,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
+(1, 'admin1', '$2y$10$cfG.Glj5s4GTocadoW.QDupZ/HMVIOwf74xes7gEjqWx5J8fV3GuO'),
+(2, 'admin2', '$2y$10$dqut0FsGPQwl.1S1n9m9MuXqwbynWDAutKAs9/kUe5D9uev1zRKpK'),
 (1000001234, '1000001234', '$2y$10$4fhM2Q0vP6grGN.pbFApVONMOI5b41zd93DoPt1RafqjB1si6LtLC'),
 (1000001235, '1000001235', '$2y$10$P3vImaR.pFuxTs8c43oT1.XPMXGtAk5NqZBazDAelrv8usUORCw5e'),
 (1000001236, '1000001236', '$2y$10$tyeWDRjI15fzNm2W5YcM6Okq2Wwt81gLZBlJBleRlClF4sWV.LnRS'),
@@ -916,6 +956,8 @@ CREATE TABLE `user_roles` (
 --
 
 INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
+(1, 1),
+(2, 1),
 (1000001234, 2),
 (1000001235, 2),
 (1000001236, 2),
@@ -943,6 +985,12 @@ INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 --
 -- Chỉ mục cho các bảng đã đổ
 --
+
+--
+-- Chỉ mục cho bảng `admins`
+--
+ALTER TABLE `admins`
+  ADD PRIMARY KEY (`admin_id`);
 
 --
 -- Chỉ mục cho bảng `announcements`
@@ -1055,6 +1103,12 @@ ALTER TABLE `user_roles`
 --
 
 --
+-- AUTO_INCREMENT cho bảng `admins`
+--
+ALTER TABLE `admins`
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT cho bảng `announcements`
 --
 ALTER TABLE `announcements`
@@ -1106,7 +1160,7 @@ ALTER TABLE `schedules`
 -- AUTO_INCREMENT cho bảng `semesters`
 --
 ALTER TABLE `semesters`
-  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT cho bảng `students`
@@ -1124,11 +1178,17 @@ ALTER TABLE `teachers`
 -- AUTO_INCREMENT cho bảng `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2001219013;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2001219017;
 
 --
 -- Các ràng buộc cho các bảng đã đổ
 --
+
+--
+-- Các ràng buộc cho bảng `admins`
+--
+ALTER TABLE `admins`
+  ADD CONSTRAINT `admins_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `announcements`
