@@ -108,10 +108,11 @@ CREATE TABLE attendances (
     student_id INT(11) NOT NULL,
     status TINYINT(1) NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_schedule_id FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id) ON DELETE CASCADE,
-    CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    CONSTRAINT fk_attendance_schedule_id FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id) ON DELETE CASCADE,
+    CONSTRAINT fk_attendance_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
     CONSTRAINT unique_attendance UNIQUE (schedule_id, student_id)
 );
+
 -- 9
 CREATE TABLE attendance_reports (
     report_id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -120,10 +121,13 @@ CREATE TABLE attendance_reports (
     total_present INT DEFAULT 0,
     total_absent INT DEFAULT 0,
     total_late INT DEFAULT 0,
-    total INT DEFAULT 0;
+    total INT DEFAULT 0,
     CONSTRAINT fk_attendance_report_class_id FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE,
-    CONSTRAINT fk_attendance_report_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
+    CONSTRAINT fk_attendance_report_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    CONSTRAINT fk_attendance_report_class_student FOREIGN KEY (class_id, student_id) REFERENCES class_students(class_id, student_id) ON DELETE CASCADE,
+    CONSTRAINT unique_report UNIQUE (class_id, student_id)
 );
+
 
 -- 10
 CREATE TABLE announcements (
