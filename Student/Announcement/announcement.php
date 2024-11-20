@@ -1,5 +1,6 @@
 <?php
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra nếu có lớp học ID
 if (isset($_GET['class_id'])) {

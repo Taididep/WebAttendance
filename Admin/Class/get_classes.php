@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem có gửi semester_id không
 if (isset($_POST['semester_id'])) {

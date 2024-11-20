@@ -1,5 +1,6 @@
 <?php
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 if (isset($_GET['schedule_id'])) {
     $scheduleId = $_GET['schedule_id'];

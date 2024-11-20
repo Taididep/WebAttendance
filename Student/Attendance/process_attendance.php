@@ -2,6 +2,7 @@
 session_start();
 $basePath = '../'; // Đường dẫn gốc
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem class_id, schedule_id và status có được gửi qua POST hay không
 if (!isset($_POST['class_id']) || !isset($_POST['schedule_id'])) {

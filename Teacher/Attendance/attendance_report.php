@@ -2,6 +2,7 @@
 session_start();
 $basePath = '../'; // Đường dẫn gốc
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem class_id có được gửi qua URL hay không
 if (!isset($_GET['class_id'])) {

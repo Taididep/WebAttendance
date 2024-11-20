@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $teacher_id = $_POST['teacher_id'];

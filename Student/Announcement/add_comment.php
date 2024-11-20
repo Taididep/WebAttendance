@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra nếu dữ liệu từ form đã được gửi lên
 if (isset($_POST['content']) && isset($_POST['announcement_id'])) {

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../Connect/connect.php';
+include __DIR__ . '/../../Account/islogin.php';
 
 // Kiểm tra xem class_id và schedule_id có được gửi qua URL hay không
 if (!isset($_GET['class_id']) || !isset($_GET['schedule_id'])) {
