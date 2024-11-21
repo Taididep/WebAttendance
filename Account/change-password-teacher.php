@@ -26,18 +26,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(':username', $username, PDO::PARAM_STR);
 
             if ($stmt->execute()) {  
-                $message = "<p style='color:green;'>Password changed successfully.</p>";  
+                $message = "<p style='color:green;'>Đổi mật khẩu thành công.</p>";  
             } else {  
-                $message = "<p style='color:red;'>Error updating password: " . $stmt->errorInfo()[2] . "</p>";  
+                $message = "<p style='color:red;'>Đổi mật khẩu thất bại." . $stmt->errorInfo()[2] . "</p>";  
             }  
         } else {  
-            $message = "<p style='color:red;'>Current password is incorrect.</p>";  
+            $message = "<p style='color:red;'>Mật khẩu hiện tại không đúng.</p>";  
         }  
     } catch (PDOException $e) {
-        $message = "<p style='color:red;'>Database error: " . $e->getMessage() . "</p>";
-    }
-}  
-
+        $message = "<p style='color:red;'>Lỗi dữ liệu " . $e->getMessage() . "</p>";
+    }  
+}
 ?>
 
 <!DOCTYPE html>  

@@ -64,7 +64,7 @@ function resetPassword($conn, $username, $emailInput) {
     }
 
     // Chuyển hướng lại trang forgot-pass.php để hiển thị thông báo
-    header("Location: ../forgot-pass.php");
+    header("Location: ./forgot-pass.php");
     exit();
 }
 
