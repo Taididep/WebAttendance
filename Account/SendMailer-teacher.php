@@ -20,16 +20,16 @@ try {
 }
 session_start();
 
-// Lấy lịch học cho ngày mai
+// Lấy lịch dạy cho ngày mai
 $tomorrow = date("Y-m-d", strtotime('+1 day'));
 
-// SQL query để lấy danh sách lịch học của sinh viên vào ngày mai
-$sql = "SELECT students.email, students.firstname, schedules.date, schedules.start_time, schedules.end_time 
-        FROM students
-        JOIN attendances ON students.student_id = attendances.student_id
-        JOIN schedules ON schedules.schedule_id = attendances.schedule_id
-        WHERE schedules.date = :tomorrow
-        ORDER BY students.email, schedules.start_time";
+// SQL query để lấy danh sách lịch dạy của giảng viên vào ngày mai
+$sql = "SELECT t.email, t.firstname, t.lastname, s.date, s.start_time, s.end_time, c.class_name
+        FROM teachers t
+        JOIN classes c ON t.teacher_id = c.teacher_id
+        JOIN schedules s ON c.class_id = s.class_id
+        WHERE s.date = :tomorrow
+        ORDER BY t.email, s.start_time";
 
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':tomorrow', $tomorrow, PDO::PARAM_STR);
@@ -42,31 +42,36 @@ if ($stmt->rowCount() > 0) {
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $email = $row['email'];
         $firstname = $row['firstname'];
+        $lastname = $row['lastname'];
         $date = $row['date'];
         $start_time = $row['start_time'];
         $end_time = $row['end_time'];
+        $class_name = $row['class_name'];
         
-        // Thêm lịch học vào danh sách của sinh viên
+        // Thêm lịch dạy vào danh sách của giảng viên
         if (!isset($emails[$email])) {
             $emails[$email] = [
                 'firstname' => $firstname,
+                'lastname' => $lastname,
                 'schedules' => []
             ];
         }
         
         $emails[$email]['schedules'][] = [
+            'class_name' => $class_name,
             'start_time' => $start_time,
             'end_time' => $end_time
         ];
     }
 
-    // Duyệt qua từng sinh viên và gửi email nhắc nhở với tất cả lịch học của họ
+    // Duyệt qua từng giảng viên và gửi email nhắc nhở với tất cả lịch dạy của họ
     foreach ($emails as $email => $info) {
         $firstname = $info['firstname'];
+        $lastname = $info['lastname'];
         $scheduleList = '';
 
         foreach ($info['schedules'] as $schedule) {
-            $scheduleList .= "<li>Từ {$schedule['start_time']} đến {$schedule['end_time']}</li>";
+            $scheduleList .= "<li>Lớp: {$schedule['class_name']}, từ {$schedule['start_time']} đến {$schedule['end_time']}</li>";
         }
 
         // Cấu hình và gửi email
@@ -84,15 +89,15 @@ if ($stmt->rowCount() > 0) {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 
             // Người gửi
-            $mail->setFrom('thongnguyen@ittc.edu.vn', 'Lịch học nhắc nhở');
+            $mail->setFrom('thongnguyen@ittc.edu.vn', 'Lịch dạy nhắc nhở');
 
             // Người nhận
-            $mail->addAddress($email, $firstname);
+            $mail->addAddress($email, "$firstname $lastname");
 
             // Nội dung email
             $mail->isHTML(true);
-            $mail->Subject = "Lịch học ngày mai";
-            $mail->Body = "<h3>Chào $firstname,</h3><p>Bạn có lịch học vào ngày mai ($date):</p><ul>$scheduleList</ul>";
+            $mail->Subject = "Lịch dạy ngày mai";
+            $mail->Body = "<h3>Chào $firstname $lastname,</h3><p>Bạn có lịch dạy vào ngày mai ($date):</p><ul>$scheduleList</ul>";
 
             // Gửi email
             $mail->send();
@@ -102,7 +107,7 @@ if ($stmt->rowCount() > 0) {
         }
     }
 } else {
-    echo "Không có lịch học vào ngày mai.";
+    echo "Không có lịch dạy vào ngày mai.";
 }
 
 $conn = null;  // Đóng kết nối cơ sở dữ liệu
