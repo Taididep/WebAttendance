@@ -44,7 +44,7 @@
                     ?>
                         <ul class="nav nav-tabs" id="register-tab" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="teacher-tab" data-toggle="tab" href="#teacher" role="tab">Đăng ký Giáo viên</a>
+                                <a class="nav-link active" id="teacher-tab" data-toggle="tab" href="#teacher" role="tab">Đăng ký Giảng viên</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="student-tab" data-toggle="tab" href="#student" role="tab">Đăng ký Sinh viên</a>
@@ -56,16 +56,24 @@
                             <div class="tab-pane fade show active" id="teacher" role="tabpanel">
                             <form action="./register_teacher.php" method="post">
                                         <div class="form-group">
-                                            <label for="teacher_id">Mã số giáo viên:</label>
+                                            <label for="teacher_id">Mã giáo viên:</label>
                                             <input type="text" class="form-control" name="teacher_id" id="teacher_id" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="teacher_username">Username:</label>
+                                            <label for="teacher_username">Tên đăng nhập:</label>
                                             <input type="text" class="form-control" name="username" id="teacher_username" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="teacher_password">Password:</label>
-                                            <input type="password" class="form-control" name="password" id="teacher_password" required>
+                                            <label for="teacher_password">Mật khẩu:</label>
+                                            <div class="input-group">  
+                                                <input type="password" class="form-control" name="password" id="teacher_password" required>  
+                                                <div class="input-group-append">  
+                                                    <span class="input-group-text toggle-password" data-target="#password">  
+                                                        <i class="bi bi-eye-slash"></i>  
+                                                    </span>  
+                                                </div>  
+                                            </div>
+                                            
                                         </div>
                                         <div class="form-group">
                                             <label for="teacher_lastname">Họ:</label>
@@ -98,7 +106,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <button type="submit" class="btn btn-primary btn-block">Đăng Ký Giáo viên</button>
+                                        <button type="submit" class="btn btn-primary btn-block">Đăng Ký Giảng viên</button>
                                           
                                     </form>
                             </div>
@@ -107,16 +115,23 @@
                             <div class="tab-pane fade" id="student" role="tabpanel">
                                 <form action="./register_student.php" method="post">
                                         <div class="form-group">
-                                            <label for="student_id">Mã số sinh viên:</label>
+                                            <label for="student_id">Mã sinh viên:</label>
                                             <input type="text" class="form-control" name="student_id" id="student_id" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="student_username">Username:</label>
+                                            <label for="student_username">Tên đăng nhập:</label>
                                             <input type="text" class="form-control" name="username" id="student_username" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="student_password">Password:</label>
-                                            <input type="password" class="form-control" name="password" id="student_password" required>
+                                            <label for="student_password">Mật khẩu:</label>
+                                            <div class="input-group">  
+                                                <input type="password" class="form-control" name="password" id="student_password" required>  
+                                                <div class="input-group-append">  
+                                                    <span class="input-group-text toggle-password" data-target="#password">  
+                                                        <i class="bi bi-eye-slash"></i>  
+                                                    </span>  
+                                                </div>  
+                                            </div> 
                                         </div>
                                         <div class="form-group">
                                             <label for="student_lastname">Họ:</label>

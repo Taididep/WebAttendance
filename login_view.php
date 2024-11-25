@@ -38,11 +38,11 @@
                         <div id="login-form">  
                             <form action="Account/login.php" method="post">  
                                 <div class="form-group">  
-                                    <label for="username">Username:</label>  
+                                    <label for="username">Tên đăng nhập:</label>  
                                     <input type="text" class="form-control" name="username" id="username" required>  
                                 </div>  
                                 <div class="form-group">  
-                                    <label for="password">Password:</label>  
+                                    <label for="password">Mật khẩu:</label>  
                                     <div class="input-group">  
                                         <input type="password" class="form-control" name="password" id="password" required>  
                                         <div class="input-group-append">  
