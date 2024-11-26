@@ -28,7 +28,7 @@ $stmtAttendance->execute([$class_id]);
 $attendanceData = $stmtAttendance->fetchAll(PDO::FETCH_ASSOC);
 $stmtAttendance->closeCursor();
 
-$sqlSchedules = "SELECT schedule_id, date FROM schedules WHERE class_id = ?";
+$sqlSchedules = "CALL GetDistinctDatesByClassId(?)";
 $stmtSchedules = $conn->prepare($sqlSchedules);
 $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);

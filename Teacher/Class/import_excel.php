@@ -47,13 +47,17 @@ try {
         $student_id = trim($row['B']); // Cột B chứa student_id
 
         if (!empty($student_id)) {
-            // Kiểm tra sự tồn tại của student_id trong class_students
-            $query = $conn->prepare("SELECT 1 FROM class_students WHERE class_id = :class_id AND student_id = :student_id");
+            // Gọi thủ tục lưu trữ để kiểm tra sự tồn tại của student_id
+            $query = $conn->prepare("CALL CheckStudentExistence(:class_id, :student_id, @exists)");
             $query->bindParam(':class_id', $class_id);
             $query->bindParam(':student_id', $student_id);
             $query->execute();
 
-            if ($query->rowCount() == 0) {
+            // Lấy giá trị tồn tại từ biến OUT
+            $existsQuery = $conn->query("SELECT @exists");
+            $existsResult = $existsQuery->fetch(PDO::FETCH_ASSOC);
+
+            if ($existsResult['@exists'] == 0) {
                 // Thêm mới vào class_students
                 $insertQuery = $conn->prepare("INSERT INTO class_students (class_id, student_id, status) VALUES (:class_id, :student_id, 0)");
                 $insertQuery->bindParam(':class_id', $class_id);

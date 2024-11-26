@@ -1,8 +1,8 @@
 1GetUserInfoByUsername
 
-3GetAllSemesters
-
 2GetTeacherInfo
+
+3GetAllSemesters
 
 4GetClassesBySemesterAndTeacher 	-- get_classes.php
 
@@ -11,7 +11,6 @@
 6GetStudentsByClassId			-- export_excel, attendance_list, attendance_edit,
  
 7GetSchedulesAndAttendanceByClassId
-
 
 8GetDistinctDatesByClassId
 
@@ -27,16 +26,25 @@
 
 15GetStudentsByClassIdAndStudentId 
 
-16
+16GetCoursePeriodsByClassId
 
-17
+17AddSchedules
 
 18GetClassInfoById
+
 19GetScheduleById
 
 20GetAttendanceReportByClassId
 
-21 GetClassesBySemester
+21GetClassesBySemester
+
+22GetTeacherById
+
+23UpdateTeacherById
+
+24RemoveStudentFromClass
+
+25
 
 -- 1. Thủ tục trong login.php
 DELIMITER //
@@ -504,4 +512,76 @@ BEGIN
     WHERE c.semester_id = semester_id;
 END //
 DELIMITER ;
+
+
+-- 22
+DELIMITER $$
+
+CREATE PROCEDURE GetTeacherById(IN teacherId INT)
+BEGIN
+    SELECT * 
+    FROM teachers 
+    WHERE teacher_id = teacherId;
+END $$
+
+DELIMITER ;
+
+-- 23
+DELIMITER $$
+
+CREATE PROCEDURE UpdateTeacherById(
+    IN teacherId INT,
+    IN lastname VARCHAR(100),
+    IN firstname VARCHAR(100),
+    IN birthday DATE,
+    IN gender ENUM('Male', 'Female'),
+    IN email VARCHAR(255),
+    IN phone VARCHAR(20)
+)
+BEGIN
+    UPDATE teachers
+    SET 
+        lastname = lastname,
+        firstname = firstname,
+        birthday = birthday,
+        gender = gender,
+        email = email,
+        phone = phone
+    WHERE teacher_id = teacherId;
+END $$
+
+DELIMITER ;
+
+-- 24
+DELIMITER $$
+
+CREATE PROCEDURE RemoveStudentFromClass(
+    IN classId INT,
+    IN studentId INT
+)
+BEGIN
+    DELETE FROM class_students 
+    WHERE class_id = classId AND student_id = studentId;
+END $$
+
+DELIMITER ;
+
+-- 25
+DELIMITER $$
+
+CREATE PROCEDURE CheckStudentExistence(
+    IN p_class_id INT,
+    IN p_student_id INT,
+    OUT p_exists INT
+)
+BEGIN
+    -- Check if student_id exists for the given class_id
+    SELECT COUNT(*) INTO p_exists
+    FROM class_students
+    WHERE class_id = p_class_id AND student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+
 

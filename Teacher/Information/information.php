@@ -7,7 +7,7 @@ include __DIR__ . '/../../Account/islogin.php';
 $user_id = $_SESSION['user_id'];
 
 // Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
-$sql = "SELECT * FROM teachers WHERE teacher_id = ?";
+$sql = "CALL GetTeacherById(?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$user_id]);
 
@@ -18,6 +18,9 @@ $stmt->closeCursor();
 // Hàm để ẩn email
 function maskEmail($email)
 {
+    if (empty($email)) {
+        return ''; // Nếu email bị null
+    }
     $parts = explode('@', $email);
     $masked = substr($parts[0], 0, 3) . '***' . '@' . $parts[1];
     return $masked;

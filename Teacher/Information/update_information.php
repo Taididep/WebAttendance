@@ -12,13 +12,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $phone = $_POST['phone'];
 
-    // Cập nhật thông tin giáo viên
-    $sql = "UPDATE teachers SET lastname = ?, firstname = ?, birthday = ?, gender = ?, email = ?, phone = ? WHERE teacher_id = ?";
+    // Gọi thủ tục
+    $sql = "CALL UpdateTeacherById(?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->execute([$lastname, $firstname, $birthday, $gender, $email, $phone, $teacher_id]);
-    
-    // Chuyển hướng về trang giáo viên sau khi cập nhật
+    $stmt->execute([$teacher_id, $lastname, $firstname, $birthday, $gender, $email, $phone]);
+
+    // Chuyển hướng về trang thông tin giáo viên sau khi cập nhật
     header("Location: information.php");
     exit;
 }
-?>

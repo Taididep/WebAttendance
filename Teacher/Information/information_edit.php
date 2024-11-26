@@ -7,7 +7,7 @@ include __DIR__ . '/../../Account/islogin.php';
 $user_id = $_SESSION['user_id'];
 
 // Chuẩn bị câu lệnh SQL để lấy thông tin giáo viên
-$sql = "SELECT * FROM teachers WHERE teacher_id = ?";
+$sql = "CALL GetTeacherById(?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$user_id]);
 
@@ -42,7 +42,7 @@ $stmt->closeCursor();
 
                     <div class="mb-3">
                         <label for="lastname" class="form-label">Họ</label>
-                        <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($teacherData->lastname); ?>" required>
+                        <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($teacherData->lastname); ?>">
                     </div>
 
                     <div class="mb-3">
@@ -65,12 +65,12 @@ $stmt->closeCursor();
 
                     <div class="mb-3">
                         <label for="email" class="form-label"><i class="bi bi-envelope-fill icon"></i>Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($teacherData->email); ?>" required>
+                        <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($teacherData->email); ?>">
                     </div>
 
                     <div class="mb-3">
                         <label for="phone" class="form-label"><i class="bi bi-telephone-fill icon"></i>Điện thoại</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($teacherData->phone); ?>" required>
+                        <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($teacherData->phone); ?>">
                     </div>
 
                     <div class="text-center">
