@@ -28,7 +28,7 @@ if (isset($_POST['semester_id'])) {
             $counter = 1;
             foreach ($classes as $class) {
                 // Lấy thông tin điểm danh của sinh viên trong lớp
-                $sql_attendance = "SELECT total_present, total_absent, total_late, total FROM attendance_reports WHERE class_id = ? AND student_id = ?";
+                $sql_attendance = "CALL GetAttendanceReport(?, ?)";
                 $stmt_attendance = $conn->prepare($sql_attendance);
                 $stmt_attendance->execute([$class['class_id'], $student_id]);
                 $attendance = $stmt_attendance->fetch(PDO::FETCH_ASSOC);

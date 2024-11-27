@@ -20,9 +20,11 @@ try {
     $conn->beginTransaction();
 
     // Kiểm tra xem class_id có tồn tại không
-    $stmt = $conn->prepare("SELECT class_id FROM classes WHERE class_id = ?");
+    $sql = "CALL GetClassById(?)";
+    $stmt = $conn->prepare($sql);
     $stmt->execute([$class_id]);
     $class = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();  // Close the cursor to allow the next query
 
     if (!$class) {
         echo "Mã lớp không tồn tại.";
@@ -30,17 +32,22 @@ try {
     }
 
     // Kiểm tra xem sinh viên đã tham gia lớp học này chưa
-    $stmt = $conn->prepare("SELECT status FROM class_students WHERE class_id = ? AND student_id = ?");
+    $sql = "CALL GetStudentClassStatus(?, ?)";
+    $stmt = $conn->prepare($sql);
     $stmt->execute([$class_id, $user_id]);
     $studentClass = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();  // Close the cursor to allow the next query
 
     if ($studentClass) {
         if ($studentClass['status'] == 1) {
             echo "Bạn đã tham gia lớp này rồi.";
         } else {
             // Nếu chưa kích hoạt, cập nhật status thành 1
-            $stmt = $conn->prepare("UPDATE class_students SET status = 1 WHERE class_id = ? AND student_id = ?");
+            $sql = "CALL UpdateStudentClassStatus(?, ?)";
+            $stmt = $conn->prepare($sql);
             $stmt->execute([$class_id, $user_id]);
+            $stmt->closeCursor();  // Close the cursor to allow the next query
+            
             echo "Tham gia lớp học thành công.";
         }
     } else {

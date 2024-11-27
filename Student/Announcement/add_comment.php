@@ -11,7 +11,7 @@ if (isset($_POST['content']) && isset($_POST['announcement_id'])) {
 
     // Kiểm tra xem nội dung bình luận có rỗng không
     if (!empty($content)) {
-        $sql = "INSERT INTO comments (announcement_id, user_id, content) VALUES (?, ?, ?)";
+        $sql = "CALL InsertComment(?, ?, ?)";
         $stmt = $conn->prepare($sql);
 
         try {

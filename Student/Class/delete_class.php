@@ -19,10 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['class_id'])) {
     if (!empty($classId)) {
         try {
             // Cập nhật trạng thái lớp học thành 0
-            $sql = "UPDATE class_students SET status = 0 WHERE class_id = :class_id AND student_id = :student_id";
+            $sql = "CALL UpdateStudentClassStatusToInactive(?, ?)";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':class_id', $classId);
-            $stmt->bindParam(':student_id', $studentId);
+            $stmt->execute([$classId, $studentId]);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

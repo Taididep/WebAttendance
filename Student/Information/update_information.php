@@ -13,9 +13,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = $_POST['phone'];
 
     // Cập nhật thông tin sinh viên
-    $sql = "UPDATE students SET lastname = ?, firstname = ?, birthday = ?, gender = ?, email = ?, phone = ? WHERE student_id = ?";
+    $sql = "CALL UpdateStudentInfo(?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->execute([$lastname, $firstname, $birthday, $gender, $email, $phone, $student_id]);
+    $stmt->execute([$student_id, $lastname, $firstname, $birthday, $gender, $email, $phone]);
     
     // Chuyển hướng về trang thông tin sau khi cập nhật
     header("Location: information.php");

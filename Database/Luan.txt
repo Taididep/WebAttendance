@@ -1,0 +1,203 @@
+--- Sinh Viên
+
+-- 1 thủ tục lấy thông tin
+DELIMITER $$
+
+CREATE PROCEDURE GetStudentById(IN student_id_param INT)
+BEGIN
+    SELECT * FROM students WHERE student_id = student_id_param;
+END $$
+
+DELIMITER ;
+
+-- 2 thủ tục cập nhật thông tin
+DELIMITER $$
+
+CREATE PROCEDURE UpdateStudentInfo(
+    IN p_student_id INT,
+    IN p_lastname VARCHAR(50),
+    IN p_firstname VARCHAR(50),
+    IN p_birthday DATE,
+    IN p_gender ENUM('Nam', 'Nữ'),
+    IN p_email VARCHAR(100),
+    IN p_phone VARCHAR(15)
+)
+BEGIN
+    UPDATE students 
+    SET 
+        lastname = p_lastname,
+        firstname = p_firstname,
+        birthday = p_birthday,
+        gender = p_gender,
+        email = p_email,
+        phone = p_phone
+    WHERE 
+        student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+-- 3 thủ tục kiểm tra xem class_id có tồn tại không
+DELIMITER $$
+
+CREATE PROCEDURE GetClassById(IN p_class_id CHAR(36))
+BEGIN
+    SELECT class_id FROM classes WHERE class_id = p_class_id;
+END $$
+
+DELIMITER ;
+
+-- 4 thủ tục kiểm tra sinh viên đã tham gia lớp học này chưa
+DELIMITER $$
+
+CREATE PROCEDURE GetStudentClassStatus(
+    IN p_class_id CHAR(36),
+    IN p_student_id INT
+)
+BEGIN
+    SELECT status FROM class_students 
+    WHERE class_id = p_class_id AND student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+-- 5 thủ tục nếu chưa kích hoạt, cập nhật status thành 1
+DELIMITER $$
+
+CREATE PROCEDURE UpdateStudentClassStatus(
+    IN p_class_id CHAR(36),
+    IN p_student_id INT
+)
+BEGIN
+    UPDATE class_students 
+    SET status = 1 
+    WHERE class_id = p_class_id AND student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+-- 6 thủ tục lấy thông tin điểm danh của sinh viên trong lớp
+DELIMITER $$
+
+CREATE PROCEDURE GetAttendanceReport(
+    IN p_class_id CHAR(36),
+    IN p_student_id INT
+)
+BEGIN
+    SELECT total_present, total_absent, total_late, total 
+    FROM attendance_reports 
+    WHERE class_id = p_class_id AND student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+-- 7 thủ tục cập nhật trạng thái lớp học thành 0
+DELIMITER $$
+
+CREATE PROCEDURE UpdateStudentClassStatusToInactive(
+    IN p_class_id CHAR(36),
+    IN p_student_id INT
+)
+BEGIN
+    UPDATE class_students 
+    SET status = 0 
+    WHERE class_id = p_class_id AND student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+-- 8 thủ tục lấy thông tin ngày giờ buổi học từ bảng schedules
+DELIMITER $$
+
+CREATE PROCEDURE GetScheduleDate(
+    IN p_schedule_id INT
+)
+BEGIN
+    SELECT date FROM schedules WHERE schedule_id = p_schedule_id;
+END $$
+
+DELIMITER ;
+
+-- 9 thủ tục kiểm tra xem điểm danh đã tồn tại hay chưa
+DELIMITER $$
+
+CREATE PROCEDURE GetAttendanceRecord(
+    IN p_schedule_id INT,
+    IN p_student_id INT
+)
+BEGIN
+    SELECT * FROM attendances 
+    WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+-- 10 thủ tục nếu đã tồn tại, cập nhật trạng thái
+DELIMITER $$
+
+CREATE PROCEDURE UpdateAttendanceStatus(
+    IN p_status TINYINT,
+    IN p_schedule_id INT,
+    IN p_student_id INT
+)
+BEGIN
+    UPDATE attendances 
+    SET status = p_status 
+    WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+-- 11 thủ tục nếu chưa tồn tại, thêm mới
+DELIMITER $$
+
+CREATE PROCEDURE InsertAttendanceRecord(
+    IN p_schedule_id INT,
+    IN p_student_id INT,
+    IN p_status TINYINT
+)
+BEGIN
+    INSERT INTO attendances (schedule_id, student_id, status) 
+    VALUES (p_schedule_id, p_student_id, p_status);
+END $$
+
+DELIMITER ;
+
+-- 12 thủ tục lấy thông tin lớp học
+DELIMITER $$
+
+CREATE PROCEDURE GetClassNameById(
+    IN p_class_id CHAR(8)
+)
+BEGIN
+    SELECT class_name FROM classes WHERE class_id = p_class_id;
+END $$
+
+DELIMITER ;
+
+-- 13 thủ tục lấy thông tin status và date của lịch học
+DELIMITER $$
+
+CREATE PROCEDURE GetScheduleStatusAndDate(
+    IN p_schedule_id INT
+)
+BEGIN
+    SELECT status, date FROM schedules WHERE schedule_id = p_schedule_id;
+END $$
+
+DELIMITER ;
+
+-- 14 thủ tục kiểm tra xem nội dung bình luận có rỗng không
+DELIMITER $$
+
+CREATE PROCEDURE InsertComment(
+    IN p_announcement_id INT,
+    IN p_user_id INT,
+    IN p_content TEXT
+)
+BEGIN
+    INSERT INTO comments (announcement_id, user_id, content) 
+    VALUES (p_announcement_id, p_user_id, p_content);
+END $$
+
+DELIMITER ;
