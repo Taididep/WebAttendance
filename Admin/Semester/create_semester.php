@@ -20,14 +20,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } else {
         // Thực hiện truy vấn để thêm học kỳ
-        $sql = "INSERT INTO semesters (semester_name, start_date, end_date, is_active) VALUES (?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-
-        if ($stmt->execute([$semesterName, $startDate, $endDate, $isActive])) {
-            echo "Thêm học kỳ thành công!";
-            exit();
-        } else {
-            echo "Có lỗi xảy ra, vui lòng thử lại.";
+        $stmt = $conn->prepare("CALL AddSemester(:semester_name, :start_date, :end_date, :is_active)");
+        $stmt->bindParam(':semester_name', $semesterName);
+        $stmt->bindParam(':start_date', $startDate);
+        $stmt->bindParam(':end_date', $endDate);
+        $stmt->bindParam(':is_active', $isActive, PDO::PARAM_BOOL);
+        
+        try {
+            // Execute the procedure
+            if ($stmt->execute()) {
+                echo "Thêm học kỳ thành công!";
+                exit();
+            } else {
+                echo "Có lỗi xảy ra, vui lòng thử lại.";
+                exit();
+            }
+        } catch (PDOException $e) {
+            echo "Lỗi: " . $e->getMessage();
             exit();
         }
     }

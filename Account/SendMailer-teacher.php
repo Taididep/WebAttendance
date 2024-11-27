@@ -24,13 +24,7 @@ session_start();
 $tomorrow = date("Y-m-d", strtotime('+1 day'));
 
 // SQL query để lấy danh sách lịch dạy của giảng viên vào ngày mai
-$sql = "SELECT t.email, t.firstname, t.lastname, s.date, s.start_time, s.end_time, c.class_name
-        FROM teachers t
-        JOIN classes c ON t.teacher_id = c.teacher_id
-        JOIN schedules s ON c.class_id = s.class_id
-        WHERE s.date = :tomorrow
-        ORDER BY t.email, s.start_time";
-
+$sql = "CALL GetTeachingSchedulesByDate(:tomorrow)";
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':tomorrow', $tomorrow, PDO::PARAM_STR);
 $stmt->execute();

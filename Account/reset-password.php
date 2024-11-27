@@ -17,17 +17,7 @@ function resetPassword($conn, $username, $emailInput) {
 
     try {
         // SQL để kiểm tra nếu username (tên đăng nhập) và email tồn tại và khớp trong bảng sinh viên hoặc giáo viên
-        $sql = "
-            SELECT 'student' AS user_type, student_id AS id, email 
-            FROM db_atd.students 
-            WHERE email = :email AND student_id = (SELECT user_id FROM db_atd.users WHERE username = :username)
-            UNION
-            SELECT 'teacher' AS user_type, teacher_id AS id, email 
-            FROM db_atd.teachers 
-            WHERE email = :email AND teacher_id = (SELECT user_id FROM db_atd.users WHERE username = :username)
-        ";
-
-        $stmt = $conn->prepare($sql);
+        $stmt = $conn->prepare("CALL GetUserByEmailAndUsername(:email, :username)");
         $stmt->bindParam(':email', $emailInput, PDO::PARAM_STR);
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
@@ -39,10 +29,10 @@ function resetPassword($conn, $username, $emailInput) {
             // Lấy user ID và email từ kết quả
             $userId = $row['id'];
             $userEmail = $row['email'];
+            $stmt->closeCursor(); // Close cursor
             
             // Cập nhật mật khẩu trong bảng users
-            $updateSql = "UPDATE db_atd.users SET password = :new_password WHERE user_id = :user_id";
-            $updateStmt = $conn->prepare($updateSql);
+            $updateStmt = $conn->prepare("CALL UpdateUserPassword(:user_id, :new_password)");
             $updateStmt->bindParam(':new_password', $hashedPassword, PDO::PARAM_STR);
             $updateStmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 

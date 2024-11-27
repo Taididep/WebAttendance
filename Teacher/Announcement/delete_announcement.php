@@ -7,8 +7,10 @@ if (isset($_GET['announcement_id']) && isset($_GET['class_id'])) {
     $class_id = $_GET['class_id'];
 
     // Truy vấn xóa thông báo
-    $sql = "DELETE FROM announcements WHERE announcement_id = ? AND class_id = ?";
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare("CALL DeleteAnnouncement(:announcement_id, :class_id)");
+    $stmt->bindParam(':announcement_id', $announcement_id);
+    $stmt->bindParam(':class_id', $class_id);
+    $stmt->closeCursor();
 
     if ($stmt->execute([$announcement_id, $class_id])) {
         // Sau khi xóa thành công, chuyển hướng về trang chi tiết lớp học

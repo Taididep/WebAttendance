@@ -11,8 +11,7 @@ if (isset($_GET['semester_id']) && is_numeric($_GET['semester_id'])) {
     $semesterId = $_GET['semester_id'];
 
     // Lấy thông tin học kỳ từ cơ sở dữ liệu
-    $sql = "SELECT * FROM semesters WHERE semester_id = :semester_id";
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare("CALL GetSemesterById(:semester_id)");
     $stmt->bindParam(':semester_id', $semesterId, PDO::PARAM_INT);
     $stmt->execute();
     $semester = $stmt->fetch(PDO::FETCH_ASSOC);

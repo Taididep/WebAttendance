@@ -12,16 +12,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         // Check current password
-        $stmt = $conn->prepare("SELECT password FROM users WHERE username = :username");
+        $stmt = $conn->prepare("CALL GetPasswordByUsername(:username)");
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->execute();  
         $hashed_password = $stmt->fetchColumn(); // Fetch the password column
+        $stmt->closeCursor(); // Close the cursor if needed
 
         if ($hashed_password && password_verify($current_password, $hashed_password)) {  
             // Update new password  
             $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);  
 
-            $stmt = $conn->prepare("UPDATE users SET password = :new_password WHERE username = :username");
+            $stmt = $conn->prepare("CALL UpdateUserPassword(:new_password, :username)");
             $stmt->bindParam(':new_password', $new_hashed_password, PDO::PARAM_STR);
             $stmt->bindParam(':username', $username, PDO::PARAM_STR);
 

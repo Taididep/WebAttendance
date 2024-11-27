@@ -16,36 +16,28 @@ $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] :
 $offset = ($page - 1) * $records_per_page;
 
 // Truy vấn tổng số khóa học
-$total_records_sql = "SELECT COUNT(*) AS total FROM courses";
-$total_stmt = $conn->prepare($total_records_sql);
-$total_stmt->execute();
-$total_records = $total_stmt->fetch(PDO::FETCH_ASSOC)['total'];
-$total_stmt->closeCursor();
+$stmt = $conn->prepare("CALL GetTotalCoursesCount(@total)");
+$stmt->execute();
+$result = $conn->query("SELECT @total AS total");
+$total_records = $result->fetch(PDO::FETCH_ASSOC)['total'];
 
 // Tính tổng số trang
 $total_pages = ceil($total_records / $records_per_page);
 
 // Truy vấn danh sách khóa học với giới hạn số lượng
-$sql_courses = "
-    SELECT 
-        c.course_id,
-        c.course_name,
-        ct.course_type_name,
-        ct.credits,
-        ct.theory_periods,
-        ct.practice_periods
-    FROM 
-        courses c
-    LEFT JOIN 
-        course_types ct ON c.course_type_id = ct.course_type_id
-    LIMIT :limit OFFSET :offset
-";
-
-$stmt_courses = $conn->prepare($sql_courses);
+$stmt_courses = $conn->prepare("CALL GetCourses(:limit, :offset)");
 $stmt_courses->bindValue(':limit', $records_per_page, PDO::PARAM_INT);
 $stmt_courses->bindValue(':offset', $offset, PDO::PARAM_INT);
-$stmt_courses->execute();
-$courses = $stmt_courses->fetchAll(PDO::FETCH_ASSOC);
+
+try {
+    // Execute the procedure
+    $stmt_courses->execute();
+    $courses = $stmt_courses->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Lỗi khi lấy danh sách khóa học: " . $e->getMessage();
+}
+
+// Close the cursor
 $stmt_courses->closeCursor();
 ?>
 

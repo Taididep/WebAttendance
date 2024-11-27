@@ -11,8 +11,8 @@ if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
     $courseId = $_GET['course_id'];
 
     // Thực hiện truy vấn xóa khóa học
-    $sql = "DELETE FROM courses WHERE course_id = :course_id";
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare("CALL DeleteCourse(:course_id)");
+    $stmt->bindParam(':course_id', $courseId);
 
     // Liên kết giá trị và thực hiện truy vấn
     $stmt->bindParam(':course_id', $courseId, PDO::PARAM_INT);

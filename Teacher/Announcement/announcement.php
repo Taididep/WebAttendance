@@ -10,10 +10,12 @@ if (isset($_GET['class_id'])) {
 }
 
 // Truy vấn bảng tin
-$sql = "SELECT * FROM announcements WHERE class_id = ? ORDER BY created_at DESC";
+$sql = "CALL GetAnnouncementsByClass(:class_id)";
 $stmt = $conn->prepare($sql);
-$stmt->execute([$class_id]);
+$stmt->bindParam(':class_id', $class_id);
+$stmt->execute();
 $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();  // Close the cursor to allow the next query
 
 if ($announcements) {
     foreach ($announcements as $announcement) {
@@ -48,10 +50,12 @@ if ($announcements) {
 
             <!-- Kiểm tra nếu có bình luận -->
             <?php
-            $comment_sql = "SELECT COUNT(*) AS comment_count FROM comments WHERE announcement_id = ?";
-            $comment_stmt = $conn->prepare($comment_sql);
-            $comment_stmt->execute([$announcement['announcement_id']]);
-            $comment_count = $comment_stmt->fetch(PDO::FETCH_ASSOC);
+            $comment_stmt = $conn->prepare("CALL GetCommentCountByAnnouncement(:announcement_id, @comment_count)");
+            $comment_stmt->bindParam(':announcement_id', $announcement['announcement_id']);
+            $comment_stmt->execute();
+            $stmt_result = $conn->query("SELECT @comment_count AS comment_count");
+            $comment_count = $stmt_result->fetch(PDO::FETCH_ASSOC);
+            $stmt_result->closeCursor();  // Close the cursor to allow the next query
 
             if ($comment_count['comment_count'] > 0) {
             ?>
@@ -61,18 +65,11 @@ if ($announcements) {
                     </h6>
                     <div id="commentsList_<?php echo $announcement['announcement_id']; ?>">
                         <?php
-                        $comment_sql = "
-                            SELECT c.*, 
-                                   COALESCE(t.lastname, s.lastname) AS lastname, 
-                                   COALESCE(t.firstname, s.firstname) AS firstname
-                            FROM comments c
-                            LEFT JOIN teachers t ON c.user_id = t.teacher_id
-                            LEFT JOIN students s ON c.user_id = s.student_id
-                            WHERE c.announcement_id = ?
-                            ORDER BY c.created_at ASC";
-                        $comment_stmt = $conn->prepare($comment_sql);
-                        $comment_stmt->execute([$announcement['announcement_id']]);
+                        $comment_stmt = $conn->prepare("CALL GetCommentsByAnnouncement(:announcement_id)");
+                        $comment_stmt->bindParam(':announcement_id', $announcement['announcement_id']);
+                        $comment_stmt->execute();
                         $comments = $comment_stmt->fetchAll(PDO::FETCH_ASSOC);
+                        $comment_stmt->closeCursor();  // Close the cursor to allow the next query
 
                         if ($comments) {
                             foreach ($comments as $comment) {
