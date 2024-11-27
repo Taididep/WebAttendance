@@ -23,18 +23,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($className) || empty($courseId) || empty($semesterId) || empty($startDate) || empty($startPeriod) || empty($endPeriod)) {
         $errorMessage = "Vui lòng điền đầy đủ thông tin.";
     } else {
-        // Thực hiện truy vấn để thêm lớp học
-        $sql = "INSERT INTO classes (class_name, course_id, semester_id, teacher_id) VALUES (?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
+        // Gọi thủ tục InsertClass để thêm lớp học
+        $sqlInsert = "CALL InsertClass(?, ?, ?, ?)";
+        $stmtInsert = $conn->prepare($sqlInsert);
 
-        if ($stmt->execute([$className, $courseId, $semesterId, $teacherId])) {
+        if ($stmtInsert->execute([$className, $courseId, $semesterId, $teacherId])) {
             $successMessage = "Tạo lớp học thành công!";
 
-            // Lấy class_id vừa mới được thêm vào
-            $sqlGetClassId = "SELECT class_id FROM classes WHERE class_name = ? AND teacher_id = ? ORDER BY class_id DESC LIMIT 1";
+            // Gọi thủ tục GetLatestClassId để lấy class_id vừa thêm
+            $sqlGetClassId = "CALL GetLatestClassId(?, ?)";
             $stmtGetClassId = $conn->prepare($sqlGetClassId);
             $stmtGetClassId->execute([$className, $teacherId]);
             $classId = $stmtGetClassId->fetchColumn();
+
+            // Đảm bảo giải phóng kết quả
+            $stmtGetClassId->closeCursor();
+            $stmtInsert->closeCursor();
 
             // Kiểm tra nếu muốn tạo lịch học
             if ($createSchedule) {
@@ -46,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
 
 // Lấy danh sách khóa học và học kỳ
 $courses = $conn->query("SELECT * FROM courses")->fetchAll(PDO::FETCH_ASSOC);

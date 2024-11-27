@@ -48,7 +48,7 @@ try {
 
         if (!empty($student_id)) {
             // Gọi thủ tục lưu trữ để kiểm tra sự tồn tại của student_id
-            $query = $conn->prepare("CALL CheckStudentExistence(:class_id, :student_id, @exists)");
+            $query = $conn->prepare("CALL CheckClassStudentExistence(:class_id, :student_id, @exists)");
             $query->bindParam(':class_id', $class_id);
             $query->bindParam(':student_id', $student_id);
             $query->execute();

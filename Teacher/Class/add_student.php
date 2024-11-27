@@ -1,6 +1,5 @@
 <?php
 include __DIR__ . '/../../Connect/connect.php';
-include __DIR__ . '/../../Account/islogin.php';
 
 $response = ['success' => false, 'message' => ''];
 
@@ -17,11 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Kiểm tra sinh viên có tồn tại trong bảng students không
-        $checkStudentSql = "SELECT COUNT(*) FROM students WHERE student_id = ?";
+        $checkStudentSql = "CALL CheckStudentExistence(?, @p_exists)";
         $stmtCheckStudent = $conn->prepare($checkStudentSql);
         $stmtCheckStudent->execute([$student_id]);
-        $studentExists = $stmtCheckStudent->fetchColumn();
         $stmtCheckStudent->closeCursor();
+
+        // Lấy giá trị từ biến OUT
+        $existsResult = $conn->query("SELECT @p_exists")->fetch(PDO::FETCH_ASSOC);
+        $studentExists = $existsResult['@p_exists'];
 
         if (!$studentExists) {
             $response['message'] = 'Sinh viên không tồn tại trong hệ thống.';
@@ -30,11 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Kiểm tra xem sinh viên đã có trong lớp chưa
-        $checkSql = "SELECT COUNT(*) FROM class_students WHERE class_id = ? AND student_id = ?";
+        $checkSql = "CALL CheckClassStudentExistence(?, ?, @p_exists)";
         $stmtCheck = $conn->prepare($checkSql);
         $stmtCheck->execute([$class_id, $student_id]);
-        $exists = $stmtCheck->fetchColumn();
         $stmtCheck->closeCursor();
+
+        // Lấy giá trị từ biến OUT
+        $existsResult = $conn->query("SELECT @p_exists")->fetch(PDO::FETCH_ASSOC);
+        $exists = $existsResult['@p_exists'];
 
         if ($exists) {
             $response['message'] = 'Sinh viên đã có trong lớp.';
@@ -43,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Thêm sinh viên mới vào lớp
-        $insertSql = "INSERT INTO class_students (class_id, student_id, status) VALUES (?, ?, 0)";
+        $insertSql = "CALL InsertClassStudent(?, ?)";
         $stmtInsert = $conn->prepare($insertSql);
         $stmtInsert->execute([$class_id, $student_id]);
         $stmtInsert->closeCursor();

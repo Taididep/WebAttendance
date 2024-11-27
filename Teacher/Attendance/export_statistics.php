@@ -21,7 +21,7 @@ if (!isset($_GET['class_id'])) {
 $class_id = $_GET['class_id'];
 
 // Lấy thông tin lớp học
-$sqlClass = "SELECT class_name FROM classes WHERE class_id = ?";
+$sqlClass = "CALL GetClassDetailsById(?)";
 $stmtClass = $conn->prepare($sqlClass);
 $stmtClass->execute([$class_id]);
 $classInfo = $stmtClass->fetch(PDO::FETCH_ASSOC);
@@ -33,17 +33,12 @@ if (!$classInfo) {
 }
 
 // Lấy thống kê điểm danh
-$sqlSummary = "
-    SELECT 
-        SUM(r.total_present) AS total_present,
-        SUM(r.total_late) AS total_late,
-        SUM(r.total_absent) AS total_absent
-    FROM attendance_reports r
-    WHERE r.class_id = ?";
+$sqlSummary = "CALL GetAttendanceSummary(?)";
 $stmtSummary = $conn->prepare($sqlSummary);
 $stmtSummary->execute([$class_id]);
 $summary = $stmtSummary->fetch(PDO::FETCH_ASSOC);
 $stmtSummary->closeCursor();
+
 
 if (!$summary) {
     echo 'Không có dữ liệu điểm danh.';
@@ -51,7 +46,7 @@ if (!$summary) {
 }
 
 // Lấy danh sách các buổi học đã qua và hiện tại
-$sqlSchedules = "SELECT schedule_id, date FROM schedules WHERE class_id = ? AND date <= CURDATE()"; // Lấy các buổi học không phải tương lai
+$sqlSchedules = "CALL GetSchedulesBeforeToday(?)"; // Lấy các buổi học không phải tương lai
 $stmtSchedules = $conn->prepare($sqlSchedules);
 $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);

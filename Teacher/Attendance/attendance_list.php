@@ -40,7 +40,7 @@ $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor(); // Đóng con trỏ
 
 // Lấy thống kê điểm danh cho tất cả sinh viên (cùng một lúc)
-$sqlReport = "SELECT student_id, total_present, total_late, total_absent FROM attendance_reports WHERE class_id = ?";
+$sqlReport = "CALL GetAttendanceReports(?)";
 $stmtReport = $conn->prepare($sqlReport);
 $stmtReport->execute([$class_id]);
 $attendanceReports = $stmtReport->fetchAll(PDO::FETCH_ASSOC);

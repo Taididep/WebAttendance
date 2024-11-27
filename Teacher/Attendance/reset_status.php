@@ -14,7 +14,7 @@ $class_id = $_GET['class_id'];
 $schedule_id = $_GET['schedule_id'];
 
 // Đặt lại status thành 0 cho buổi học
-$updateSql = "UPDATE schedules SET status = 0 WHERE schedule_id = ?";
+$updateSql = "CALL UpdateScheduleStatus(?, 0)";
 $updateStmt = $conn->prepare($updateSql);
 $updateStmt->execute([$schedule_id]);
 

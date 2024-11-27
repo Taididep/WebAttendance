@@ -10,11 +10,10 @@ if (!isset($_GET['class_id'])) {
     exit;
 }
 
-// Lấy class_id từ URL
 $class_id = $_GET['class_id'];
 
-// Lấy thông tin lớp học
-$sqlClass = "SELECT class_name FROM classes WHERE class_id = ?";
+// Lấy thông tin lớp
+$sqlClass = "CALL GetClassDetailsById(?)";
 $stmtClass = $conn->prepare($sqlClass);
 $stmtClass->execute([$class_id]);
 $classInfo = $stmtClass->fetch(PDO::FETCH_ASSOC);

@@ -33,4 +33,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo 'Có lỗi xảy ra khi cập nhật thời gian.';
     }
 }
-?>

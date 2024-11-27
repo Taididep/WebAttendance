@@ -14,9 +14,11 @@ $class_id = $_GET['class_id'];
 $schedule_id = $_GET['schedule_id'];
 
 // Cập nhật status thành 1 cho buổi học
-$updateSql = "UPDATE schedules SET status = 1 WHERE schedule_id = ?";
+$updateSql = "CALL UpdateScheduleStatus(?, 1)"; // Cập nhật status = 1
 $updateStmt = $conn->prepare($updateSql);
 $updateStmt->execute([$schedule_id]);
+$updateStmt->closeCursor();
+
 
 // Lấy thông tin lớp học
 $sql = "CALL GetClassDetailsById(?)";

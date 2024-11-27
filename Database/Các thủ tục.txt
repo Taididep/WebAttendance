@@ -50,7 +50,7 @@
 
 27GetAttendanceReports
 
-
+28
 
 
 -- 1. Thủ tục trong login.php
@@ -576,7 +576,7 @@ DELIMITER ;
 -- 25
 DELIMITER $$
 
-CREATE PROCEDURE CheckStudentExistence(
+CREATE PROCEDURE CheckClassStudentExistence(
     IN p_class_id INT,
     IN p_student_id INT,
     OUT p_exists INT
@@ -682,7 +682,7 @@ END $$
 
 DELIMITER ;
 
--- 32
+-- 33
 DELIMITER $$
 
 CREATE PROCEDURE GetAllCourses()
@@ -691,4 +691,104 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+-- 34
+DELIMITER $$
+
+CREATE PROCEDURE InsertClass(
+    IN className VARCHAR(255),
+    IN courseId INT,
+    IN semesterId INT,
+    IN teacherId INT
+)
+BEGIN
+    INSERT INTO classes (class_name, course_id, semester_id, teacher_id)
+    VALUES (className, courseId, semesterId, teacherId);
+END $$
+
+DELIMITER ;
+
+-- 35
+DELIMITER $$
+
+CREATE PROCEDURE GetLatestClassId(
+    IN className VARCHAR(255),
+    IN teacherId INT
+)
+BEGIN
+    SELECT class_id 
+    FROM classes 
+    WHERE class_name = className AND teacher_id = teacherId 
+    ORDER BY class_id DESC 
+    LIMIT 1;
+END $$
+
+DELIMITER ;
+
+-- 36
+DELIMITER $$
+
+CREATE PROCEDURE CheckStudentExistence(
+    IN p_student_id INT,
+    OUT p_exists INT
+)
+BEGIN
+    -- Kiểm tra sự tồn tại của student_id trong bảng students
+    SELECT COUNT(*) INTO p_exists
+    FROM students
+    WHERE student_id = p_student_id;
+END $$
+
+DELIMITER ;
+
+-- 37
+DELIMITER $$
+
+CREATE PROCEDURE UpdateScheduleStatus(
+    IN p_schedule_id INT,
+    IN p_status TINYINT(1)
+)
+BEGIN
+    -- Cập nhật trạng thái của lịch học
+    UPDATE schedules
+    SET status = p_status
+    WHERE schedule_id = p_schedule_id;
+END $$
+
+DELIMITER ;
+
+-- 38
+DELIMITER $$
+
+CREATE PROCEDURE GetSchedulesBeforeToday(
+    IN p_class_id CHAR(36)
+)
+BEGIN
+    -- Lấy các buổi học không phải trong tương lai
+    SELECT schedule_id, date
+    FROM schedules
+    WHERE class_id = p_class_id AND date <= CURDATE();
+END $$
+
+DELIMITER ;
+
+-- 39
+DELIMITER $$
+
+CREATE PROCEDURE GetAttendanceSummary(
+    IN p_class_id CHAR(36)
+)
+BEGIN
+    -- Lấy tổng số buổi có mặt, muộn và vắng mặt
+    SELECT 
+        SUM(r.total_present) AS total_present,
+        SUM(r.total_late) AS total_late,
+        SUM(r.total_absent) AS total_absent
+    FROM attendance_reports r
+    WHERE r.class_id = p_class_id;
+END $$
+
+DELIMITER ;
+
 
