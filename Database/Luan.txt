@@ -1,4 +1,4 @@
---- Sinh Viên
+------  Sinh Viên ------ 
 
 -- 1 thủ tục lấy thông tin
 DELIMITER $$
@@ -201,3 +201,143 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+------ Account ------ 
+-- 15 thủ tục lấy tất cả người dùng với mật khẩu hiện tại
+DELIMITER $$
+
+CREATE PROCEDURE GetAllUsers()
+BEGIN
+    SELECT user_id, password FROM users;
+END $$
+
+DELIMITER ;
+
+-- 16 thủ tục cập nhật mật khẩu đã mã hóa vào cơ sở dữ liệu
+DELIMITER $$
+
+CREATE PROCEDURE UpdateUserPassword(
+    IN p_hashed_password VARCHAR(255),
+    IN p_user_id INT
+)
+BEGIN
+    UPDATE users 
+    SET password = p_hashed_password 
+    WHERE user_id = p_user_id;
+END $$
+
+DELIMITER ;
+
+-- 17 thủ tục Check current password
+DELIMITER $$
+
+CREATE PROCEDURE GetPasswordByUsername(
+    IN p_username VARCHAR(255)
+)
+BEGIN
+    SELECT password FROM users WHERE username = p_username;
+END $$
+
+DELIMITER ;
+
+-- 18 thủ tục kiểm tra nếu username (tên đăng nhập) và email tồn tại và khớp trong bảng sinh viên hoặc giáo viên
+DELIMITER $$
+
+CREATE PROCEDURE GetUserByEmailAndUsername(
+    IN p_email VARCHAR(255),
+    IN p_username VARCHAR(255)
+)
+BEGIN
+    SELECT 'student' AS user_type, student_id AS id, email 
+    FROM db_atd.students 
+    WHERE email = p_email 
+      AND student_id = (SELECT user_id FROM db_atd.users WHERE username = p_username)
+    UNION
+    SELECT 'teacher' AS user_type, teacher_id AS id, email 
+    FROM db_atd.teachers 
+    WHERE email = p_email 
+      AND teacher_id = (SELECT user_id FROM db_atd.users WHERE username = p_username);
+END $$
+
+DELIMITER ;
+
+-- 19 thủ tục để lấy danh sách lịch dạy của giảng viên vào ngày mai
+DELIMITER $$
+
+CREATE PROCEDURE GetTeachingSchedulesByDate(
+    IN p_date DATE
+)
+BEGIN
+    SELECT t.email, t.firstname, t.lastname, s.date, s.start_time, s.end_time, c.class_name
+    FROM teachers t
+    JOIN classes c ON t.teacher_id = c.teacher_id
+    JOIN schedules s ON c.class_id = s.class_id
+    WHERE s.date = p_date
+    ORDER BY t.email, s.start_time;
+END $$
+
+DELIMITER ;
+
+-- 20 thủ tục để lấy danh sách lịch học của sinh viên vào ngày mai
+DELIMITER $$
+
+CREATE PROCEDURE GetStudentSchedulesByDate(
+    IN p_date DATE
+)
+BEGIN
+    SELECT students.email, students.firstname, schedules.date, schedules.start_time, schedules.end_time 
+    FROM students
+    JOIN attendances ON students.student_id = attendances.student_id
+    JOIN schedules ON schedules.schedule_id = attendances.schedule_id
+    WHERE schedules.date = p_date
+    ORDER BY students.email, schedules.start_time;
+END $$
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
