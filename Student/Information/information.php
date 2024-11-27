@@ -7,7 +7,7 @@ include __DIR__ . '/../../Account/islogin.php';
 $user_id = $_SESSION['user_id'];
 
 // Chuẩn bị câu lệnh SQL để lấy thông tin sinh viên
-$sql = "SELECT * FROM students WHERE student_id = ?";
+$sql = "CALL GetStudentById(?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$user_id]);
 

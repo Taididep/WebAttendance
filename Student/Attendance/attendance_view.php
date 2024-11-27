@@ -16,11 +16,11 @@ $class_id = $_GET['class_id'];
 $schedule_id = $_GET['schedule_id'];
 
 // Lấy thông tin lớp học
-$sqlClass = "SELECT class_name FROM classes WHERE class_id = ?";
+$sqlClass = "CALL GetClassNameById(?)";
 $stmtClass = $conn->prepare($sqlClass);
 $stmtClass->execute([$class_id]);
 $classInfo = $stmtClass->fetch(PDO::FETCH_ASSOC);
-$stmtClass->closeCursor();
+$stmtClass->closeCursor();  // Close the cursor if needed
 
 if (!$classInfo) {
     echo 'Không tìm thấy thông tin lớp học.';
@@ -28,11 +28,11 @@ if (!$classInfo) {
 }
 
 // Lấy thông tin status và date của lịch học
-$sqlStatus = "SELECT status, date FROM schedules WHERE schedule_id = ?";
+$sqlStatus = "CALL GetScheduleStatusAndDate(?)";
 $stmtStatus = $conn->prepare($sqlStatus);
 $stmtStatus->execute([$schedule_id]);
 $scheduleData = $stmtStatus->fetch(PDO::FETCH_ASSOC);
-$stmtStatus->closeCursor();
+$stmtStatus->closeCursor();  // Close the cursor if needed
 
 if (!$scheduleData) {
     echo 'Không tìm thấy thông tin lịch học.';

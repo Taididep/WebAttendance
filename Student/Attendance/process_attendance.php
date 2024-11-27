@@ -19,10 +19,11 @@ $status = $_POST['status'];
 $user_id = $_SESSION['user_id']; // Giả sử user_id được lưu trong session
 
 // Lấy thông tin ngày giờ buổi học từ bảng schedules
-$sqlDate = "SELECT date FROM schedules WHERE schedule_id = ?";
+$sqlDate = "CALL GetScheduleDate(?)";
 $stmtDate = $conn->prepare($sqlDate);
 $stmtDate->execute([$schedule_id]);
 $scheduleDate = $stmtDate->fetch(PDO::FETCH_ASSOC);
+$stmtDate->closeCursor();  // Close the cursor if needed
 
 if (!$scheduleDate) {
     echo 'Không tìm thấy thông tin lịch học.';
@@ -40,21 +41,24 @@ if ($currentDateTime > $scheduleDateTime) {
 }
 
 // Kiểm tra xem điểm danh đã tồn tại hay chưa
-$sqlCheck = "SELECT * FROM attendances WHERE schedule_id = ? AND student_id = ?";
+$sqlCheck = "CALL GetAttendanceRecord(?, ?)";
 $stmtCheck = $conn->prepare($sqlCheck);
 $stmtCheck->execute([$schedule_id, $user_id]);
 $attendanceRecord = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+$stmtCheck->closeCursor();  // Close the cursor if needed
 
 if ($attendanceRecord) {
     // Nếu đã tồn tại, cập nhật trạng thái
-    $sqlUpdate = "UPDATE attendances SET status = ? WHERE schedule_id = ? AND student_id = ?";
+    $sqlUpdate = "CALL UpdateAttendanceStatus(?, ?, ?)";
     $stmtUpdate = $conn->prepare($sqlUpdate);
     $stmtUpdate->execute([$status, $schedule_id, $user_id]);
+    $stmtCheck->closeCursor();
 } else {
     // Nếu chưa tồn tại, thêm mới
-    $sqlInsert = "INSERT INTO attendances (schedule_id, student_id, status) VALUES (?, ?, ?)";
+    $sqlInsert = "CALL InsertAttendanceRecord(?, ?, ?)";
     $stmtInsert = $conn->prepare($sqlInsert);
     $stmtInsert->execute([$schedule_id, $user_id, $status]);
+    $stmtCheck->closeCursor();
 }
 
 // Chuyển hướng về trang lớp học với thông báo thành công
