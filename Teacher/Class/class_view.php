@@ -14,17 +14,32 @@ if (!$classId) {
     exit;
 }
 
-// Gọi thủ tục để lấy thông tin lớp học
-$sql_class_info = "CALL GetClassInfoById(?)";
-$stmt_class_info = $conn->prepare($sql_class_info);
-$stmt_class_info->execute([$classId]);
-$classInfo = $stmt_class_info->fetch(PDO::FETCH_ASSOC);
-$stmt_class_info->closeCursor();
+// // Gọi thủ tục để lấy thông tin lớp học
+// $sql_class_info = "CALL GetClassInfoById(?)";
+// $stmt_class_info = $conn->prepare($sql_class_info);
+// $stmt_class_info->execute([$classId]);
+// $classInfo = $stmt_class_info->fetch(PDO::FETCH_ASSOC);
+// $stmt_class_info->closeCursor();
 
-if (!$classInfo) {
-    echo '<div class="alert alert-danger">Không tìm thấy thông tin cho lớp học này.</div>';
+// if (!$classInfo) {
+//     echo '<div class="alert alert-danger">Không tìm thấy thông tin cho lớp học này.</div>';
+//     exit;
+// }
+
+$class_id = $_GET['class_id'];
+
+// Truy vấn chi tiết lớp học
+$sql = "CALL GetClassDetailsById(?)";
+$stmt = $conn->prepare($sql);
+$stmt->execute([$class_id]);
+$classData = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+
+if (!$classData) {
+    echo 'Không tìm thấy thông tin lớp học.';
     exit;
 }
+
 
 // Gọi thủ tục để lấy lịch học
 $sql_schedules = "CALL GetSchedulesByClassId(?)"; // Sử dụng thủ tục lấy lịch học
@@ -47,27 +62,56 @@ $currentDate = date('Y-m-d');
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../Css/class_view.css">
+    <link rel="stylesheet" href="../Css/class_detail.css">
 </head>
 
 <body>
 
+    <div class="side-tabs">
+        <ul class="nav nav-tabs flex-column" id="tabMenu">
+            <li class="nav-item">
+                <a style="color: black;" class="nav-link" id="news-tab"
+                    href="class_detail_announcement.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Bảng
+                    tin</a>
+            </li>
+            <li class="nav-item">
+                <a style="color: black;" class="nav-link" id="attendance-tab"
+                    href="class_detail_list.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Danh sách</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="attendance-tab"
+                    href="class_view.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Lịch học</a>
+            </li>
+        </ul>
+    </div>
+
+
+
+    <div class="container mt-5">
+        <div class="card classroom-card shadow-lg">
+            <div class="card-body">
+                <h2 data-bs-toggle="modal" data-bs-target="#classModal">
+                    <?php echo htmlspecialchars($classData['class_name']); ?>
+                </h2>
+                <hr>
+                <div>
+                    <h5><?php echo htmlspecialchars($classData['semester_name']); ?></h5>
+                    <h5><?php echo htmlspecialchars($classData['course_name']); ?></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container mt-5">
         <div class="card mb-4">
-            <div class="card-header text-center">
-                <h2>Lịch Học Lớp: <?php echo htmlspecialchars($classInfo['class_name']); ?></h2>
-            </div>
             <div class="card-body">
-                <p><strong>Môn học:</strong> <?php echo htmlspecialchars($classInfo['course_name']); ?></p>
-                <p><strong>Giáo viên:</strong> <?php echo htmlspecialchars($classInfo['teacher_fullname']); ?></p>
-                <p><strong>Học kỳ:</strong> <?php echo htmlspecialchars($classInfo['semester_name']); ?></p>
-
-                <h4 class="mt-4">Lịch học</h4>
-                <table class="table table-bordered">
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>Ngày học</th>
                             <th>Tiết bắt đầu</th>
                             <th>Tiết kết thúc</th>
+                            <th style="width: 1%;"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -104,7 +148,7 @@ $currentDate = date('Y-m-d');
                                     <td>
                                         <!-- Dropdown for Edit and Delete -->
                                         <div class="dropdown">
-                                            <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton<?php echo $schedule['schedule_id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <button class="btn btn-link btn-sm text-black" type="button" id="dropdownMenuButton<?php echo $schedule['schedule_id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo $schedule['schedule_id']; ?>">

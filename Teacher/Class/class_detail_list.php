@@ -52,6 +52,10 @@ if (!$classData) {
                 <a class="nav-link active" id="attendance-tab"
                     href="class_detail_list.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Danh sách</a>
             </li>
+            <li class="nav-item">
+                <a style="color: black;" class="nav-link" id="attendance-tab"
+                    href="class_view.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Lịch học</a>
+            </li>
         </ul>
     </div>
 
