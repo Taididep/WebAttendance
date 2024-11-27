@@ -1,7 +1,7 @@
 // Hàm để cập nhật tiêu đề
 function updateAnnouncementTitle(announcementId, newTitle) {
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "update_announcement_title.php");
+    xhr.open("POST", "../Announcement/update_announcement_title.php");
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.send("announcement_id=" + announcementId + "&title=" + encodeURIComponent(newTitle));
 }
@@ -9,7 +9,7 @@ function updateAnnouncementTitle(announcementId, newTitle) {
 // Hàm để cập nhật nội dung
 function updateAnnouncementContent(announcementId, newContent) {
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "update_announcement_content.php");
+    xhr.open("POST", "../Announcement/update_announcement_content.php");
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.send("announcement_id=" + announcementId + "&content=" + encodeURIComponent(newContent));
 }

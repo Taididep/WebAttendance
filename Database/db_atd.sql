@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 20, 2024 lúc 07:51 PM
+-- Thời gian đã tạo: Th10 27, 2024 lúc 08:33 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -25,6 +25,19 @@ DELIMITER $$
 --
 -- Thủ tục
 --
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddAnnouncement` (IN `p_class_id` CHAR(8), IN `p_title` VARCHAR(255), IN `p_content` TEXT)   BEGIN
+    INSERT INTO announcements (class_id, title, content) VALUES (p_class_id, p_title, p_content);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddComment` (IN `p_announcement_id` INT, IN `p_user_id` INT, IN `p_content` TEXT)   BEGIN
+    INSERT INTO comments (announcement_id, user_id, content) VALUES (p_announcement_id, p_user_id, p_content);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddCourse` (IN `p_course_id` INT, IN `p_course_name` VARCHAR(255), IN `p_course_type_id` INT)   BEGIN
+    INSERT INTO courses (course_id, course_name, course_type_id) 
+    VALUES (p_course_id, p_course_name, p_course_type_id);
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `AddSchedules` (IN `p_class_id` CHAR(36), IN `p_dates` TEXT, IN `p_start_times` TEXT, IN `p_end_times` TEXT)   BEGIN
     DECLARE v_date VARCHAR(10);
     DECLARE v_start_time TIME;
@@ -56,6 +69,49 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `AddSchedules` (IN `p_class_id` CHAR
 
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddSemester` (IN `p_semester_name` VARCHAR(255), IN `p_start_date` DATE, IN `p_end_date` DATE, IN `p_is_active` BOOLEAN)   BEGIN
+    INSERT INTO semesters (semester_name, start_date, end_date, is_active) 
+    VALUES (p_semester_name, p_start_date, p_end_date, p_is_active);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CheckClassStudentExistence` (IN `p_class_id` INT, IN `p_student_id` INT, OUT `p_exists` INT)   BEGIN
+    -- Check if student_id exists for the given class_id
+    SELECT COUNT(*) INTO p_exists
+    FROM class_students
+    WHERE class_id = p_class_id AND student_id = p_student_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CheckStudentExistence` (IN `p_student_id` INT, OUT `p_exists` INT)   BEGIN
+    -- Kiểm tra sự tồn tại của student_id trong bảng students
+    SELECT COUNT(*) INTO p_exists
+    FROM students
+    WHERE student_id = p_student_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteAnnouncement` (IN `p_announcement_id` INT, IN `p_class_id` INT)   BEGIN
+    DELETE FROM announcements WHERE announcement_id = p_announcement_id AND class_id = p_class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteClass` (IN `p_class_id` CHAR(36))   BEGIN
+    DELETE FROM classes WHERE class_id = p_class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteCourse` (IN `p_course_id` INT)   BEGIN
+    DELETE FROM courses WHERE course_id = p_course_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteSchedule` (IN `p_schedule_id` CHAR(36))   BEGIN
+    DELETE FROM schedules WHERE schedule_id = p_schedule_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteSemester` (IN `p_semester_id` INT)   BEGIN
+    DELETE FROM semesters WHERE semester_id = p_semester_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllCourses` ()   BEGIN
+    SELECT * FROM courses;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
     SELECT 
         s.semester_id,
@@ -74,11 +130,30 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllSemesters` ()   BEGIN
         s.start_date DESC; -- Sắp xếp theo ngày bắt đầu mới nhất
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllUsers` ()   BEGIN
+    SELECT user_id, password FROM users;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAnnouncementsByClass` (IN `p_class_id` INT)   BEGIN
+    SELECT * FROM announcements WHERE class_id = p_class_id ORDER BY created_at DESC;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByScheduleId` (IN `scheduleId` INT, IN `class_id` CHAR(36))   BEGIN
     SELECT a.student_id, a.status
     FROM attendances a
     JOIN schedules s ON a.schedule_id = s.schedule_id
     WHERE a.schedule_id = scheduleId AND s.class_id = class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceRecord` (IN `p_schedule_id` INT, IN `p_student_id` INT)   BEGIN
+    SELECT * FROM attendances 
+    WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceReport` (IN `p_class_id` CHAR(36), IN `p_student_id` INT)   BEGIN
+    SELECT total_present, total_absent, total_late, total 
+    FROM attendance_reports 
+    WHERE class_id = p_class_id AND student_id = p_student_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceReportByClassId` (IN `input_class_id` CHAR(36))   BEGIN
@@ -91,6 +166,30 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceReportByClassId` (IN `
         attendance_reports ar
     WHERE 
         ar.class_id = input_class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceReports` (IN `p_class_id` CHAR(36))   BEGIN
+    SELECT student_id, total_present, total_late, total_absent
+    FROM attendance_reports
+    WHERE class_id = p_class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceSummary` (IN `p_class_id` CHAR(36))   BEGIN
+    -- Lấy tổng số buổi có mặt, muộn và vắng mặt
+    SELECT 
+        SUM(r.total_present) AS total_present,
+        SUM(r.total_late) AS total_late,
+        SUM(r.total_absent) AS total_absent
+    FROM attendance_reports r
+    WHERE r.class_id = p_class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassById` (IN `p_class_id` CHAR(36))   BEGIN
+    SELECT class_id FROM classes WHERE class_id = p_class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassByTeacher` (IN `p_class_id` CHAR(36), IN `p_teacher_id` CHAR(36))   BEGIN
+    SELECT * FROM classes WHERE class_id = p_class_id AND teacher_id = p_teacher_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassDetailsById` (IN `classId` CHAR(36))   BEGIN
@@ -167,6 +266,29 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassInfoById` (IN `classId` CHA
         c.class_id = classId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetClassNameById` (IN `p_class_id` CHAR(8))   BEGIN
+    SELECT class_name FROM classes WHERE class_id = p_class_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCommentCountByAnnouncement` (IN `p_announcement_id` INT, OUT `p_comment_count` INT)   BEGIN
+    SELECT COUNT(*) INTO p_comment_count FROM comments WHERE announcement_id = p_announcement_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCommentsByAnnouncement` (IN `p_announcement_id` INT)   BEGIN
+    SELECT c.*, 
+           COALESCE(t.lastname, s.lastname) AS lastname, 
+           COALESCE(t.firstname, s.firstname) AS firstname
+    FROM comments c
+    LEFT JOIN teachers t ON c.user_id = t.teacher_id
+    LEFT JOIN students s ON c.user_id = s.student_id
+    WHERE c.announcement_id = p_announcement_id
+    ORDER BY c.created_at ASC;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCourseById` (IN `p_course_id` INT)   BEGIN
+    SELECT * FROM courses WHERE course_id = p_course_id;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCoursePeriodsByClassId` (IN `p_class_id` CHAR(36))   BEGIN
     SELECT ct.theory_periods, ct.practice_periods
     FROM classes c
@@ -175,14 +297,52 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCoursePeriodsByClassId` (IN `p_c
     WHERE c.class_id = p_class_id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCourses` (IN `p_limit` INT, IN `p_offset` INT)   BEGIN
+    SELECT 
+        c.course_id,
+        c.course_name,
+        ct.course_type_name,
+        ct.credits,
+        ct.theory_periods,
+        ct.practice_periods
+    FROM 
+        courses c
+    LEFT JOIN 
+        course_types ct ON c.course_type_id = ct.course_type_id
+    LIMIT p_limit OFFSET p_offset;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetDistinctDatesByClassId` (IN `classId` CHAR(8))   BEGIN
     SELECT schedule_id, date
     FROM schedules
     WHERE class_id = classId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetLatestClassId` (IN `className` VARCHAR(255), IN `teacherId` INT)   BEGIN
+    SELECT class_id 
+    FROM classes 
+    WHERE class_name = className AND teacher_id = teacherId 
+    ORDER BY class_id DESC 
+    LIMIT 1;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetPasswordByUsername` (IN `p_username` VARCHAR(255))   BEGIN
+    SELECT password FROM users WHERE username = p_username;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetScheduleById` (IN `schedule_id` INT)   BEGIN
     SELECT * FROM schedules WHERE id = schedule_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetScheduleDate` (IN `p_schedule_id` INT)   BEGIN
+    SELECT date FROM schedules WHERE schedule_id = p_schedule_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetScheduleDateById` (IN `p_schedule_id` INT)   BEGIN
+    -- Truy vấn ngày của lịch học dựa trên schedule_id
+    SELECT date
+    FROM schedules
+    WHERE schedule_id = p_schedule_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesAndAttendanceByClassId` (IN `classId` CHAR(36))   BEGIN
@@ -198,6 +358,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesAndAttendanceByClassId`
     WHERE sch.class_id = classId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesBeforeToday` (IN `p_class_id` CHAR(36))   BEGIN
+    -- Lấy các buổi học không phải trong tương lai
+    SELECT schedule_id, date
+    FROM schedules
+    WHERE class_id = p_class_id AND date <= CURDATE();
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesByClassId` (IN `classId` VARCHAR(36))   BEGIN
     SELECT 
         sch.schedule_id,
@@ -206,6 +373,23 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSchedulesByClassId` (IN `classId
         sch.end_time
     FROM schedules sch
     WHERE sch.class_id = classId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetScheduleStatusAndDate` (IN `p_schedule_id` INT)   BEGIN
+    SELECT status, date FROM schedules WHERE schedule_id = p_schedule_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetSemesterById` (IN `p_semester_id` INT)   BEGIN
+    SELECT * FROM semesters WHERE semester_id = p_semester_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentById` (IN `student_id_param` INT)   BEGIN
+    SELECT * FROM students WHERE student_id = student_id_param;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentClassStatus` (IN `p_class_id` CHAR(36), IN `p_student_id` INT)   BEGIN
+    SELECT status FROM class_students 
+    WHERE class_id = p_class_id AND student_id = p_student_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassId` (IN `classId` CHAR(36))   BEGIN
@@ -250,6 +434,21 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate
         s.date, c.class_name;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedulesByDate` (IN `p_date` DATE)   BEGIN
+    SELECT students.email, students.firstname, schedules.date, schedules.start_time, schedules.end_time 
+    FROM students
+    JOIN attendances ON students.student_id = attendances.student_id
+    JOIN schedules ON schedules.schedule_id = attendances.schedule_id
+    WHERE schedules.date = p_date
+    ORDER BY students.email, schedules.start_time;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherById` (IN `teacherId` INT)   BEGIN
+    SELECT * 
+    FROM teachers 
+    WHERE teacher_id = teacherId;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_param` INT)   BEGIN
     SELECT lastname, firstname 
     FROM teachers 
@@ -282,12 +481,95 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate
         s.date, s.start_time;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeachingSchedulesByDate` (IN `p_date` DATE)   BEGIN
+    SELECT t.email, t.firstname, t.lastname, s.date, s.start_time, s.end_time, c.class_name
+    FROM teachers t
+    JOIN classes c ON t.teacher_id = c.teacher_id
+    JOIN schedules s ON c.class_id = s.class_id
+    WHERE s.date = p_date
+    ORDER BY t.email, s.start_time;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTotalCoursesCount` (OUT `p_total` INT)   BEGIN
+    SELECT COUNT(*) INTO p_total FROM courses;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserByEmailAndUsername` (IN `p_email` VARCHAR(255), IN `p_username` VARCHAR(255))   BEGIN
+    SELECT 'student' AS user_type, student_id AS id, email 
+    FROM db_atd.students 
+    WHERE email = p_email 
+      AND student_id = (SELECT user_id FROM db_atd.users WHERE username = p_username)
+    UNION
+    SELECT 'teacher' AS user_type, teacher_id AS id, email 
+    FROM db_atd.teachers 
+    WHERE email = p_email 
+      AND teacher_id = (SELECT user_id FROM db_atd.users WHERE username = p_username);
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserInfoByUsername` (IN `input_username` VARCHAR(255))   BEGIN
     SELECT u.user_id, u.username, u.password, r.role_name 
     FROM users u
     JOIN user_roles ur ON u.user_id = ur.user_id
     JOIN roles r ON ur.role_id = r.role_id
     WHERE u.username = input_username;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertAttendanceRecord` (IN `p_schedule_id` INT, IN `p_student_id` INT, IN `p_status` TINYINT)   BEGIN
+    INSERT INTO attendances (schedule_id, student_id, status) 
+    VALUES (p_schedule_id, p_student_id, p_status);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertClass` (IN `className` VARCHAR(255), IN `courseId` INT, IN `semesterId` INT, IN `teacherId` INT)   BEGIN
+    INSERT INTO classes (class_name, course_id, semester_id, teacher_id)
+    VALUES (className, courseId, semesterId, teacherId);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertClassStudent` (IN `p_class_id` CHAR(36), IN `p_student_id` INT)   BEGIN
+    -- Kiểm tra sự tồn tại của student_id trong bảng class_students
+    IF NOT EXISTS (SELECT 1 FROM class_students WHERE class_id = p_class_id AND student_id = p_student_id) THEN
+        -- Nếu chưa tồn tại, chèn dữ liệu mới vào bảng class_students
+        INSERT INTO class_students (class_id, student_id, status)
+        VALUES (p_class_id, p_student_id, 0);
+    END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertComment` (IN `p_announcement_id` INT, IN `p_user_id` INT, IN `p_content` TEXT)   BEGIN
+    INSERT INTO comments (announcement_id, user_id, content) 
+    VALUES (p_announcement_id, p_user_id, p_content);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `RemoveStudentFromClass` (IN `classId` INT, IN `studentId` INT)   BEGIN
+    DELETE FROM class_students 
+    WHERE class_id = classId AND student_id = studentId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateAnnouncementContent` (IN `p_announcement_id` INT, IN `p_content` TEXT)   BEGIN
+    UPDATE announcements SET content = p_content WHERE announcement_id = p_announcement_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateAnnouncementTitle` (IN `p_announcement_id` INT, IN `p_title` VARCHAR(255))   BEGIN
+    UPDATE announcements SET title = p_title WHERE announcement_id = p_announcement_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateAttendanceStatus` (IN `p_status` TINYINT, IN `p_schedule_id` INT, IN `p_student_id` INT)   BEGIN
+    UPDATE attendances 
+    SET status = p_status 
+    WHERE schedule_id = p_schedule_id AND student_id = p_student_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateClass` (IN `p_class_name` VARCHAR(255), IN `p_course_id` CHAR(36), IN `p_semester_id` CHAR(36), IN `p_class_id` CHAR(36), IN `p_teacher_id` CHAR(36))   BEGIN
+    UPDATE classes
+    SET class_name = p_class_name,
+        course_id = p_course_id,
+        semester_id = p_semester_id
+    WHERE class_id = p_class_id AND teacher_id = p_teacher_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateCourse` (IN `p_course_name` VARCHAR(255), IN `p_course_type_id` INT, IN `p_course_id` INT)   BEGIN
+    UPDATE courses 
+    SET course_name = p_course_name, 
+        course_type_id = p_course_type_id 
+    WHERE course_id = p_course_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateOrInsertAttendance` (IN `p_schedule_id` INT, IN `p_student_id` INT, IN `p_status` INT)   BEGIN
@@ -308,6 +590,69 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateOrInsertAttendance` (IN `p_sc
         INSERT INTO attendances (schedule_id, student_id, status)
         VALUES (p_schedule_id, p_student_id, p_status);
     END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateSchedule` (IN `p_date` DATE, IN `p_start_time` TIME, IN `p_end_time` TIME, IN `p_schedule_id` CHAR(36))   BEGIN
+    UPDATE schedules
+    SET date = p_date, start_time = p_start_time, end_time = p_end_time
+    WHERE schedule_id = p_schedule_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateScheduleDate` (IN `p_schedule_id` INT, IN `p_date` DATE)   BEGIN
+    -- Cập nhật ngày của lịch học
+    UPDATE schedules
+    SET date = p_date
+    WHERE schedule_id = p_schedule_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateScheduleStatus` (IN `p_schedule_id` INT, IN `p_status` TINYINT(1))   BEGIN
+    -- Cập nhật trạng thái của lịch học
+    UPDATE schedules
+    SET status = p_status
+    WHERE schedule_id = p_schedule_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateStudentClassStatus` (IN `p_class_id` CHAR(36), IN `p_student_id` INT)   BEGIN
+    UPDATE class_students 
+    SET status = 1 
+    WHERE class_id = p_class_id AND student_id = p_student_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateStudentClassStatusToInactive` (IN `p_class_id` CHAR(36), IN `p_student_id` INT)   BEGIN
+    UPDATE class_students 
+    SET status = 0 
+    WHERE class_id = p_class_id AND student_id = p_student_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateStudentInfo` (IN `p_student_id` INT, IN `p_lastname` VARCHAR(50), IN `p_firstname` VARCHAR(50), IN `p_birthday` DATE, IN `p_gender` ENUM('Nam','Nữ'), IN `p_email` VARCHAR(100), IN `p_phone` VARCHAR(15))   BEGIN
+    UPDATE students 
+    SET 
+        lastname = p_lastname,
+        firstname = p_firstname,
+        birthday = p_birthday,
+        gender = p_gender,
+        email = p_email,
+        phone = p_phone
+    WHERE 
+        student_id = p_student_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateTeacherById` (IN `teacherId` INT, IN `lastname` VARCHAR(100), IN `firstname` VARCHAR(100), IN `birthday` DATE, IN `gender` ENUM('Male','Female'), IN `email` VARCHAR(255), IN `phone` VARCHAR(20))   BEGIN
+    UPDATE teachers
+    SET 
+        lastname = lastname,
+        firstname = firstname,
+        birthday = birthday,
+        gender = gender,
+        email = email,
+        phone = phone
+    WHERE teacher_id = teacherId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateUserPassword` (IN `p_hashed_password` VARCHAR(255), IN `p_user_id` INT)   BEGIN
+    UPDATE users 
+    SET password = p_hashed_password 
+    WHERE user_id = p_user_id;
 END$$
 
 DELIMITER ;
@@ -355,8 +700,7 @@ CREATE TABLE `announcements` (
 
 INSERT INTO `announcements` (`announcement_id`, `class_id`, `title`, `content`, `created_at`, `updated_at`) VALUES
 (8, 'a409fd1d', 'Báo cáo tiến độ', 'Vào lúc 8h30 sẽ báo cáo đồ án', '2024-11-06 17:26:32', '2024-11-08 16:53:57'),
-(9, 'a409fd1d', 'Thông báo khẩn', '30/11 sẽ hết hạn đồ án chuyên ngành, các em tranh thủ nha.', '2024-11-06 18:25:00', '2024-11-08 16:52:48'),
-(14, 'a409fd1d', 'aaa', 'aaa', '2024-11-10 15:21:04', '2024-11-10 15:21:04');
+(9, 'a409fd1d', 'Thông báo khẩn', '30/11 sẽ hết hạn đồ án chuyên ngành, các em tranh thủ nha.', '2024-11-06 18:25:00', '2024-11-08 16:52:48');
 
 -- --------------------------------------------------------
 
@@ -392,9 +736,6 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (13, 16, 2001215679, 0, '2024-11-20 11:39:51'),
 (14, 17, 2001215679, 0, '2024-11-20 11:39:51'),
 (15, 18, 2001215679, 0, '2024-11-20 11:39:51'),
-(16, 16, 2001216114, 0, '2024-11-20 11:39:51'),
-(17, 17, 2001216114, 2, '2024-11-20 11:39:51'),
-(18, 18, 2001216114, 2, '2024-11-20 11:39:51'),
 (19, 16, 2001216780, 0, '2024-11-20 11:39:51'),
 (20, 17, 2001216780, 0, '2024-11-20 11:39:51'),
 (21, 18, 2001216780, 0, '2024-11-20 11:39:51');
@@ -581,7 +922,6 @@ INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_
 (3, 'a409fd1d', 2001214568, 0, 3, 0, 15),
 (4, 'a409fd1d', 2001215678, 0, 3, 0, 15),
 (5, 'a409fd1d', 2001215679, 0, 3, 0, 15),
-(6, 'a409fd1d', 2001216114, 0, 1, 2, 15),
 (7, 'a409fd1d', 2001216780, 0, 3, 0, 15);
 
 -- --------------------------------------------------------
@@ -629,7 +969,7 @@ INSERT INTO `class_students` (`class_id`, `student_id`, `status`) VALUES
 ('a409fd1d', 2001214568, 0),
 ('a409fd1d', 2001215678, 1),
 ('a409fd1d', 2001215679, 0),
-('a409fd1d', 2001216114, 1),
+('a409fd1d', 2001216114, 0),
 ('a409fd1d', 2001216780, 1),
 ('a409fd1d', 2001216789, 0);
 
@@ -787,9 +1127,9 @@ CREATE TABLE `schedules` (
 INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_time`, `status`) VALUES
 (16, 'a409fd1d', '2024-11-05 20:56:28', 1, 3, 0),
 (17, 'a409fd1d', '2024-11-11 00:00:00', 1, 3, 0),
-(18, 'a409fd1d', '2024-11-15 00:00:00', 1, 3, 1),
+(18, 'a409fd1d', '2024-11-15 00:00:00', 1, 3, 0),
 (19, 'a409fd1d', '2024-11-25 00:00:00', 1, 3, 0),
-(20, 'a409fd1d', '2024-12-03 00:00:00', 1, 3, 0),
+(20, 'a409fd1d', '2024-12-04 00:00:00', 1, 3, 0),
 (21, 'a409fd1d', '2024-12-10 00:00:00', 1, 3, 0),
 (22, 'a409fd1d', '2024-12-17 00:00:00', 1, 3, 0),
 (23, 'a409fd1d', '2024-12-24 00:00:00', 1, 3, 0),
@@ -808,13 +1148,7 @@ INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_t
 (104, '1432cd49', '2024-12-11 00:00:00', 1, 3, 0),
 (105, '1432cd49', '2024-12-18 00:00:00', 1, 3, 0),
 (106, '1432cd49', '2024-12-25 00:00:00', 1, 3, 0),
-(107, '1432cd49', '2025-01-01 00:00:00', 1, 3, 0),
-(108, '1432cd49', '2025-01-08 00:00:00', 1, 3, 0),
-(109, '1432cd49', '2025-01-15 00:00:00', 1, 3, 0),
-(110, '1432cd49', '2025-01-22 00:00:00', 1, 3, 0),
-(111, '1432cd49', '2025-01-29 00:00:00', 1, 3, 0),
-(112, '1432cd49', '2025-02-05 00:00:00', 1, 3, 0),
-(113, '1432cd49', '2025-02-12 00:00:00', 1, 3, 0);
+(107, '1432cd49', '2025-01-01 00:00:00', 1, 3, 0);
 
 -- --------------------------------------------------------
 
@@ -907,7 +1241,7 @@ CREATE TABLE `teachers` (
 --
 
 INSERT INTO `teachers` (`teacher_id`, `lastname`, `firstname`, `email`, `phone`, `birthday`, `gender`, `avatar`) VALUES
-(1000001234, 'Trần Thị Vân', 'Anh', 'vanAnh123@example.com', '0903456789', '1995-01-01', 'Nữ', '../../Image/Avatar/new_teacher.jpeg'),
+(1000001234, '', 'Giáo Viên 1', '', '', '1995-01-01', '', '../../Image/Avatar/new_teacher.jpeg'),
 (1000001235, 'Trần Văn', 'Hùng', 'HungTV@example.com', '0903456790', '1990-01-01', 'Nam', NULL),
 (1000001236, 'Nguyễn Văn', 'Tùng', 'NguyenVT@example.com', '0904567890', '1992-01-01', 'Nam', NULL);
 
@@ -1126,7 +1460,7 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT cho bảng `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `announcement_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `announcement_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT cho bảng `attendances`
@@ -1144,7 +1478,7 @@ ALTER TABLE `attendance_reports`
 -- AUTO_INCREMENT cho bảng `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT cho bảng `courses`

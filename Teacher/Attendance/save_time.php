@@ -12,10 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $schedule_id = $_POST['schedule_id'];
     $time = $_POST['time'];
 
-    $sql = "SELECT date FROM schedules WHERE schedule_id = ?";
+    $sql = "CALL GetScheduleDateById(?)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$schedule_id]);
     $scheduleData = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+
 
     if (!$scheduleData) {
         echo 'Không tìm thấy buổi học.';
@@ -25,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $date = new DateTime($scheduleData['date']);
     $date->setTime(...explode(':', $time));
 
-    $updateSql = "UPDATE schedules SET date = ? WHERE schedule_id = ?";
+    $updateSql = "CALL UpdateScheduleDate(?, ?)";
     $updateStmt = $conn->prepare($updateSql);
     if ($updateStmt->execute([$date->format('Y-m-d H:i:s'), $schedule_id])) {
         echo 'Thời gian đã được cập nhật thành công!';

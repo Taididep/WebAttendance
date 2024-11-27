@@ -32,7 +32,7 @@ if ($announcements) {
                         <small class="text-muted ms-3"><?php echo $announcement['created_at']; ?></small>
 
                         <!-- Nút Xóa thông báo -->
-                        <a href="delete_announcement.php?announcement_id=<?php echo $announcement['announcement_id']; ?>&class_id=<?php echo $class_id; ?>" class="btn btn-danger btn-sm ms-3" onclick="return confirm('Bạn có chắc chắn muốn xóa thông báo này không?');">
+                        <a href="../Announcement/delete_announcement.php?announcement_id=<?php echo $announcement['announcement_id']; ?>&class_id=<?php echo $class_id; ?>" class="btn btn-danger btn-sm ms-3" onclick="return confirm('Bạn có chắc chắn muốn xóa thông báo này không?');">
                             <i class="bi bi-trash"></i>
                         </a>
                     </div>
@@ -89,7 +89,7 @@ if ($announcements) {
 
             <!-- Thanh nhập bình luận -->
             <div class="card-body">
-                <form action="add_comment.php?class_id=<?php echo $class_id; ?>" method="POST" class="d-flex align-items-center">
+                <form action="../Announcement/add_comment.php?class_id=<?php echo $class_id; ?>" method="POST" class="d-flex align-items-center">
                     <div class="flex-grow-1 me-2">
                         <textarea class="form-control" name="content" rows="2" placeholder="Nhập bình luận của bạn..." required></textarea>
                     </div>

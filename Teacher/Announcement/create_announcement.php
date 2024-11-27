@@ -19,15 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
-    // Lưu thông báo vào cơ sở dữ liệu
-    $stmt = $conn->prepare("CALL AddAnnouncement(:class_id, :title, :content)");
-    $stmt->bindParam(':class_id', $class_id);
-    $stmt->bindParam(':title', $title);
-    $stmt->bindParam(':content', $content);
-    $stmt->closeCursor();     
+    $sql = "CALL AddAnnouncement(?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$class_id, $title, $content]);
+
 
     if ($stmt->rowCount() > 0) {
-        header("Location: Announcement/class_detail_announcement.php?class_id=" . $class_id); // Chuyển hướng về trang chi tiết lớp học
+        header("Location: ../Class/class_detail_announcement.php?class_id=" . $class_id);
         exit;
     } else {
         echo 'Có lỗi khi tạo bảng tin.';
