@@ -11,11 +11,16 @@ if (isset($_GET['course_id']) && is_numeric($_GET['course_id'])) {
     $courseId = $_GET['course_id'];
 
     // Lấy thông tin khóa học từ cơ sở dữ liệu
-    $sql = "SELECT * FROM courses WHERE course_id = :course_id";
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare("CALL GetCourseById(:course_id)");
     $stmt->bindParam(':course_id', $courseId, PDO::PARAM_INT);
-    $stmt->execute();
-    $course = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    try {
+        // Execute the procedure
+        $stmt->execute();
+        $course = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        echo "Lỗi khi lấy thông tin khóa học: " . $e->getMessage();
+    }
 
     if (!$course) {
         // Nếu không tìm thấy khóa học, chuyển hướng về trang quản lý khóa học
@@ -40,13 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Vui lòng điền đầy đủ thông tin.";
     } else {
         // Cập nhật dữ liệu khóa học
-        $sql = "UPDATE courses SET course_name = ?, course_type_id = ? WHERE course_id = ?";
-        $stmt = $conn->prepare($sql);
-
-        if ($stmt->execute([$courseName, $courseTypeId, $courseId])) {
-            echo "Cập nhật khóa học thành công";
-        } else {
-            echo "Có lỗi xảy ra, vui lòng thử lại.";
+        $stmt = $conn->prepare("CALL UpdateCourse(:course_name, :course_type_id, :course_id)");
+        $stmt->bindParam(':course_name', $courseName);
+        $stmt->bindParam(':course_type_id', $courseTypeId);
+        $stmt->bindParam(':course_id', $courseId);
+        
+        try {
+            // Execute the procedure
+            if ($stmt->execute()) {
+                echo "Cập nhật khóa học thành công";
+            } else {
+                echo "Có lỗi xảy ra, vui lòng thử lại.";
+            }
+        } catch (PDOException $e) {
+            echo "Lỗi: " . $e->getMessage();
         }
     }
 }

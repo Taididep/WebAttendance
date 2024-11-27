@@ -10,8 +10,10 @@ if (isset($_POST['content']) && isset($_POST['announcement_id'])) {
 
     // Kiểm tra xem nội dung bình luận có rỗng không
     if (!empty($content)) {
-        $sql = "INSERT INTO comments (announcement_id, user_id, content) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($sql);
+        $stmt = $conn->prepare("CALL AddComment(:announcement_id, :user_id, :content)");
+        $stmt->bindParam(':announcement_id', $announcement_id);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':content', $content);
 
         try {
             // Thực thi câu truy vấn

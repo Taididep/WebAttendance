@@ -11,8 +11,7 @@ if (isset($_GET['semester_id']) && is_numeric($_GET['semester_id'])) {
     $semesterId = $_GET['semester_id'];
 
     // Thực hiện truy vấn xóa học kỳ
-    $sql = "DELETE FROM semesters WHERE semester_id = :semester_id";
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare("CALL DeleteSemester(:semester_id)");
 
     // Liên kết giá trị và thực hiện truy vấn
     $stmt->bindParam(':semester_id', $semesterId, PDO::PARAM_INT);

@@ -13,13 +13,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Vui lòng điền đầy đủ thông tin.";
     } else {
         // Thực hiện truy vấn để thêm môn học
-        $sql = "INSERT INTO courses (course_id, course_name, course_type_id) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-
-        if ($stmt->execute([$courseId, $courseName, $courseTypeId])) {
-            echo "Thêm môn học thành công!";
-        } else {
-            echo "Có lỗi xảy ra, vui lòng thử lại.";
+        $stmt = $conn->prepare("CALL AddCourse(:course_id, :course_name, :course_type_id)");
+        $stmt->bindParam(':course_id', $courseId);
+        $stmt->bindParam(':course_name', $courseName);
+        $stmt->bindParam(':course_type_id', $courseTypeId);
+        
+        try {
+            // Execute the procedure
+            if ($stmt->execute()) {
+                echo "Thêm môn học thành công!";
+            } else {
+                echo "Có lỗi xảy ra, vui lòng thử lại.";
+            }
+        } catch (PDOException $e) {
+            echo "Lỗi: " . $e->getMessage();
         }
     }
 }
