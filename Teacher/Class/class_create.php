@@ -49,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Lấy danh sách khóa học và học kỳ
 $courses = $conn->query("SELECT * FROM courses")->fetchAll(PDO::FETCH_ASSOC);
+
 $sql_semesters = "CALL GetAllSemesters()";
 $stmt_semesters = $conn->prepare($sql_semesters);
 $stmt_semesters->execute();

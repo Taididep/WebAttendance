@@ -112,7 +112,8 @@ $currentDate = date('Y-m-d');
                                                     <a class="dropdown-item" href="#" onclick="openEditModal(<?php echo $schedule['schedule_id']; ?>, '<?php echo $schedule['date']; ?>', <?php echo $schedule['start_time']; ?>, <?php echo $schedule['end_time']; ?>)">Sửa</a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item text-danger" href="delete_schedule.php?schedule_id=<?php echo $schedule['schedule_id']; ?>" onclick="return confirm('Bạn có chắc chắn muốn xóa lịch học này?');">Xóa</a>
+                                                    <a class="dropdown-item text-danger" href="delete_schedule.php?schedule_id=<?php echo $schedule['schedule_id']; ?>&class_id=<?php echo $classId; ?>" onclick="return confirm('Bạn có chắc chắn muốn xóa lịch học này?');">Xóa</a>
+
                                                 </li>
                                             </ul>
                                         </div>

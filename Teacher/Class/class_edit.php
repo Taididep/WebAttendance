@@ -16,9 +16,10 @@ if (!isset($_GET['class_id'])) {
 
 // Lấy thông tin lớp học
 $classId = $_GET['class_id'];
-$classQuery = $conn->prepare("SELECT * FROM classes WHERE class_id = ? AND teacher_id = ?");
+$classQuery = $conn->prepare("CALL GetClassByTeacher(?, ?)");
 $classQuery->execute([$classId, $teacherId]);
 $class = $classQuery->fetch(PDO::FETCH_ASSOC);
+$classQuery->closeCursor();
 
 if (!$class) {
     header("Location: {$basePath}Class/class_manage.php");
@@ -26,8 +27,8 @@ if (!$class) {
 }
 
 // Lấy danh sách khóa học và học kỳ để hiển thị trong form
-$courses = $conn->query("SELECT * FROM courses")->fetchAll(PDO::FETCH_ASSOC);
-$semesters = $conn->query("SELECT * FROM semesters")->fetchAll(PDO::FETCH_ASSOC);
+$courses = $conn->query("CALL GetAllCourses()")->fetchAll(PDO::FETCH_ASSOC);
+$semesters = $conn->query("CALL GetAllSemesters()")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>

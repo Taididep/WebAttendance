@@ -44,7 +44,14 @@
 
 24RemoveStudentFromClass
 
-25
+25CheckStudentExistence
+
+26InsertClassStudent
+
+27GetAttendanceReports
+
+
+
 
 -- 1. Thủ tục trong login.php
 DELIMITER //
@@ -583,5 +590,105 @@ END $$
 
 DELIMITER ;
 
+-- 26
+DELIMITER $$
 
+CREATE PROCEDURE InsertClassStudent(IN p_class_id CHAR(36), IN p_student_id INT)
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM class_students WHERE class_id = p_class_id AND student_id = p_student_id) THEN
+        -- Nếu chưa tồn tại, chèn dữ liệu mới vào bảng class_students
+        INSERT INTO class_students (class_id, student_id, status)
+        VALUES (p_class_id, p_student_id, 0);
+    END IF;
+END $$
+
+DELIMITER ;
+
+
+--27
+DELIMITER $$
+
+CREATE PROCEDURE GetAttendanceReports(IN p_class_id CHAR(36))
+BEGIN
+    SELECT student_id, total_present, total_late, total_absent
+    FROM attendance_reports
+    WHERE class_id = p_class_id;
+END $$
+
+DELIMITER ;
+
+
+-- 28
+DELIMITER $$
+
+CREATE PROCEDURE UpdateSchedule(IN p_date DATE, IN p_start_time TIME, IN p_end_time TIME, IN p_schedule_id CHAR(36))
+BEGIN
+    UPDATE schedules
+    SET date = p_date, start_time = p_start_time, end_time = p_end_time
+    WHERE schedule_id = p_schedule_id;
+END $$
+
+DELIMITER ;
+
+-- 29
+DELIMITER $$
+
+CREATE PROCEDURE UpdateClass(
+    IN p_class_name VARCHAR(255),
+    IN p_course_id CHAR(36),
+    IN p_semester_id CHAR(36),
+    IN p_class_id CHAR(36),
+    IN p_teacher_id CHAR(36)
+)
+BEGIN
+    UPDATE classes
+    SET class_name = p_class_name,
+        course_id = p_course_id,
+        semester_id = p_semester_id
+    WHERE class_id = p_class_id AND teacher_id = p_teacher_id;
+END $$
+
+DELIMITER ;
+
+-- 30
+DELIMITER $$
+
+CREATE PROCEDURE DeleteSchedule(IN p_schedule_id CHAR(36))
+BEGIN
+    DELETE FROM schedules WHERE schedule_id = p_schedule_id;
+END $$
+
+DELIMITER ;
+
+
+
+-- 31
+DELIMITER $$
+
+CREATE PROCEDURE DeleteClass(IN p_class_id CHAR(36))
+BEGIN
+    DELETE FROM classes WHERE class_id = p_class_id;
+END $$
+
+DELIMITER ;
+
+-- 32
+DELIMITER $$
+
+CREATE PROCEDURE GetClassByTeacher(IN p_class_id CHAR(36), IN p_teacher_id CHAR(36))
+BEGIN
+    SELECT * FROM classes WHERE class_id = p_class_id AND teacher_id = p_teacher_id;
+END $$
+
+DELIMITER ;
+
+-- 32
+DELIMITER $$
+
+CREATE PROCEDURE GetAllCourses()
+BEGIN
+    SELECT * FROM courses;
+END $$
+
+DELIMITER ;
 

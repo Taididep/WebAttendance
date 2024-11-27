@@ -59,7 +59,7 @@ try {
 
             if ($existsResult['@exists'] == 0) {
                 // Thêm mới vào class_students
-                $insertQuery = $conn->prepare("INSERT INTO class_students (class_id, student_id, status) VALUES (:class_id, :student_id, 0)");
+                $insertQuery = $conn->prepare("CALL InsertClassStudent(:class_id, :student_id)");
                 $insertQuery->bindParam(':class_id', $class_id);
                 $insertQuery->bindParam(':student_id', $student_id);
                 if ($insertQuery->execute()) {

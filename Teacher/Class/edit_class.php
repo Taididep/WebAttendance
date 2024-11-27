@@ -30,8 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Thực hiện truy vấn để cập nhật lớp học
-    $sql = "UPDATE classes SET class_name = ?, course_id = ?, semester_id = ? WHERE class_id = ? AND teacher_id = ?";
+    $sql = "CALL UpdateClass(?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
+    $stmt->execute([$className, $courseId, $semesterId, $classId, $teacherId]);
 
     if ($stmt->execute([$className, $courseId, $semesterId, $classId, $teacherId])) {
         $successMessage = "Cập nhật lớp học thành công!";

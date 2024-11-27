@@ -1,6 +1,6 @@
 <?php
 include __DIR__ . '/../../Connect/connect.php';
-include __DIR__ . '/../../Account/islogin.php';
+// include __DIR__ . '/../../Account/islogin.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $scheduleId = $_POST['schedule_id'];
@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $endTime = $_POST['end_time'];
     $classId = $_POST['class_id'];
 
-    $sql = "UPDATE schedules SET date = ?, start_time = ?, end_time = ? WHERE schedule_id = ?";
+    $sql = "CALL UpdateSchedule(?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$date, $startTime, $endTime, $scheduleId]);
 
