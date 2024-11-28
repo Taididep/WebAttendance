@@ -652,9 +652,35 @@ END //
 
 DELIMITER ;
 
+-- 40 thủ tục Kiểm tra xem lịch học đã tồn tại trong bảng schedules chưa
+DELIMITER $$
+
+CREATE PROCEDURE CheckScheduleExists(IN class_id CHAR(36), IN schedule_date DATETIME, IN start_time INT, IN end_time INT, OUT exists_flag INT)
+BEGIN
+    -- Kiểm tra lịch học có tồn tại trong bảng schedules hay không
+    SELECT COUNT(*) INTO exists_flag
+    FROM schedules
+    WHERE class_id = class_id 
+    AND date = schedule_date
+    AND start_time = start_time
+    AND end_time = end_time;
+END $$
+
+DELIMITER ;
 
 
+-- 41 thủ tục Kiểm tra lớp học có tồn tại trong bảng classes hay không
+DELIMITER $$
 
+CREATE PROCEDURE CheckClassExists(IN class_id CHAR(36), OUT exists_flag INT)
+BEGIN
+    -- Kiểm tra lớp học có tồn tại trong bảng classes hay không
+    SELECT COUNT(*) INTO exists_flag
+    FROM classes
+    WHERE class_id = class_id;
+END $$
+
+DELIMITER ;
 
 
 
