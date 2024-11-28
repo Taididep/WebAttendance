@@ -795,17 +795,18 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE UpdateScheduleDate(
-    IN p_schedule_id INT,
-    IN p_date DATE
+    IN p_date DATETIME,
+    IN p_schedule_id INT
 )
 BEGIN
-    -- Cập nhật ngày của lịch học
     UPDATE schedules
     SET date = p_date
     WHERE schedule_id = p_schedule_id;
 END $$
 
 DELIMITER ;
+
+
 
 -- 41
 DELIMITER $$

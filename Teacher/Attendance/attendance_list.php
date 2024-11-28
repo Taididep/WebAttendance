@@ -204,7 +204,7 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                             sinh viên</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="remove-tab" data-bs-toggle="tab" href="#removeStudent" role="tab">Đá
+                        <a class="nav-link" id="remove-tab" data-bs-toggle="tab" href="#removeStudent" role="tab">Xóa
                             sinh viên</a>
                     </li>
                     <li class="nav-item" role="presentation">
