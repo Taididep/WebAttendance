@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 27, 2024 lúc 08:33 PM
+-- Thời gian đã tạo: Th10 28, 2024 lúc 05:24 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -108,6 +108,30 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteSemester` (IN `p_semester_id`
     DELETE FROM semesters WHERE semester_id = p_semester_id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAdminById` (IN `p_admin_id` INT)   BEGIN
+    SELECT 
+        admin_id, 
+        lastname, 
+        firstname, 
+        email, 
+        phone 
+    FROM 
+        admins 
+    WHERE 
+        admin_id = p_admin_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllAdmins` ()   BEGIN
+    SELECT 
+        admin_id, 
+        lastname, 
+        firstname, 
+        email, 
+        phone 
+    FROM 
+        admins;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllCourses` ()   BEGIN
     SELECT * FROM courses;
 END$$
@@ -136,6 +160,13 @@ END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAnnouncementsByClass` (IN `p_class_id` INT)   BEGIN
     SELECT * FROM announcements WHERE class_id = p_class_id ORDER BY created_at DESC;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAnnouncementsByClassId` (IN `class_id` INT)   BEGIN
+    SELECT * 
+    FROM announcements 
+    WHERE class_id = class_id 
+    ORDER BY created_at DESC;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAttendanceByScheduleId` (IN `scheduleId` INT, IN `class_id` CHAR(36))   BEGIN
@@ -274,6 +305,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCommentCountByAnnouncement` (IN 
     SELECT COUNT(*) INTO p_comment_count FROM comments WHERE announcement_id = p_announcement_id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCommentCountByAnnouncementId` (IN `announcement_id` INT, OUT `comment_count` INT)   BEGIN
+    SELECT COUNT(*) INTO comment_count
+    FROM comments
+    WHERE announcement_id = announcement_id;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCommentsByAnnouncement` (IN `p_announcement_id` INT)   BEGIN
     SELECT c.*, 
            COALESCE(t.lastname, s.lastname) AS lastname, 
@@ -282,6 +319,17 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCommentsByAnnouncement` (IN `p_a
     LEFT JOIN teachers t ON c.user_id = t.teacher_id
     LEFT JOIN students s ON c.user_id = s.student_id
     WHERE c.announcement_id = p_announcement_id
+    ORDER BY c.created_at ASC;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCommentsByAnnouncementId` (IN `announcement_id` INT)   BEGIN
+    SELECT c.*, 
+           COALESCE(t.lastname, s.lastname) AS lastname, 
+           COALESCE(t.firstname, s.firstname) AS firstname
+    FROM comments c
+    LEFT JOIN teachers t ON c.user_id = t.teacher_id
+    LEFT JOIN students s ON c.user_id = s.student_id
+    WHERE c.announcement_id = announcement_id
     ORDER BY c.created_at ASC;
 END$$
 
@@ -538,9 +586,40 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertComment` (IN `p_announcement_
     VALUES (p_announcement_id, p_user_id, p_content);
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertStudent` (IN `p_student_id` INT, IN `p_lastname` VARCHAR(255), IN `p_firstname` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_phone` VARCHAR(20), IN `p_class` VARCHAR(50), IN `p_birthday` DATE, IN `p_gender` VARCHAR(10))   BEGIN
+    INSERT INTO students (student_id, lastname, firstname, email, phone, class, birthday, gender)
+    VALUES (p_student_id, p_lastname, p_firstname, p_email, p_phone, p_class, p_birthday, p_gender);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertTeacher` (IN `p_teacher_id` INT, IN `p_lastname` VARCHAR(255), IN `p_firstname` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_phone` VARCHAR(20), IN `p_birthday` DATE, IN `p_gender` VARCHAR(10))   BEGIN
+    INSERT INTO teachers (teacher_id, lastname, firstname, email, phone, birthday, gender)
+    VALUES (p_teacher_id, p_lastname, p_firstname, p_email, p_phone, p_birthday, p_gender);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertUser` (IN `p_user_id` INT, IN `p_username` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+    INSERT INTO users (user_id, username, password)
+    VALUES (p_user_id, p_username, p_password);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertUserRole` (IN `p_user_id` INT, IN `p_role_id` INT)   BEGIN
+    INSERT INTO user_roles (user_id, role_id)
+    VALUES (p_user_id, p_role_id);
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `RemoveStudentFromClass` (IN `classId` INT, IN `studentId` INT)   BEGIN
     DELETE FROM class_students 
     WHERE class_id = classId AND student_id = studentId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateAdmin` (IN `p_admin_id` INT, IN `p_lastname` VARCHAR(50), IN `p_firstname` VARCHAR(50), IN `p_email` VARCHAR(100), IN `p_phone` VARCHAR(15))   BEGIN
+    UPDATE admins 
+    SET 
+        lastname = p_lastname, 
+        firstname = p_firstname, 
+        email = p_email, 
+        phone = p_phone 
+    WHERE 
+        admin_id = p_admin_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateAnnouncementContent` (IN `p_announcement_id` INT, IN `p_content` TEXT)   BEGIN
@@ -738,7 +817,21 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (15, 18, 2001215679, 0, '2024-11-20 11:39:51'),
 (19, 16, 2001216780, 0, '2024-11-20 11:39:51'),
 (20, 17, 2001216780, 0, '2024-11-20 11:39:51'),
-(21, 18, 2001216780, 0, '2024-11-20 11:39:51');
+(21, 18, 2001216780, 0, '2024-11-20 11:39:51'),
+(25, 19, 2001210224, 0, '2024-11-28 14:17:57'),
+(26, 19, 2001214567, 0, '2024-11-28 14:17:57'),
+(27, 19, 2001214568, 0, '2024-11-28 14:17:57'),
+(28, 19, 2001215678, 0, '2024-11-28 14:17:57'),
+(29, 19, 2001215679, 0, '2024-11-28 14:17:57'),
+(30, 16, 2001216114, 1, '2024-11-28 14:17:57'),
+(31, 17, 2001216114, 1, '2024-11-28 14:17:57'),
+(32, 18, 2001216114, 0, '2024-11-28 14:17:57'),
+(33, 19, 2001216114, 0, '2024-11-28 14:17:57'),
+(34, 19, 2001216780, 0, '2024-11-28 14:17:57'),
+(35, 16, 2001216789, 0, '2024-11-28 14:17:57'),
+(36, 17, 2001216789, 0, '2024-11-28 14:17:57'),
+(37, 18, 2001216789, 0, '2024-11-28 14:17:57'),
+(38, 19, 2001216789, 0, '2024-11-28 14:17:57');
 
 --
 -- Bẫy `attendances`
@@ -917,12 +1010,14 @@ CREATE TABLE `attendance_reports` (
 --
 
 INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_present`, `total_absent`, `total_late`, `total`) VALUES
-(1, 'a409fd1d', 2001210224, 0, 3, 0, 15),
-(2, 'a409fd1d', 2001214567, 0, 3, 0, 15),
-(3, 'a409fd1d', 2001214568, 0, 3, 0, 15),
-(4, 'a409fd1d', 2001215678, 0, 3, 0, 15),
-(5, 'a409fd1d', 2001215679, 0, 3, 0, 15),
-(7, 'a409fd1d', 2001216780, 0, 3, 0, 15);
+(1, 'a409fd1d', 2001210224, 0, 4, 0, 15),
+(2, 'a409fd1d', 2001214567, 0, 4, 0, 15),
+(3, 'a409fd1d', 2001214568, 0, 4, 0, 15),
+(4, 'a409fd1d', 2001215678, 0, 4, 0, 15),
+(5, 'a409fd1d', 2001215679, 0, 4, 0, 15),
+(6, 'a409fd1d', 2001216114, 2, 2, 0, 15),
+(7, 'a409fd1d', 2001216780, 0, 4, 0, 15),
+(8, 'a409fd1d', 2001216789, 0, 4, 0, 15);
 
 -- --------------------------------------------------------
 
@@ -944,7 +1039,7 @@ CREATE TABLE `classes` (
 
 INSERT INTO `classes` (`class_id`, `class_name`, `course_id`, `semester_id`, `teacher_id`) VALUES
 ('1432cd49', 'KTMT T4 (1 - 3)', 7, 2, 1000001234),
-('a409fd1d', 'NMLT Vân Anh (T2 1-3)', 1, 2, 1000001234);
+('a409fd1d', 'NMLT (T2 1-3)', 1, 2, 1000001234);
 
 -- --------------------------------------------------------
 
@@ -964,7 +1059,14 @@ CREATE TABLE `class_students` (
 
 INSERT INTO `class_students` (`class_id`, `student_id`, `status`) VALUES
 ('1432cd49', 2001216114, 1),
+('a409fd1d', 2001210123, 0),
 ('a409fd1d', 2001210224, 0),
+('a409fd1d', 2001211234, 0),
+('a409fd1d', 2001211785, 0),
+('a409fd1d', 2001212345, 0),
+('a409fd1d', 2001212346, 0),
+('a409fd1d', 2001213456, 0),
+('a409fd1d', 2001213457, 0),
 ('a409fd1d', 2001214567, 0),
 ('a409fd1d', 2001214568, 0),
 ('a409fd1d', 2001215678, 1),
@@ -1128,7 +1230,7 @@ INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_t
 (16, 'a409fd1d', '2024-11-05 20:56:28', 1, 3, 0),
 (17, 'a409fd1d', '2024-11-11 00:00:00', 1, 3, 0),
 (18, 'a409fd1d', '2024-11-15 00:00:00', 1, 3, 0),
-(19, 'a409fd1d', '2024-11-25 00:00:00', 1, 3, 0),
+(19, 'a409fd1d', '2024-11-28 00:00:00', 1, 3, 0),
 (20, 'a409fd1d', '2024-12-04 00:00:00', 1, 3, 0),
 (21, 'a409fd1d', '2024-12-10 00:00:00', 1, 3, 0),
 (22, 'a409fd1d', '2024-12-17 00:00:00', 1, 3, 0),
@@ -1241,7 +1343,7 @@ CREATE TABLE `teachers` (
 --
 
 INSERT INTO `teachers` (`teacher_id`, `lastname`, `firstname`, `email`, `phone`, `birthday`, `gender`, `avatar`) VALUES
-(1000001234, '', 'Giáo Viên 1', '', '', '1995-01-01', '', '../../Image/Avatar/new_teacher.jpeg'),
+(1000001234, '', 'Giáo Viên 1', '', '', '1995-01-01', '', '../../Image/Avatar/anime-anime-girls-digital-art-artwork-Big-Orange-AD-illustration-2186615-wallhere.com.jpg'),
 (1000001235, 'Trần Văn', 'Hùng', 'HungTV@example.com', '0903456790', '1990-01-01', 'Nam', NULL),
 (1000001236, 'Nguyễn Văn', 'Tùng', 'NguyenVT@example.com', '0904567890', '1992-01-01', 'Nam', NULL);
 
@@ -1264,6 +1366,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
 (1, 'admin1', '$2y$10$cfG.Glj5s4GTocadoW.QDupZ/HMVIOwf74xes7gEjqWx5J8fV3GuO'),
 (2, 'admin2', '$2y$10$dqut0FsGPQwl.1S1n9m9MuXqwbynWDAutKAs9/kUe5D9uev1zRKpK'),
+(99999, '2', '$2y$10$VeSMxZjBXpxtzLwS.TMO2eXqFUx42.no6U5G/9xfEaM8kQSFuyPXW'),
 (1000001234, '1000001234', '$2y$10$4fhM2Q0vP6grGN.pbFApVONMOI5b41zd93DoPt1RafqjB1si6LtLC'),
 (1000001235, '1000001235', '$2y$10$P3vImaR.pFuxTs8c43oT1.XPMXGtAk5NqZBazDAelrv8usUORCw5e'),
 (1000001236, '1000001236', '$2y$10$tyeWDRjI15fzNm2W5YcM6Okq2Wwt81gLZBlJBleRlClF4sWV.LnRS'),
@@ -1306,6 +1409,7 @@ CREATE TABLE `user_roles` (
 INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 (1, 1),
 (2, 1),
+(99999, 2),
 (1000001234, 2),
 (1000001235, 2),
 (1000001236, 2),
@@ -1466,7 +1570,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT cho bảng `attendance_reports`

@@ -58,6 +58,7 @@ foreach ($attendanceReports as $report) {
 $currentDate = date('Y-m-d');
 ?>
 
+<link rel="stylesheet" href="../Css/attendance_list.css">
 
 <div id="attendanceEdit">
     <?php if (empty($students)): ?>
@@ -171,9 +172,12 @@ $currentDate = date('Y-m-d');
             </div>
 
             <!-- Thanh nhập, nút xác nhận và nút hiện tất cả nằm ngang -->
-            <div class="d-flex align-items-center justify-content-end mt-3">
-                <button class="btn btn-secondary btn-custom" id="listModeBtn">Hủy</button>
-                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            <div class="d-flex align-items-center justify-content-between mt-3">
+                <div id="paginationEdit" class="pagination-container"></div>
+                <div>
+                    <button class="btn btn-secondary btn-custom" id="listModeBtn">Quay lại</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
             </div>
 
         </form>

@@ -88,7 +88,7 @@ foreach ($students as $index => $student) {
 
     // Điểm danh từng buổi
     foreach ($schedules as $schedule) {
-        $status = $attendanceMap[$student['student_id']][$schedule['date']] ?? '0';
+        $status = $attendanceMap[$student['student_id']][$schedule['date']] ?? '';
         $row[] = $status; // 1, 0, hoặc 2
     }
 

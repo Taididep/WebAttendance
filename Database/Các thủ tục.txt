@@ -1439,8 +1439,105 @@ END //
 DELIMITER ;
 
 
+-- 83
+DELIMITER $$
 
+CREATE PROCEDURE GetAdminById(
+    IN p_admin_id INT
+)
+BEGIN
+    SELECT 
+        admin_id, 
+        lastname, 
+        firstname, 
+        email, 
+        phone 
+    FROM 
+        admins 
+    WHERE 
+        admin_id = p_admin_id;
+END $$
 
+DELIMITER ;
 
+-- 84
+DELIMITER $$
 
+CREATE PROCEDURE UpdateAdmin(
+    IN p_admin_id INT,
+    IN p_lastname VARCHAR(50),
+    IN p_firstname VARCHAR(50),
+    IN p_email VARCHAR(100),
+    IN p_phone VARCHAR(15)
+)
+BEGIN
+    UPDATE admins 
+    SET 
+        lastname = p_lastname, 
+        firstname = p_firstname, 
+        email = p_email, 
+        phone = p_phone 
+    WHERE 
+        admin_id = p_admin_id;
+END $$
 
+DELIMITER ;
+
+-- 85
+DELIMITER $$
+
+CREATE PROCEDURE GetAllAdmins()
+BEGIN
+    SELECT 
+        admin_id, 
+        lastname, 
+        firstname, 
+        email, 
+        phone 
+    FROM 
+        admins;
+END $$
+
+DELIMITER ;
+
+-- 86
+DELIMITER //
+
+CREATE PROCEDURE GetAnnouncementsByClassId(IN class_id INT)
+BEGIN
+    SELECT * 
+    FROM announcements 
+    WHERE class_id = class_id 
+    ORDER BY created_at DESC;
+END //
+
+DELIMITER ;
+
+-- 87
+DELIMITER //
+
+CREATE PROCEDURE GetCommentsByAnnouncementId(IN announcement_id INT)
+BEGIN
+    SELECT c.*, 
+           COALESCE(t.lastname, s.lastname) AS lastname, 
+           COALESCE(t.firstname, s.firstname) AS firstname
+    FROM comments c
+    LEFT JOIN teachers t ON c.user_id = t.teacher_id
+    LEFT JOIN students s ON c.user_id = s.student_id
+    WHERE c.announcement_id = announcement_id
+    ORDER BY c.created_at ASC;
+END //
+
+DELIMITER ;
+
+-- 88
+DELIMITER //
+
+CREATE PROCEDURE GetCommentCountByAnnouncementId(IN announcement_id INT, OUT comment_count INT)
+BEGIN
+    SELECT COUNT(*) INTO comment_count
+    FROM comments
+    WHERE announcement_id = announcement_id;
+END //
+
+DELIMITER ;

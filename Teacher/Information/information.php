@@ -122,11 +122,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['avatar'])) {
                         <input type="file" name="avatar" id="avatar" class="hidden-input" accept="image/*" onchange="handleFileSelect(event);">
                         <label for="avatar" style="position: relative;">
                             <?php if (!empty($teacherData->avatar)): ?>
-                                <img src="<?php echo htmlspecialchars($teacherData->avatar); ?>" alt="Ảnh đại diện" id="avatarImage" style="cursor: pointer;">
+                                <img src="<?php echo htmlspecialchars($teacherData->avatar); ?>" alt="Ảnh đại diện" id="avatarImage">
                             <?php else: ?>
                                 <img src="../../Image/Avatar/avatar_default.png" alt="Ảnh đại diện" style="width: 250px; height: 250px; border-radius: 50%; cursor: pointer;">
                             <?php endif; ?>
-                            <span class="change-text">Thay đổi</span>
+                            <span style="cursor: pointer;" class="change-text">Thay đổi</span>
                         </label>
                     </form>
                 </div>

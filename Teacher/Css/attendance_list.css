@@ -23,3 +23,8 @@ body {
 .unlocked {
     color: red !important;
 }
+
+th,
+td {
+    vertical-align: middle;
+}

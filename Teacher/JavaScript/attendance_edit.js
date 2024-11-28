@@ -15,15 +15,21 @@ document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', fu
         return;
     }
 
-    // Ẩn tất cả các cột và tiêu đề
+    // Ẩn tất cả các cột và dữ liệu
     document.querySelectorAll('#attendanceEdit .edit-data, #attendanceEdit .edit-column').forEach(cell => {
         cell.style.display = 'none';
     });
 
-    // Hiện cột buổi đã nhập
-    const cells = document.querySelectorAll(`#attendanceEdit td:nth-child(${index + 10})`); // Cột thứ index (cột 11 là buổi đầu tiên)
-    cells.forEach(cell => {
-        cell.style.display = ''; // Hiện cột tương ứng
+    // Hiện cột buổi đã nhập trong tbody
+    const tbodyCells = document.querySelectorAll(`#attendanceEdit tbody td:nth-child(${index + 10})`);
+    tbodyCells.forEach(cell => {
+        cell.style.display = ''; // Hiện cột tương ứng trong tbody
+    });
+
+    // Hiện cột buổi đã nhập trong tfoot
+    const tfootCells = document.querySelectorAll(`#attendanceEdit tfoot td:nth-child(${index + 1})`);
+    tfootCells.forEach(cell => {
+        cell.style.display = ''; // Hiện cột tương ứng trong tfoot
     });
 
     // Cập nhật tiêu đề cột
@@ -57,3 +63,71 @@ attendanceSelects.forEach(function (select) {
     }
 });
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    const studentsPerPage = 10; // Số sinh viên mỗi trang
+    const students = Array.from(document.querySelectorAll('#attendanceEdit tbody tr')); // Lấy tất cả các sinh viên từ bảng
+    const totalStudents = students.length;
+    const totalPages = Math.ceil(totalStudents / studentsPerPage); // Tính tổng số trang
+    let currentPage = 1; // Mặc định là trang 1
+
+    function showPage(page) {
+        const start = (page - 1) * studentsPerPage;
+        const end = start + studentsPerPage;
+
+        // Ẩn tất cả sinh viên
+        students.forEach(student => {
+            student.style.display = 'none';
+        });
+
+        // Hiển thị sinh viên của trang hiện tại
+        for (let i = start; i < end && i < totalStudents; i++) {
+            students[i].style.display = ''; // Hiển thị sinh viên
+        }
+
+        // Cập nhật phân trang
+        updatePagination(page);
+    }
+
+    function updatePagination(page) {
+        const pagination = document.getElementById('paginationEdit');
+        pagination.innerHTML = ''; // Xóa các nút phân trang hiện tại
+
+        // Tạo nút "Previous"
+        const prevButton = document.createElement('button');
+        prevButton.classList.add('btn', 'btn-secondary', 'me-2');
+        prevButton.textContent = 'Trước';
+        prevButton.disabled = page === 1;
+        prevButton.addEventListener('click', () => {
+            if (page > 1) {
+                showPage(page - 1);
+            }
+        });
+        pagination.appendChild(prevButton);
+
+        // Tạo các nút trang
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.classList.add('btn', 'btn-secondary', 'me-2');
+            pageButton.textContent = i;
+            pageButton.disabled = i === page;
+            pageButton.addEventListener('click', () => showPage(i));
+            pagination.appendChild(pageButton);
+        }
+
+        // Tạo nút "Next"
+        const nextButton = document.createElement('button');
+        nextButton.classList.add('btn', 'btn-secondary', 'me-2');
+        nextButton.textContent = 'Sau';
+        nextButton.disabled = page === totalPages;
+        nextButton.addEventListener('click', () => {
+            if (page < totalPages) {
+                showPage(page + 1);
+            }
+        });
+        pagination.appendChild(nextButton);
+    }
+
+    // Hiển thị trang 1 ban đầu
+    showPage(currentPage);
+});

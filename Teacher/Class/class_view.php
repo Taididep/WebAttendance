@@ -67,6 +67,7 @@ $currentDate = date('Y-m-d');
 
 <body>
 
+
     <div class="side-tabs">
         <ul class="nav nav-tabs flex-column" id="tabMenu">
             <li class="nav-item">
@@ -80,7 +81,7 @@ $currentDate = date('Y-m-d');
             </li>
             <li class="nav-item">
                 <a class="nav-link active" id="attendance-tab"
-                    href="class_view.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Lịch học</a>
+                    href="class_view.php?class_id=<?php echo htmlspecialchars($class_id); ?>">Lịch dạy</a>
             </li>
         </ul>
     </div>
@@ -105,6 +106,8 @@ $currentDate = date('Y-m-d');
     <div class="container mt-5">
         <div class="card mb-4">
             <div class="card-body">
+                <h3 class="text-center">Lịch dạy</h3>
+                <hr>
                 <table class="table table-striped">
                     <thead>
                         <tr>

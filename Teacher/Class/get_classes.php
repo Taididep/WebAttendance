@@ -39,7 +39,6 @@ if (isset($_POST['semester_id'])) {
                 echo '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $counter . '">';
                 echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy lớp học này không?\')">Hủy lớp</a></li>';
                 echo '<li><a class="dropdown-item" href="class_edit.php?class_id=' . htmlspecialchars($class['class_id']) . '">Cập nhật lớp</a></li>';
-                echo '<li><a class="dropdown-item" href="class_view.php?class_id=' . htmlspecialchars($class['class_id']) . '">Xem lịch học</a></li>';
                 echo '</ul>';
                 echo '</div>';
                 echo '</td>';

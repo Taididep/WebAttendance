@@ -62,13 +62,19 @@ document.getElementById('confirmAttendanceBtnList').addEventListener('click', fu
         cell.style.display = 'none';
     });
 
-    // Hiện cột buổi đã nhập
-    const cells = document.querySelectorAll(`#attendanceList td:nth-child(${index + 10})`); // Cột thứ index (cột 11 là buổi đầu tiên)
-    cells.forEach(cell => {
-        cell.style.display = ''; // Hiện cột tương ứng
+    // Hiện cột buổi đã nhập trong tbody
+    const tbodyCells = document.querySelectorAll(`#attendanceList tbody td:nth-child(${index + 10})`);
+    tbodyCells.forEach(cell => {
+        cell.style.display = ''; // Hiện cột tương ứng trong tbody
     });
 
-    // Hiện tiêu đề cột tương ứng
+    // Hiện cột buổi đã nhập trong tfoot
+    const tfootCells = document.querySelectorAll(`#attendanceList tfoot td:nth-child(${index + 1})`);
+    tfootCells.forEach(cell => {
+        cell.style.display = ''; // Hiện cột tương ứng trong tfoot
+    });
+
+    // Hiện tiêu đề cột tương ứng trong th
     const headerCells = document.querySelectorAll(`#attendanceList th.list-column`);
     headerCells.forEach((headerCell, idx) => {
         if (idx === index - 1) {
@@ -78,6 +84,7 @@ document.getElementById('confirmAttendanceBtnList').addEventListener('click', fu
         }
     });
 });
+
 
 // khoa
 const scheduleCells = document.querySelectorAll('.list-column');
@@ -93,9 +100,7 @@ scheduleCells.forEach(cell => {
         cell.classList.add('today', 'unlocked');
     }
     else if (scheduleDate < currentDateTime) {
-        // Nếu ngày đã qua
-        cell.classList.add('table-secondary');
-        cell.innerHTML = cell.innerHTML;  // Không thêm icon ổ khóa
+        cell.innerHTML = cell.innerHTML;
         const link = cell.querySelector('a');
         if (link) link.style.pointerEvents = 'none';  // Tắt link
         cell.style.pointerEvents = 'none';  // Tắt ô điểm danh
@@ -224,3 +229,73 @@ document.getElementById('uploadStudentForm').addEventListener('submit', function
         });
 });
 
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const studentsPerPage = 10; // Số sinh viên mỗi trang
+    const students = Array.from(document.querySelectorAll('#attendanceList tbody tr')); // Lấy tất cả các sinh viên từ bảng
+    const totalStudents = students.length;
+    const totalPages = Math.ceil(totalStudents / studentsPerPage); // Tính tổng số trang
+    let currentPage = 1; // Mặc định là trang 1
+
+    function showPage(page) {
+        const start = (page - 1) * studentsPerPage;
+        const end = start + studentsPerPage;
+
+        // Ẩn tất cả sinh viên
+        students.forEach(student => {
+            student.style.display = 'none';
+        });
+
+        // Hiển thị sinh viên của trang hiện tại
+        for (let i = start; i < end && i < totalStudents; i++) {
+            students[i].style.display = ''; // Hiển thị sinh viên
+        }
+
+        // Cập nhật phân trang
+        updatePagination(page);
+    }
+
+    function updatePagination(page) {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = ''; // Xóa các nút phân trang hiện tại
+
+        // Tạo nút "Previous"
+        const prevButton = document.createElement('button');
+        prevButton.classList.add('btn', 'btn-secondary', 'me-2');
+        prevButton.textContent = 'Trước';
+        prevButton.disabled = page === 1;
+        prevButton.addEventListener('click', () => {
+            if (page > 1) {
+                showPage(page - 1);
+            }
+        });
+        pagination.appendChild(prevButton);
+
+        // Tạo các nút trang
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.classList.add('btn', 'btn-secondary', 'me-2');
+            pageButton.textContent = i;
+            pageButton.disabled = i === page;
+            pageButton.addEventListener('click', () => showPage(i));
+            pagination.appendChild(pageButton);
+        }
+
+        // Tạo nút "Next"
+        const nextButton = document.createElement('button');
+        nextButton.classList.add('btn', 'btn-secondary', 'me-2');
+        nextButton.textContent = 'Sau';
+        nextButton.disabled = page === totalPages;
+        nextButton.addEventListener('click', () => {
+            if (page < totalPages) {
+                showPage(page + 1);
+            }
+        });
+        pagination.appendChild(nextButton);
+    }
+
+    // Hiển thị trang 1 ban đầu
+    showPage(currentPage);
+});

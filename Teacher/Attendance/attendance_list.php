@@ -178,10 +178,12 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
         <?php endif; ?>
     </div>
     <div class="d-flex align-items-center justify-content-between mt-3">
-        <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Quản lý
-            sinh
-            viên</button>
-        <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
+        <div id="pagination" class="pagination-container"></div>
+        <div>
+            <button class="btn btn-secondary btn-custom" data-bs-toggle="modal" data-bs-target="#addStudentModal">Quản lý sinh viên</button>
+            <button class="btn btn-secondary btn-custom" id="editModeBtn">Chỉnh sửa</button>
+        </div>
+
     </div>
 </div>
 
