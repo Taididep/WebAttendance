@@ -6,13 +6,13 @@ include __DIR__ . '/../../Account/islogin.php';
 // Lấy thông tin người dùng từ phiên
 $user_id = $_SESSION['user_id'];
 
-// Chuẩn bị câu lệnh SQL để lấy thông tin sinh viên
-$sql = "CALL GetStudentById(?)";
+// Chuẩn bị câu lệnh SQL để lấy thông tin admin
+$sql = "CALL GetAdminById(?)"; // Thay đổi thủ tục gọi
 $stmt = $conn->prepare($sql);
 $stmt->execute([$user_id]);
 
-// Lấy kết quả thông tin sinh viên
-$studentData = $stmt->fetchObject();
+// Lấy kết quả thông tin admin
+$adminData = $stmt->fetchObject();
 $stmt->closeCursor();
 
 ?>
@@ -22,7 +22,7 @@ $stmt->closeCursor();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh sửa thông tin cá nhân</title>
+    <title>Chỉnh sửa thông tin cá nhân - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../Css/information_edit.css">
@@ -35,39 +35,26 @@ $stmt->closeCursor();
         </div>
         <div class="card-body">
             <form id="editForm" method="POST" action="update_information.php">
-                <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($studentData->student_id); ?>">
+                <input type="hidden" name="admin_id" value="<?php echo htmlspecialchars($adminData->admin_id); ?>">
                 
                 <div class="mb-3">
                     <label for="lastname" class="form-label">Họ</label>
-                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($studentData->lastname); ?>" required>
+                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($adminData->lastname); ?>" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="firstname" class="form-label">Tên</label>
-                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($studentData->firstname); ?>" required>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="birthday" class="form-label">Ngày sinh</label>
-                    <input type="date" class="form-control" id="birthday" name="birthday" value="<?php echo htmlspecialchars($studentData->birthday); ?>" required>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="gender" class="form-label">Giới tính</label>
-                    <select class="form-select" id="gender" name="gender" required>
-                        <option value="Nam" <?php echo ($studentData->gender == 'Nam') ? 'selected' : ''; ?>>Nam</option>
-                        <option value="Nữ" <?php echo ($studentData->gender == 'Nữ') ? 'selected' : ''; ?>>Nữ</option>
-                    </select>
+                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($adminData->firstname); ?>" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($studentData->email); ?>" required>
+                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($adminData->email); ?>" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="phone" class="form-label">Điện thoại</label>
-                    <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($studentData->phone); ?>" required>
+                    <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($adminData->phone); ?>" required>
                 </div>
                 
                 <div class="text-center">

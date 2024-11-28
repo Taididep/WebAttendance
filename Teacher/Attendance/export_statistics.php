@@ -39,7 +39,6 @@ $stmtSummary->execute([$class_id]);
 $summary = $stmtSummary->fetch(PDO::FETCH_ASSOC);
 $stmtSummary->closeCursor();
 
-
 if (!$summary) {
     echo 'Không có dữ liệu điểm danh.';
     exit;
@@ -57,7 +56,7 @@ $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle("Thống kê điểm danh");
 
-// Thêm dữ liệu thống kê
+// Thêm tiêu đề cho thống kê
 $data = [
     ["Trạng thái", "Số lượng"],
     ["Có mặt", $summary['total_present'] ?? 0],
@@ -76,38 +75,33 @@ foreach (range('A', 'B') as $column) {
     $sheet->getColumnDimension($column)->setAutoSize(true);
 }
 
-// Cập nhật tiêu đề cột với buổi và ngày (quá khứ và hiện tại)
-$headers = ["Trạng thái", "Số lượng"]; // Tiêu đề ban đầu
+// Thêm tiêu đề cho buổi học
+$sheet->setCellValue('A' . ($rowIndex + 1), 'Buổi học đã qua');
+$rowIndex = $rowIndex + 2; // Bắt đầu từ dòng 3
 foreach ($schedules as $schedule) {
-    $headers[] = 'Buổi ' . $schedule['schedule_id'] . ' (' . date('d/m', strtotime($schedule['date'])) . ')';
-}
-
-// Thêm tiêu đề vào Excel
-$sheet->fromArray($headers, NULL, 'A1');
-
-// Thêm dữ liệu thống kê điểm danh
-$data = [
-    ["Có mặt", $summary['total_present'] ?? 0],
-    ["Muộn", $summary['total_late'] ?? 0],
-    ["Vắng mặt", $summary['total_absent'] ?? 0],
-];
-
-// Bắt đầu từ dòng 2
-$rowIndex = 2;
-foreach ($data as $row) {
-    $sheet->fromArray($row, NULL, 'A' . $rowIndex);
+    $sheet->setCellValue('C' . $rowIndex, 'Buổi ' . $schedule['schedule_id'] . ' (' . date('d/m', strtotime($schedule['date'])) . ')');
     $rowIndex++;
 }
 
+// Đưa dữ liệu thống kê vào các cột tương ứng
+$sheet->setCellValue('A' . ($rowIndex + 1), 'Trạng thái');
+$sheet->setCellValue('B' . ($rowIndex + 1), 'Số lượng');
+$sheet->setCellValue('A' . ($rowIndex + 2), 'Có mặt');
+$sheet->setCellValue('B' . ($rowIndex + 2), $summary['total_present'] ?? 0);
+$sheet->setCellValue('A' . ($rowIndex + 3), 'Muộn');
+$sheet->setCellValue('B' . ($rowIndex + 3), $summary['total_late'] ?? 0);
+$sheet->setCellValue('A' . ($rowIndex + 4), 'Vắng mặt');
+$sheet->setCellValue('B' . ($rowIndex + 4), $summary['total_absent'] ?? 0);
+
 // Thêm biểu đồ
 $dataSeriesLabels = [
-    new DataSeriesValues('String', "'Thống kê điểm danh'!\$A\$2:\$A\$4", null, 3), // Tên trạng thái: Có mặt, Muộn, Vắng mặt
+    new DataSeriesValues('String', "'Thống kê điểm danh'!\$A\$" . ($rowIndex + 2) . ":$A\$" . ($rowIndex + 4), null, 3), // Tên trạng thái: Có mặt, Muộn, Vắng mặt
 ];
 $xAxisTickValues = [
-    new DataSeriesValues('String', "'Thống kê điểm danh'!\$A\$2:\$A\$4", null, 3), // Trục X: Trạng thái
+    new DataSeriesValues('String', "'Thống kê điểm danh'!\$A\$" . ($rowIndex + 2) . ":$A\$" . ($rowIndex + 4), null, 3), // Trục X: Trạng thái
 ];
 $dataSeriesValues = [
-    new DataSeriesValues('Number', "'Thống kê điểm danh'!\$B\$2:\$B\$4", null, 3), // Giá trị: Số lượng
+    new DataSeriesValues('Number', "'Thống kê điểm danh'!\$B\$" . ($rowIndex + 2) . ":$B\$" . ($rowIndex + 4), null, 3), // Giá trị: Số lượng
 ];
 
 // Tạo biểu đồ
@@ -148,3 +142,4 @@ $writer = new Xlsx($spreadsheet);
 $writer->setIncludeCharts(true); // Bao gồm biểu đồ
 $writer->save("php://output");
 exit;
+?>

@@ -11,10 +11,11 @@ if (isset($_GET['class_id'])) {
 }
 
 // Truy vấn bảng tin
-$sql = "SELECT * FROM announcements WHERE class_id = ? ORDER BY created_at DESC";
+$sql = "CALL GetAnnouncementsByClassId(?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$class_id]);
 $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
 
 // Hiển thị bảng tin
 if ($announcements) {
@@ -25,7 +26,6 @@ if ($announcements) {
                 <!-- Tiêu đề và ngày tạo -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="card-title mb-0"><?php echo htmlspecialchars($announcement['title']); ?></h5>
-
                     <div class="d-flex align-items-center">
                         <small class="text-muted ms-3"><?php echo $announcement['created_at']; ?></small>
                     </div>
@@ -43,33 +43,31 @@ if ($announcements) {
 
             <!-- Kiểm tra nếu có bình luận -->
             <?php
-            $comment_sql = "SELECT COUNT(*) AS comment_count FROM comments WHERE announcement_id = ?";
+            // Gọi thủ tục
+            $comment_sql = "CALL GetCommentCountByAnnouncementId(?, @comment_count)";
             $comment_stmt = $conn->prepare($comment_sql);
             $comment_stmt->execute([$announcement['announcement_id']]);
-            $comment_count = $comment_stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Lấy giá trị của biến đầu ra
+            $result = $conn->query("SELECT @comment_count AS comment_count");
+            $comment_count = $result->fetch(PDO::FETCH_ASSOC)['comment_count']; // comment_count là một số nguyên
 
-            if ($comment_count['comment_count'] > 0) {
+            // Kiểm tra số lượng bình luận
+            if ($comment_count > 0) { // Sử dụng $comment_count như một số nguyên
                 ?>
                 <div class="card-body">
                     <h6 class="mb-3" id="commentsTitle_<?php echo $announcement['announcement_id']; ?>" style="cursor: pointer;"
                         onclick="toggleComments(<?php echo $announcement['announcement_id']; ?>)">
-                        Bình luận (<?php echo $comment_count['comment_count']; ?>)
+                        Bình luận (<?php echo $comment_count; ?>) <!-- Sử dụng $comment_count như một số nguyên -->
                     </h6>
                     <div id="commentsList_<?php echo $announcement['announcement_id']; ?>">
                         <?php
                         // Truy vấn bình luận từ giáo viên và học sinh
-                        $comment_sql = "
-                            SELECT c.*, 
-                                   COALESCE(t.lastname, s.lastname) AS lastname, 
-                                   COALESCE(t.firstname, s.firstname) AS firstname
-                            FROM comments c
-                            LEFT JOIN teachers t ON c.user_id = t.teacher_id
-                            LEFT JOIN students s ON c.user_id = s.student_id
-                            WHERE c.announcement_id = ?
-                            ORDER BY c.created_at ASC";
+                        $comment_sql = "CALL GetCommentsByAnnouncementId(?)";
                         $comment_stmt = $conn->prepare($comment_sql);
                         $comment_stmt->execute([$announcement['announcement_id']]);
                         $comments = $comment_stmt->fetchAll(PDO::FETCH_ASSOC);
+                        $comment_stmt->closeCursor();
 
                         if ($comments) {
                             // Hiển thị tất cả bình luận từ cũ đến mới
@@ -90,7 +88,7 @@ if ($announcements) {
 
             <!-- Thanh nhập bình luận -->
             <div class="card-body">
-                <form action="add_comment.php?class_id=<?php echo $class_id; ?>" method="POST"
+                <form action="../Announcement/add_comment.php?class_id=<?php echo $class_id; ?>" method="POST"
                     class="d-flex align-items-center">
                     <div class="flex-grow-1 me-2">
                         <textarea class="form-control" name="content" rows="2" placeholder="Nhập bình luận của bạn..."
