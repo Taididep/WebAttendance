@@ -132,11 +132,14 @@ CREATE TABLE attendance_reports (
     total_absent INT DEFAULT 0,
     total_late INT DEFAULT 0,
     total INT DEFAULT 0,
+
     CONSTRAINT fk_attendance_report_class_id FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE,
     CONSTRAINT fk_attendance_report_student_id FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
     CONSTRAINT fk_attendance_report_class_student FOREIGN KEY (class_id, student_id) REFERENCES class_students(class_id, student_id) ON DELETE CASCADE,
     CONSTRAINT unique_report UNIQUE (class_id, student_id)
 );
+
+
 
 
 -- 10

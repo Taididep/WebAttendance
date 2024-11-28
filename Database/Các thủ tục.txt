@@ -1370,6 +1370,74 @@ END $$
 
 DELIMITER ;
 
+-- 79
+DELIMITER //
+
+CREATE PROCEDURE InsertUser(
+    IN p_user_id INT,
+    IN p_username VARCHAR(255),
+    IN p_password VARCHAR(255)
+)
+BEGIN
+    INSERT INTO users (user_id, username, password)
+    VALUES (p_user_id, p_username, p_password);
+END //
+
+DELIMITER ;
+
+-- 80
+DELIMITER //
+
+CREATE PROCEDURE InsertUserRole(
+    IN p_user_id INT,
+    IN p_role_id INT
+)
+BEGIN
+    INSERT INTO user_roles (user_id, role_id)
+    VALUES (p_user_id, p_role_id);
+END //
+
+DELIMITER ;
+
+-- 81
+DELIMITER //
+
+CREATE PROCEDURE InsertStudent(
+    IN p_student_id INT,
+    IN p_lastname VARCHAR(255),
+    IN p_firstname VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_phone VARCHAR(20),
+    IN p_class VARCHAR(50),
+    IN p_birthday DATE,
+    IN p_gender VARCHAR(10)
+)
+BEGIN
+    INSERT INTO students (student_id, lastname, firstname, email, phone, class, birthday, gender)
+    VALUES (p_student_id, p_lastname, p_firstname, p_email, p_phone, p_class, p_birthday, p_gender);
+END //
+
+DELIMITER ;
+
+-- 82
+DELIMITER //
+
+CREATE PROCEDURE InsertTeacher(
+    IN p_teacher_id INT,
+    IN p_lastname VARCHAR(255),
+    IN p_firstname VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_phone VARCHAR(20),
+    IN p_birthday DATE,
+    IN p_gender VARCHAR(10)
+)
+BEGIN
+    INSERT INTO teachers (teacher_id, lastname, firstname, email, phone, birthday, gender)
+    VALUES (p_teacher_id, p_lastname, p_firstname, p_email, p_phone, p_birthday, p_gender);
+END //
+
+DELIMITER ;
+
 
 
 
