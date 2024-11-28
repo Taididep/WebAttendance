@@ -170,9 +170,11 @@ $currentDate = date('Y-m-d');
                         <?php endif; ?>
                     </tbody>
 
-
                 </table>
-                <a href="<?php echo $basePath; ?>Class/class_manage.php" class="btn btn-primary mt-3">Quay lại</a>
+                <div class="container d-flex justify-content-between mt-3">
+                    <a href="<?php echo $basePath; ?>Class/class_manage.php" class="btn btn-primary">Quay lại</a>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createScheduleModal">Tạo lịch học</button>
+                </div>
             </div>
         </div>
     </div>
@@ -208,6 +210,41 @@ $currentDate = date('Y-m-d');
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                         <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tạo Lịch Học -->
+    <div class="modal fade" id="createScheduleModal" tabindex="-1" aria-labelledby="createScheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="create_schedule.php" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createScheduleModalLabel">Tạo lịch học mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Hidden input for class_id -->
+                        <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+
+                        <div class="mb-3">
+                            <label for="schedule_date" class="form-label">Ngày học</label>
+                            <input type="date" class="form-control" name="schedule_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="start_time" class="form-label">Tiết bắt đầu</label>
+                            <input type="number" class="form-control" name="start_time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_time" class="form-label">Tiết kết thúc</label>
+                            <input type="number" class="form-control" name="end_time" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Tạo lịch học</button>
                     </div>
                 </form>
             </div>

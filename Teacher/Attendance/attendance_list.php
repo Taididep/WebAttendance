@@ -204,7 +204,7 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                             sinh viên</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="remove-tab" data-bs-toggle="tab" href="#removeStudent" role="tab">Xóa
+                        <a class="nav-link" id="remove-tab" data-bs-toggle="tab" href="#removeStudent" role="tab">Xoá
                             sinh viên</a>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -253,7 +253,7 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                <button type="button" class="btn btn-danger d-none" id="removeStudentButton">Đá sinh
+                                <button type="button" class="btn btn-danger d-none" id="removeStudentButton">Xóa sinh
                                     viên</button>
                             </div>
                         </form>
