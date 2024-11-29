@@ -38,7 +38,6 @@ $totalUsers = $stmt_count->fetch(PDO::FETCH_ASSOC)['total_users'];
 $totalPages = ceil($totalUsers / $usersPerPage);
 
 $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
-
 ?>
 
 <!DOCTYPE html>
@@ -171,6 +170,7 @@ $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
     </div>
 
     <!-- Modal Sửa tài khoản -->
+    <?php foreach ($users as $user): ?>
     <div class="modal fade" id="editAccountModal<?php echo $user['user_id']; ?>" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -180,10 +180,7 @@ $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="edit_account.php?user_id=<?php echo $user['user_id']; ?>">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Tên đăng nhập</label>
-                            <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
-                        </div>
+                        <!-- Chỉ chỉnh sửa vai trò -->
                         <div class="mb-3">
                             <label for="role" class="form-label">Vai trò</label>
                             <select class="form-select" id="role" name="role" required>
@@ -192,14 +189,16 @@ $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
                                 <option value="student" <?php echo $user['role_name'] == 'student' ? 'selected' : ''; ?>>Sinh viên</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Cập nhật tài khoản</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật vai trò</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    <?php endforeach; ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
 
 </html>
