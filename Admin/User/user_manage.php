@@ -18,7 +18,7 @@ $sql_users = "SELECT u.user_id, u.username, r.role_name
               FROM users u
               JOIN user_roles ur ON u.user_id = ur.user_id
               JOIN roles r ON ur.role_id = r.role_id
-              LIMIT :offset, :limit"; 
+              LIMIT :offset, :limit";
 
 // Thực hiện truy vấn và lấy kết quả
 $stmt_users = $conn->prepare($sql_users);
@@ -38,6 +38,13 @@ $totalUsers = $stmt_count->fetch(PDO::FETCH_ASSOC)['total_users'];
 $totalPages = ceil($totalUsers / $usersPerPage);
 
 $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
+
+$roleMapping = [
+    'admin' => 'Quản trị',
+    'teacher' => 'Giảng viên',
+    'student' => 'Sinh viên',
+];
+
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +58,7 @@ $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../Css/account_manage.css">
+    <link rel="stylesheet" href="../Css/user_manage.css">
 </head>
 
 <body>
@@ -67,11 +74,6 @@ $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
                 <div class="flex-grow-1">
                     <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm tài khoản..." />
                 </div>
-                <div>
-                    <a href="#" class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#createAccountModal">
-                        <i class="bi bi-plus-circle"></i> Thêm tài khoản
-                    </a>
-                </div>
             </div>
 
             <!-- Bảng danh sách tài khoản -->
@@ -79,14 +81,14 @@ $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>STT</th>
+                            <th style="width: 1%;">STT</th>
                             <th>ID tài khoản</th>
                             <th>Tên đăng nhập</th>
                             <th>Vai trò</th>
                             <th style="width: 1%;"></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="AccountTable">
                         <?php
                         $stt = $offset + 1;
                         foreach ($users as $user): ?>
@@ -94,7 +96,7 @@ $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
                                 <td><?php echo $stt++; ?></td>
                                 <td><?php echo htmlspecialchars($user['user_id']); ?></td>
                                 <td><?php echo htmlspecialchars($user['username']); ?></td>
-                                <td><?php echo htmlspecialchars($user['role_name']); ?></td>
+                                <td><?php echo isset($roleMapping[$user['role_name']]) ? $roleMapping[$user['role_name']] : htmlspecialchars($user['role_name']); ?></td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -133,72 +135,59 @@ $stmt_users->closeCursor(); // Đóng kết quả của truy vấn
         </div>
     </div>
 
-    <!-- Modal Thêm tài khoản -->
-    <div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createAccountModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createAccountModalLabel">Thêm tài khoản</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="create_account.php">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Tên đăng nhập</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Vai trò</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="admin">Quản trị viên</option>
-                                <option value="teacher">Giảng viên</option>
-                                <option value="student">Sinh viên</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Trạng thái</label>
-                            <select class="form-select" id="status" name="status" required>
-                                <option value="1">Hoạt động</option>
-                                <option value="0">Không hoạt động</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Thêm tài khoản</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Sửa tài khoản -->
     <?php foreach ($users as $user): ?>
-    <div class="modal fade" id="editAccountModal<?php echo $user['user_id']; ?>" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editAccountModalLabel">Sửa tài khoản</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="edit_account.php?user_id=<?php echo $user['user_id']; ?>">
-                        <!-- Chỉ chỉnh sửa vai trò -->
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Vai trò</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="admin" <?php echo $user['role_name'] == 'admin' ? 'selected' : ''; ?>>Quản trị viên</option>
-                                <option value="teacher" <?php echo $user['role_name'] == 'teacher' ? 'selected' : ''; ?>>Giảng viên</option>
-                                <option value="student" <?php echo $user['role_name'] == 'student' ? 'selected' : ''; ?>>Sinh viên</option>
-                            </select>
+        <div class="modal fade" id="editAccountModal<?php echo $user['user_id']; ?>" tabindex="-1" aria-labelledby="editAccountLabel<?php echo $user['user_id']; ?>" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editAccountLabel<?php echo $user['user_id']; ?>">Chỉnh sửa tài khoản</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="edit_account.php">
+                        <div class="modal-body">
+                            <!-- Hidden input để giữ user_id -->
+                            <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>" />
+
+                            <!-- Trường sửa tên đăng nhập -->
+                            <div class="mb-3">
+                                <label for="usernameInput<?php echo $user['user_id']; ?>" class="form-label">Tên đăng nhập</label>
+                                <input type="text" class="form-control" id="usernameInput<?php echo $user['user_id']; ?>"
+                                    name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required />
+                            </div>
+
+                            <!-- Trường sửa vai trò -->
+                            <div class="mb-3">
+                                <label for="roleSelect<?php echo $user['user_id']; ?>" class="form-label">Vai trò</label>
+                                <select class="form-select" name="role_id" id="roleSelect<?php echo $user['user_id']; ?>">
+                                    <?php
+                                    $sql_roles = "SELECT * FROM roles";
+                                    $stmt_roles = $conn->query($sql_roles);
+                                    $roles = $stmt_roles->fetchAll(PDO::FETCH_ASSOC);
+                                    foreach ($roles as $role): ?>
+                                        <option value="<?php echo $role['role_id']; ?>" <?php echo $role['role_name'] === $user['role_name'] ? 'selected' : ''; ?>>
+                                            <?php
+                                            // Ánh xạ tên vai trò sang tiếng Việt
+                                            $roleNameVi = isset($roleMapping[$role['role_name']]) ? $roleMapping[$role['role_name']] : htmlspecialchars($role['role_name']);
+                                            echo $roleNameVi;
+                                            ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Cập nhật vai trò</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
     <?php endforeach; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="../JavaScript/user_manage.js"></script>
 </body>
 
 </html>

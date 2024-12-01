@@ -38,7 +38,7 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
 
             <!-- Semester Selection Form -->
             <form id="semesterForm" class="d-flex justify-content-between align-items-center mb-4">
-                <div class="mb-0 me-2" style="flex: 1;">
+                <div class="mb-0" style="flex: 1;">
                     <select class="form-select" id="semester" name="semester_id" required>
                         <option value="" disabled selected>Chọn học kỳ</option>
                         <?php foreach ($semesters as $semester): ?>

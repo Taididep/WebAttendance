@@ -51,7 +51,7 @@ if (!isset($_SESSION['user_id'])) {
                     <a class="nav-link" href="<?php echo $basePath; ?>Course/course_manage.php">Môn Học</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo $basePath; ?>User/user_manage.php">Tài khoản(Chua co)</a>
+                    <a class="nav-link" href="<?php echo $basePath; ?>User/user_manage.php">Tài khoản</a>
                 </li>
             </ul>
 

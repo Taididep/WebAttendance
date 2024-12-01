@@ -65,8 +65,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Thêm thông tin cá nhân vào bảng teachers  
         $sql_teacher = "CALL InsertTeacher(:teacher_id, :lastname, :firstname, :email, :phone, :birthday, :gender)";
 
-        // $sql_teacher = "INSERT INTO teachers (teacher_id, lastname, firstname, email, phone, birthday, gender)   
-        //                 VALUES (:teacher_id, :lastname, :firstname, :email, :phone, :birthday, :gender)";
         $stmt_teacher = $conn->prepare($sql_teacher);
         $stmt_teacher->bindParam(':teacher_id', $teacher_id);
         $stmt_teacher->bindParam(':lastname', $lastname);

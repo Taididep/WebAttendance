@@ -85,6 +85,7 @@ $stmt_courses->closeCursor();
                 <table class="table">
                     <thead>
                         <tr>
+                            <th style="text-align: center;">STT</th>
                             <th style="text-align: center;">Mã môn học</th>
                             <th style="width: 30%;">Tên môn học</th>
                             <th style="width: 17%;">Loại môn học</th>
@@ -95,8 +96,12 @@ $stmt_courses->closeCursor();
                         </tr>
                     </thead>
                     <tbody id="courseTableBody">
+                        <?php
+                        $stt = 1; // Khởi tạo số thứ tự
+                        ?>
                         <?php foreach ($courses as $course): ?>
                             <tr>
+                                <td style="padding-left: 25px;"><?php echo $stt++; ?></td>
                                 <td style="text-align: center;"><?php echo htmlspecialchars($course['course_id']); ?></td>
                                 <td><?php echo htmlspecialchars($course['course_name']); ?></td>
                                 <td><?php echo htmlspecialchars($course['course_type_name']); ?></td>

@@ -16,7 +16,7 @@ if (isset($_POST['semester_id'])) {
 
     if ($classes) {
         // Hiển thị bảng lớp học
-        echo '<table class="table table-striped">';
+        echo '<table class="table table">';
         echo '<thead><tr"><th>STT</th><th>Tên lớp học</th><th>Tên môn học</th><th>Giảng viên</th><th style="width: 1%;"></th></tr></thead>';
         echo '<tbody>';
 
@@ -24,9 +24,9 @@ if (isset($_POST['semester_id'])) {
         $counter = 1;
         foreach ($classes as $class) {
             echo '<tr>';
-            echo '<td style="padding-left: 25px; vertical-align: middle;" onclick="window.location.href=\'class_detail.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . $counter . '</td>';
-            echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_announcement.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['class_name']) . '</td>';
-            echo '<td style="vertical-align: middle;" onclick="window.location.href=\'class_detail_announcement.php?class_id=' . htmlspecialchars($class['class_id']) . '\'">' . htmlspecialchars($class['course_name']) . '</td>';
+            echo '<td style="padding-left: 25px; vertical-align: middle;">' . $counter . '</td>';
+            echo '<td style="vertical-align: middle;">' . htmlspecialchars($class['class_name']) . '</td>';
+            echo '<td style="vertical-align: middle;">' . htmlspecialchars($class['course_name']) . '</td>';
             echo '<td style="vertical-align: middle;">' . htmlspecialchars($class['lastname']) . ' ' . htmlspecialchars($class['firstname']) . '</td>';
             echo '<td>';
             echo '<div class="dropdown">';
@@ -35,7 +35,6 @@ if (isset($_POST['semester_id'])) {
             echo '</button>';
             echo '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $counter . '">';
             echo '<li><a class="dropdown-item" href="delete_class.php?class_id=' . htmlspecialchars($class['class_id']) . '" onclick="return confirm(\'Bạn có chắc chắn muốn hủy lớp học này không?\')">Hủy lớp</a></li>';
-            echo '<li><a class="dropdown-item" href="class_edit.php?class_id=' . htmlspecialchars($class['class_id']) . '">Xem chi tiết</a></li>';
             echo '</ul>';
             echo '</div>';
             echo '</td>';

@@ -10,7 +10,7 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 2rem;
     max-width: 90%;
-    margin: 0 auto;
+    margin-top: 50px;
 }
 
 .schedule-item {
@@ -19,7 +19,8 @@ body {
     background-color: #d1ecf1;
 }
 
-.table th, .table td {
+.table th,
+.table td {
     vertical-align: middle;
     text-align: center;
 }

@@ -115,7 +115,7 @@ foreach ($schedules as $schedule) {
 }
 
 // Thêm số lượng học sinh có mặt và đi trễ vào hàng tiếp theo (Tổng điểm danh)
-$attendanceCountsRow = ['Tổng điểm danh', '', '', '', '', '', '', '']; // Đặt giá trị cho 8 cột đầu tiên
+$attendanceCountsRow = ['Tổng điểm danh', '', '', '', '', '', '', '', '']; // Đặt giá trị cho 10 cột đầu tiên
 foreach ($attendanceCounts as $count) {
     $attendanceCountsRow[] = $count;
 }

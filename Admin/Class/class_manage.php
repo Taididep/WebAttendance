@@ -35,11 +35,11 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
     <div class="container">
         <div class="card p-4">
             <!-- Title -->
-            <h2 class="mb-4 text-center">Danh sách lớp học</h2>
-
+            <h2 class="mb-2 text-center">Danh sách lớp học</h2>
+            <hr>
             <!-- Semester Selection Form -->
-            <form id="semesterForm" class="d-flex justify-content-between align-items-center mb-4">
-                <div class="mb-0 me-2" style="flex: 1; display: flex; align-items: center;">
+            <form id="semesterForm" class="d-flex justify-content-between align-items-center">
+                <div class="mb-0" style="flex: 1; display: flex; align-items: center;">
                     <select class="form-select" id="semester" name="semester_id" required>
                         <option value="" disabled selected>Chọn học kỳ</option>
                         <?php foreach ($semesters as $semester): ?>
@@ -50,7 +50,6 @@ $defaultSemesterId = !empty($semesters) ? $semesters[0]['semester_id'] : null;
                     </select>
                 </div>
             </form>
-
 
             <!-- Class List Table -->
             <div id="classList" class="class-table">

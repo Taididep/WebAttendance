@@ -77,8 +77,8 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
             <span class="mx-3"><strong>A :</strong> Vắng mặt</span>
         </div>
         <div>
-            <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
-                class="btn btn-info">Thống kê điểm danh</a>
+            <!-- <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
+                class="btn btn-info">Thống kê điểm danh</a> -->
             <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>"
                 class="btn btn-success btn-custom">Xuất Excel</a>
         </div>
@@ -139,8 +139,6 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                                             echo '<span class="late">L</span>'; // Muộn
                                         } elseif ($status === '-1') {
                                             echo ''; // Chưa điểm danh
-                                        } elseif ($schedule['date'] > date('Y-m-d', strtotime($currentDateTime))) {
-                                            echo ''; // Chưa đến ngày
                                         } else {
                                             echo '<span class="absent">A</span>'; // Vắng
                                         }
