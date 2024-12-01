@@ -18,13 +18,34 @@ try {
 } catch (PDOException $e) {
     die("Kết nối thất bại: " . $e->getMessage());
 }
+
 session_start();
 
 // Lấy lịch dạy cho ngày mai
 $tomorrow = date("Y-m-d", strtotime('+1 day'));
 
-// SQL query để lấy danh sách lịch dạy của giảng viên vào ngày mai
-$sql = "CALL GetTeachingSchedulesByDate(:tomorrow)";
+// Truy vấn lấy thông tin lịch dạy của giảng viên vào ngày mai
+$sql = "
+    SELECT 
+        t.email, 
+        t.firstname, 
+        t.lastname, 
+        sc.date, 
+        sc.start_time, 
+        sc.end_time, 
+        c.course_name, 
+        cl.class_id
+    FROM 
+        teachers AS t
+    JOIN 
+        classes AS cl ON t.teacher_id = cl.teacher_id
+    JOIN 
+        schedules AS sc ON cl.class_id = sc.class_id
+    JOIN 
+        courses AS c ON cl.course_id = c.course_id
+    WHERE 
+        sc.date = :tomorrow
+";
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':tomorrow', $tomorrow, PDO::PARAM_STR);
 $stmt->execute();
@@ -37,11 +58,12 @@ if ($stmt->rowCount() > 0) {
         $email = $row['email'];
         $firstname = $row['firstname'];
         $lastname = $row['lastname'];
-        $date = $row['date'];
+        $course_name = $row['course_name'];
+        $class_id = $row['class_id'];
         $start_time = $row['start_time'];
         $end_time = $row['end_time'];
-        $class_name = $row['class_name'];
-        
+        $date = $row['date'];
+
         // Thêm lịch dạy vào danh sách của giảng viên
         if (!isset($emails[$email])) {
             $emails[$email] = [
@@ -50,9 +72,10 @@ if ($stmt->rowCount() > 0) {
                 'schedules' => []
             ];
         }
-        
+
         $emails[$email]['schedules'][] = [
-            'class_name' => $class_name,
+            'course_name' => $course_name,
+            'class_id' => $class_id,
             'start_time' => $start_time,
             'end_time' => $end_time
         ];
@@ -65,7 +88,7 @@ if ($stmt->rowCount() > 0) {
         $scheduleList = '';
 
         foreach ($info['schedules'] as $schedule) {
-            $scheduleList .= "<li>Lớp: {$schedule['class_name']}, từ {$schedule['start_time']} đến {$schedule['end_time']}</li>";
+            $scheduleList .= "<li>Lớp: {$schedule['class_id']} - Môn: {$schedule['course_name']} (Từ {$schedule['start_time']} đến {$schedule['end_time']})</li>";
         }
 
         // Cấu hình và gửi email
@@ -91,7 +114,12 @@ if ($stmt->rowCount() > 0) {
             // Nội dung email
             $mail->isHTML(true);
             $mail->Subject = "Lịch dạy ngày mai";
-            $mail->Body = "<h3>Chào $firstname $lastname,</h3><p>Bạn có lịch dạy vào ngày mai ($date):</p><ul>$scheduleList</ul>";
+            $mail->Body = "
+                <h3>Chào Thầy/Cô $firstname $lastname,</h3>
+                <p>Thầy/Cô có lịch dạy vào ngày mai ($date):</p>
+                <ul>$scheduleList</ul>
+                <p>Hãy đến đúng giờ và chuẩn bị đầy đủ nhé!</p>
+            ";
 
             // Gửi email
             $mail->send();
