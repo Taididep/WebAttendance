@@ -15,7 +15,7 @@ if (empty($username) || empty($password)) {
 
 // Tạo biến để lưu thông tin người dùng
 $userData = null;
-$pageRedirect = '/../login_view.php'; // Trang index
+$pageRedirect = '/../login_view.php'; // Trang mặc định nếu không thành công
 
 // Gọi thủ tục lưu trữ để lấy thông tin người dùng
 $sql = "CALL GetUserInfoByUsername(?)";
@@ -30,13 +30,13 @@ $userData = $stmt->fetchObject();
 // Xử lý kết quả đăng nhập
 if ($userData === false) {
     // Trường hợp không tìm thấy người dùng
-    $error = "Đăng nhập thất bại";
-    header("Location: /../login_view.php?error=" . urlencode($error));
+    $error = "Tên đăng nhập không tồn tại!";
+    header("Location: ../login_view.php?error=" . urlencode($error));
     exit;
 } else {
     // Kiểm tra mật khẩu bằng password_verify() (giả sử bạn đã lưu mật khẩu dưới dạng hash)
     if (password_verify($password, $userData->password)) {
-        // Lưu thông tin người dùng vào phiên
+        // Lưu thông tin người dùng vào session
         $_SESSION['user_id'] = $userData->user_id; // Lưu user_id
         $_SESSION['username'] = $userData->username;
         $_SESSION['role'] = $userData->role_name;
@@ -54,8 +54,9 @@ if ($userData === false) {
         exit;
     } else {
         // Trường hợp mật khẩu sai
-        $error = "Sai mật khẩu";
-        header("Location: /../login_view.php?error=" . urlencode($error));
+        $error = "Sai mật khẩu!";
+        header("Location: ../login_view.php?error=" . urlencode($error));
         exit;
     }
 }
+?>

@@ -1,3 +1,7 @@
+<?php
+// Kiểm tra xem có tham số 'error' được truyền không
+$error = $_GET['error'] ?? '';
+?>
 <!DOCTYPE html>  
 <html lang="vi">  
 <head>  
@@ -19,7 +23,16 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);  
             margin-top: 100px; 
         } 
-
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
         .input-group-text {  
             cursor: pointer;  
         }  
@@ -34,6 +47,9 @@
                     <div class="card-header">  
                         <h1 class="text-center" id="form-title">Đăng Nhập</h1>  
                     </div>  
+                    <?php if (!empty($error)): ?>
+                        <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+                    <?php endif; ?>
                     <div class="card-body">  
                         <div id="login-form">  
                             <form action="Account/login.php" method="post">  

@@ -32,7 +32,8 @@ function resetPassword($conn, $username, $emailInput) {
             $stmt->closeCursor(); // Close cursor
             
             // Cập nhật mật khẩu trong bảng users
-            $updateStmt = $conn->prepare("CALL UpdateUserPassword(:user_id, :new_password)");
+            $updateSql = "UPDATE db_atd.users SET password = :new_password WHERE user_id = :user_id";
+            $updateStmt = $conn->prepare($updateSql);
             $updateStmt->bindParam(':new_password', $hashedPassword, PDO::PARAM_STR);
             $updateStmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 
