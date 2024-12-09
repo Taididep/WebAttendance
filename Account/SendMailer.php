@@ -109,17 +109,31 @@ if ($stmt->rowCount() > 0) {
 
             // Người nhận
             $mail->addAddress($email, "$firstname $lastname");
-
+            
+            
+            // Thêm tệp đính kèm hình ảnh
+            $mail->AddEmbeddedImage('D:/Nam4/DoAnTN/WebAttendance/Image/LogoEmail.png', 'logo_cid', 'LogoEmail.png');
             // Nội dung email
             $mail->isHTML(true);
             $mail->Subject = "Lịch học ngày mai";
             $mail->Body = "
-                <h3>Chào $firstname $lastname,</h3>
-                <p>Bạn có lịch học vào ngày mai ($date):</p>
-                <ul>$scheduleList</ul>
-                <p>Hãy đến đúng giờ và chuẩn bị đầy đủ nhé!</p>
-            ";
-
+                <div style='border: 2px solid #4CAF50; padding: 15px; border-radius: 8px;'>
+                    <div style='text-align: center;'>
+                        <img src='cid:logo_cid' alt='Logo' style='width: 150px; margin-bottom: 20px;'>
+                    </div>
+                    <h3 style='color: #4CAF50;'>Chào $firstname $lastname,</h3>
+                    <p>Bạn có lịch học vào ngày mai (<strong style='color: #4CAF50;'>$date</strong>):</p>
+                    <ul style='padding-left: 20px;'>
+                        $scheduleList
+                    </ul>
+                    <p style='margin-top: 20px;'>Hãy đến đúng giờ và chuẩn bị đầy đủ nhé!</p>
+                    <div style='margin-top: 30px; text-align: center; color: #888; font-size: 12px;'>
+                        <p style='margin: 0;'>Trường Đại học TLT</p>
+                        <p style='margin: 0;'>Địa chỉ: 140 Đ. Lê Trọng Tấn, Tây Thạnh, Tân Phú, Hồ Chí Minh</p>
+                        <p style='margin: 0;'>Liên hệ: tlt@tlt.edu.vn</p>
+                    </div>
+                </div>
+                ";
             // Gửi email
             $mail->send();
             echo "Đã gửi email cho $email<br>";

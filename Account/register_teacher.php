@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($count_result > 0) {
         $_SESSION['error_message'] = "Mã giáo viên đã tồn tại.";
-        header("Location: ../register.php");
+        header("Location: ./register.php");
         exit();
     }
 
