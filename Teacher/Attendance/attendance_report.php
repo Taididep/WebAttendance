@@ -46,33 +46,30 @@ $stmtSchedules->execute([$class_id]);
 $schedules = $stmtSchedules->fetchAll(PDO::FETCH_ASSOC);
 $stmtSchedules->closeCursor();
 
-// Tính toán số lượng
-$totalStudents = count($students);
-$presentCount = 0;
-$lateCount = 0;
-$absentCount = 0;
-
 $currentDate = date('Y-m-d'); // Lấy ngày hiện tại
 
-foreach ($students as $student) {
-    foreach ($schedules as $schedule) {
-        if ($schedule['date'] < $currentDate) { // Chỉ tính những buổi đã qua
-            if (isset($attendanceMap[$student['student_id']][$schedule['date']])) {
-                $status = $attendanceMap[$student['student_id']][$schedule['date']];
-                if ($status === '1') {
-                    $presentCount++;
-                } elseif ($status === '2') {
-                    $lateCount++;
-                } else {
-                    $absentCount++;
-                }
+// Hàm tính số lượng học sinh có mặt, muộn và vắng mặt cho một buổi học cụ thể
+function calculateAttendance($students, $attendanceMap, $scheduleDate)
+{
+    $presentCount = 0;
+    $lateCount = 0;
+    $absentCount = 0;
+
+    foreach ($students as $student) {
+        if (isset($attendanceMap[$student['student_id']][$scheduleDate])) {
+            $status = $attendanceMap[$student['student_id']][$scheduleDate];
+            if ($status === '1') {
+                $presentCount++;
+            } elseif ($status === '2') {
+                $lateCount++;
+            } else {
+                $absentCount++;
             }
         }
     }
-}
 
-// Tính số lượng học sinh vắng mặt
-$absentCount = $totalStudents - ($presentCount + $lateCount);
+    return [$presentCount, $lateCount, $absentCount];
+}
 ?>
 
 <!DOCTYPE html>
@@ -91,17 +88,14 @@ $absentCount = $totalStudents - ($presentCount + $lateCount);
     <div class="container mt-5">
         <h2 class="text-center">Báo cáo điểm danh cho lớp: <?php echo htmlspecialchars($classInfo['class_name']); ?></h2>
 
-        <!-- Thêm phần nhập buổi học -->
+        <!-- Nhập buổi học -->
         <div class="attendance-input">
             <label for="attendanceInputList">Nhập buổi học:</label>
             <div class="input-group">
                 <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi (1, 2, ...)" required>
                 <div class="input-group-append">
                     <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>
-                    <button type="button" id="showAllBtnList" class="btn btn-success">Hiện tất cả</button>
-                    <button type="button" id="resetAttendanceBtnList" class="btn btn-danger">Xóa bỏ</button>
-                    <a href="export_statistics.php?class_id=<?php echo urlencode($class_id); ?>"
-                        class="btn btn-success btn-custom">Xuất Excel</a>
+                    <a href="export_statistics.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
                 </div>
             </div>
         </div>
@@ -116,31 +110,24 @@ $absentCount = $totalStudents - ($presentCount + $lateCount);
                     <thead>
                         <tr>
                             <?php foreach ($schedules as $index => $schedule): ?>
-                                <?php if ($schedule['date'] < $currentDate): // Chỉ hiển thị những buổi đã qua 
-                                ?>
-                                    <th class="schedule-header highlight" data-index="<?php echo $index; ?>">
+                                <?php if ($schedule['date'] < $currentDate): ?>
+                                    <th class="schedule-header" data-index="<?php echo $index; ?>">
                                         <?php echo 'Buổi ' . ($index + 1) . ' - ' . date('d/m', strtotime($schedule['date'])); ?>
                                     </th>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="<?php echo count(array_filter($schedules, fn($s) => $s['date'] < $currentDate)); ?>" class="text-center">
-                                <strong>Số lượng học sinh:</strong> <?php echo $totalStudents; ?> <br>
-                                <strong>Có mặt:</strong> <?php echo $presentCount; ?> <br>
-                                <strong>Muộn:</strong> <?php echo $lateCount; ?> <br>
-                                <strong>Vắng mặt:</strong> <?php echo $absentCount; ?>
-                            </td>
-                        </tr>
-                    </tbody>
                 </table>
             <?php endif; ?>
         </div>
     </div>
 
     <script>
+        let attendanceData = <?php echo json_encode($attendanceMap); ?>;
+        let schedules = <?php echo json_encode($schedules); ?>;
+        let students = <?php echo json_encode($students); ?>;
+
         const ctx = document.getElementById('attendanceChart').getContext('2d');
         const attendanceChart = new Chart(ctx, {
             type: 'bar',
@@ -148,11 +135,7 @@ $absentCount = $totalStudents - ($presentCount + $lateCount);
                 labels: ['Có mặt', 'Muộn', 'Vắng mặt'],
                 datasets: [{
                     label: 'Số lượng học sinh',
-                    data: [
-                        <?php echo $presentCount; ?>,
-                        <?php echo $lateCount; ?>,
-                        <?php echo $absentCount; ?>
-                    ],
+                    data: [0, 0, 0], // Mặc định là 0
                     backgroundColor: [
                         'rgba(76, 175, 80, 0.7)', // Có mặt
                         'rgba(255, 235, 59, 0.7)', // Muộn
@@ -195,71 +178,43 @@ $absentCount = $totalStudents - ($presentCount + $lateCount);
             }
         });
 
-        // Xử lý sự kiện nút "Xác nhận"
+        // Xử lý sự kiện khi người dùng nhập buổi học
         document.getElementById('confirmAttendanceBtnList').addEventListener('click', function() {
             const input = document.getElementById('attendanceInputList');
             const selectedIndex = parseInt(input.value) - 1; // Chỉ số bắt đầu từ 0
-            const headers = document.querySelectorAll('.schedule-header');
+            const selectedSchedule = schedules[selectedIndex];
 
-            // Xóa lớp highlight cho tất cả các tiêu đề trước
-            headers.forEach(header => header.classList.remove('highlight'));
+            if (selectedSchedule) {
+                // Tính toán số lượng học sinh có mặt, muộn, vắng mặt cho buổi học
+                const [presentCount, lateCount, absentCount] = calculateAttendance(students, attendanceData, selectedSchedule.date);
 
-            // Thêm lớp highlight cho tiêu đề tương ứng
-            if (selectedIndex >= 0 && selectedIndex < headers.length) {
-                headers[selectedIndex].classList.add('highlight');
+                // Cập nhật biểu đồ
+                attendanceChart.data.datasets[0].data = [presentCount, lateCount, absentCount];
+                attendanceChart.update();
             }
-
-            // Cập nhật dữ liệu biểu đồ
-            attendanceChart.data.datasets[0].data = [
-                <?php echo $presentCount; ?>,
-                <?php echo $lateCount; ?>,
-                <?php echo $absentCount; ?>
-            ];
-            attendanceChart.update(); // Cập nhật biểu đồ
         });
 
-        // Xử lý sự kiện nút "Hiện tất cả"
-        document.getElementById('showAllBtnList').addEventListener('click', function() {
-            const headers = document.querySelectorAll('.schedule-header');
+        function calculateAttendance(students, attendanceMap, scheduleDate) {
+            let presentCount = 0;
+            let lateCount = 0;
+            let absentCount = 0;
 
-            // Xóa lớp highlight cho tất cả các tiêu đề
-            headers.forEach(header => header.classList.remove('highlight'));
-
-            // Thêm lớp highlight cho tất cả các tiêu đề
-            headers.forEach(header => header.classList.add('highlight'));
-
-            // Cập nhật dữ liệu biểu đồ
-            attendanceChart.data.datasets[0].data = [
-                <?php echo $presentCount; ?>,
-                <?php echo $lateCount; ?>,
-                <?php echo $absentCount; ?>
-            ];
-            attendanceChart.update(); // Cập nhật biểu đồ
-        });
-
-        // Xử lý sự kiện nút "Xóa bỏ"
-        document.getElementById('resetAttendanceBtnList').addEventListener('click', function() {
-            document.getElementById('attendanceInputList').value = '';
-
-            // Xóa nội dung trong bảng cột
-            const headers = document.querySelectorAll('.schedule-header');
-            headers.forEach(header => header.classList.remove('highlight')); // Xóa highlight
-
-            const cells = document.querySelectorAll('.schedule-cell');
-            cells.forEach(cell => {
-                cell.textContent = ''; // Xóa nội dung ô
+            students.forEach(student => {
+                if (attendanceMap[student.student_id] && attendanceMap[student.student_id][scheduleDate]) {
+                    const status = attendanceMap[student.student_id][scheduleDate];
+                    if (status === '1') presentCount++;
+                    else if (status === '2') lateCount++;
+                    else absentCount++;
+                }
             });
 
-            // Đặt lại dữ liệu biểu đồ về 0
-            attendanceChart.data.datasets[0].data = [0, 0, 0];
-            attendanceChart.update(); // Cập nhật biểu đồ
-        });
+            return [presentCount, lateCount, absentCount];
+        }
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="../JavaScript/attendance_report.js"></script>
 </body>
 
 </html>

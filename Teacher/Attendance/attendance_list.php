@@ -77,8 +77,8 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
             <span class="mx-3"><strong>A :</strong> Vắng mặt</span>
         </div>
         <div>
-            <!-- <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
-                class="btn btn-info">Thống kê điểm danh</a> -->
+            <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
+                class="btn btn-info">Thống kê điểm danh</a>
             <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>"
                 class="btn btn-success btn-custom">Xuất Excel</a>
         </div>
@@ -217,10 +217,13 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                         <form id="addStudentForm" method="post">
                             <div id="joinClassMessage" class="alert d-none"></div>
 
-                            <div class="mb-3">
-                                <label for="studentIdInput" class="form-label">Mã sinh viên</label>
-                                <input type="text" class="form-control" id="studentIdInput" name="student_id" required
-                                    maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                            <!-- Row for horizontal alignment -->
+                            <div class="row align-items-center mb-3 mt-3">
+                                <label for="studentIdInput" class="col-sm-3 col-form-label">Mã sinh viên</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="studentIdInput" name="student_id" required
+                                        maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                                </div>
                             </div>
 
                             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
@@ -236,10 +239,13 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                         <form id="removeStudentForm" method="post">
                             <div id="removeClassMessage" class="alert d-none"></div>
 
-                            <div class="mb-3">
-                                <label for="removeStudentIdInput" class="form-label">Mã sinh viên</label>
-                                <input type="text" class="form-control" id="removeStudentIdInput" name="student_id"
-                                    required maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                            <!-- Row for horizontal alignment -->
+                            <div class="row align-items-center mb-3 mt-3">
+                                <label for="removeStudentIdInput" class="col-sm-3 col-form-label">Mã sinh viên</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="removeStudentIdInput" name="student_id" required
+                                        maxlength="11" oninput="this.value = this.value.replace(/\D/g, '')">
+                                </div>
                             </div>
 
                             <!-- Hiện thông tin sinh viên -->
@@ -251,18 +257,21 @@ $currentDateTime = date('Y-m-d H:i:s'); // Định dạng ngày giờ
                             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                <button type="button" class="btn btn-danger d-none" id="removeStudentButton">Xóa sinh
-                                    viên</button>
+                                <button type="button" class="btn btn-danger d-none" id="removeStudentButton">Xóa sinh viên</button>
                             </div>
                         </form>
                     </div>
+
 
                     <!-- Tab Tải lên Excel -->
                     <div class="tab-pane fade" id="uploadStudent" role="tabpanel">
                         <form id="uploadStudentForm" method="post" enctype="multipart/form-data" action="import_excel.php">
                             <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
-                            <input type="file" class="form-control" id="excelFileInput" name="excel_file" accept=".xls,.xlsx" required>
-                            <button type="submit" class="btn btn-primary">Tải lên</button>
+
+                            <input type="file" class="form-control mt-3 mb-3" id="excelFileInput" name="excel_file" accept=".xls,.xlsx" required>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Tải lên</button>
+                            </div>
                         </form>
 
                     </div>

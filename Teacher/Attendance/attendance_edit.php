@@ -80,8 +80,8 @@ $currentDate = date('Y-m-d');
                     <span class="mx-3"><strong>A :</strong> Vắng mặt</span>
                 </div>
                 <div>
-                    <!-- <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
-                        class="btn btn-info">Thống kê điểm danh</a> -->
+                    <a href="../Attendance/attendance_report.php?class_id=<?php echo urlencode($class_id); ?>"
+                        class="btn btn-info">Thống kê điểm danh</a>
                     <a href="export_excel.php?class_id=<?php echo urlencode($class_id); ?>"
                         class="btn btn-success btn-custom">Xuất Excel</a>
                 </div>
