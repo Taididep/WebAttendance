@@ -95,7 +95,7 @@ function calculateAttendance($students, $attendanceMap, $scheduleDate)
                 <input type="number" id="attendanceInputList" min="1" max="<?php echo count($schedules); ?>" class="form-control" placeholder="Nhập buổi (1, 2, ...)" required>
                 <div class="input-group-append">
                     <button type="button" id="confirmAttendanceBtnList" class="btn btn-primary">Xác nhận</button>
-                    <a href="export_statistics.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a>
+                    <!-- <a href="export_statistics.php?class_id=<?php echo urlencode($class_id); ?>" class="btn btn-success btn-custom">Xuất Excel</a> -->
                 </div>
             </div>
         </div>

@@ -14,17 +14,6 @@ if (!$classId) {
     exit;
 }
 
-// // Gọi thủ tục để lấy thông tin lớp học
-// $sql_class_info = "CALL GetClassInfoById(?)";
-// $stmt_class_info = $conn->prepare($sql_class_info);
-// $stmt_class_info->execute([$classId]);
-// $classInfo = $stmt_class_info->fetch(PDO::FETCH_ASSOC);
-// $stmt_class_info->closeCursor();
-
-// if (!$classInfo) {
-//     echo '<div class="alert alert-danger">Không tìm thấy thông tin cho lớp học này.</div>';
-//     exit;
-// }
 
 $class_id = $_GET['class_id'];
 
@@ -106,8 +95,6 @@ $currentDate = date('Y-m-d');
     <div class="container mt-5">
         <div class="card mb-4">
             <div class="card-body">
-                <h3 class="text-center">Lịch dạy</h3>
-                <hr>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -179,6 +166,41 @@ $currentDate = date('Y-m-d');
         </div>
     </div>
 
+    <!-- Modal Tạo Lịch Học -->
+    <div class="modal fade" id="createScheduleModal" tabindex="-1" aria-labelledby="createScheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="create_schedule.php" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createScheduleModalLabel">Tạo lịch học mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Hidden input for class_id -->
+                        <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
+
+                        <div class="mb-3">
+                            <label for="schedule_date" class="form-label">Ngày học</label>
+                            <input type="date" class="form-control" name="schedule_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="start_time" class="form-label">Tiết bắt đầu</label>
+                            <input type="number" class="form-control" name="start_time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_time" class="form-label">Tiết kết thúc</label>
+                            <input type="number" class="form-control" name="end_time" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Tạo lịch học</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="editScheduleModal" tabindex="-1" aria-labelledby="editScheduleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -216,43 +238,53 @@ $currentDate = date('Y-m-d');
         </div>
     </div>
 
-    <!-- Modal Tạo Lịch Học -->
-    <div class="modal fade" id="createScheduleModal" tabindex="-1" aria-labelledby="createScheduleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="create_schedule.php" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createScheduleModalLabel">Tạo lịch học mới</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Hidden input for class_id -->
-                        <input type="hidden" name="class_id" value="<?php echo htmlspecialchars($class_id); ?>">
-
-                        <div class="mb-3">
-                            <label for="schedule_date" class="form-label">Ngày học</label>
-                            <input type="date" class="form-control" name="schedule_date" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="start_time" class="form-label">Tiết bắt đầu</label>
-                            <input type="number" class="form-control" name="start_time" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="end_time" class="form-label">Tiết kết thúc</label>
-                            <input type="number" class="form-control" name="end_time" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="btn btn-primary">Tạo lịch học</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../JavaScript/class_view.js"></script>
+
+    <?php if (isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const modalElement = document.getElementById('editScheduleModal');
+                const modal = new bootstrap.Modal(modalElement);
+
+                // Kiểm tra nếu có lỗi duplicate
+                if (window.location.search.includes('error=duplicate')) {
+                    // Hiển thị thông báo lỗi trong modal
+                    const errorMessage = "Không thể cập nhật lịch học. Ngày này đã được đặt trước.";
+                    modal.show();
+
+                    // Thêm thông báo vào modal
+                    const errorDiv = document.createElement('div');
+                    errorDiv.classList.add('alert', 'alert-danger', 'mt-2');
+                    errorDiv.textContent = errorMessage;
+
+                    const modalBody = document.querySelector('#editScheduleModal .modal-body');
+                    modalBody.insertBefore(errorDiv, modalBody.firstChild);
+                }
+
+                // Lắng nghe sự kiện modal đóng
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    // Lấy URL hiện tại
+                    const currentUrl = new URL(window.location.href);
+
+                    // Lấy giá trị class_id
+                    const classId = currentUrl.searchParams.get('class_id');
+
+                    // Nếu có class_id, loại bỏ error=duplicate và tải lại trang
+                    if (classId) {
+                        currentUrl.searchParams.delete('error'); // Loại bỏ tham số error
+                        currentUrl.searchParams.set('class_id', classId); // Đảm bảo class_id còn lại
+                        window.location.href = currentUrl.toString(); // Tải lại trang mà không có tham số error
+                    } else {
+                        // Nếu không có class_id, chỉ tải lại trang
+                        window.location.reload();
+                    }
+                });
+            });
+        </script>
+    <?php endif; ?>
+
 </body>
 
 </html>

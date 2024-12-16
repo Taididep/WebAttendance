@@ -110,7 +110,14 @@ CREATE TABLE schedules (
     end_time INT NOT NULL,
     status TINYINT(1),	
     FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE
+    UNIQUE (class_id, date) -- Ràng buộc không trùng `date` trong cùng một `class_id`
 );
+
+ALTER TABLE schedules
+ADD CONSTRAINT unique_class_date UNIQUE (class_id, date);
+
+
+
 -- 8
 CREATE TABLE attendances (
     attendance_id INT(11) AUTO_INCREMENT PRIMARY KEY,
