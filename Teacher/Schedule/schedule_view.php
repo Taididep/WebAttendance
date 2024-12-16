@@ -108,66 +108,74 @@ $nextWeek->modify('+1 week');
                 </a>
             </div>
             <!-- Nút in lịch -->
-            <button class="btn btn-success" onclick="window.print()">
+            <button class="btn btn-success" onclick="printSchedule()">
                 <i class="bi bi-printer"></i> In lịch
             </button>
         </form>
 
-        <table class="table table-bordered text-center">
-            <thead>
-                <tr>
-                    <th class="align-middle">Ca học</th>
-                    <?php foreach ($daysOfWeek as $index => $day): ?>
-                        <?php
-                        // Lấy ngày cụ thể trong tuần
-                        $currentDate = clone $startDate;
-                        $currentDate->modify("+$index days");
-                        $formattedDate = $currentDate->format('d/m/Y');
-                        ?>
-                        <th class="align-middle">
-                            <?php echo $day; ?><br><?php echo $formattedDate; ?>
-                        </th>
-                    <?php endforeach; ?>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Mảng để giữ các ca học
-                $shifts = ['Sáng', 'Chiều', 'Tối'];
-                foreach ($shifts as $shift): ?>
+        <!-- Khu vực in lịch học -->
+        <div id="printable-area">
+            <table class="table table-bordered text-center">
+                <thead>
                     <tr>
-                        <td class="align-middle"><?php echo $shift; ?></td>
+                        <th class="align-middle">Ca học</th>
                         <?php foreach ($daysOfWeek as $index => $day): ?>
                             <?php
                             // Lấy ngày cụ thể trong tuần
                             $currentDate = clone $startDate;
                             $currentDate->modify("+$index days");
-                            $formattedDate = $currentDate->format('Y-m-d');
+                            $formattedDate = $currentDate->format('d/m/Y');
                             ?>
-                            <td>
-                                <?php if (isset($weeklySchedules[$formattedDate])): ?>
-                                    <div class="schedule-boxes">
-                                        <?php foreach ($weeklySchedules[$formattedDate] as $schedule): ?>
-                                            <?php if ($schedule['ca_hoc'] === $shift): ?>
-                                                <div class="schedule-item">
-                                                    <strong><?php echo htmlspecialchars($schedule['class_name']); ?></strong><br>
-                                                    <small><?php echo htmlspecialchars($schedule['course_name']); ?></small><br>
-                                                    <small>Tiết: <?php echo htmlspecialchars($schedule['start_time']) . ' - ' . htmlspecialchars($schedule['end_time']); ?></small>
-                                                </div>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-                            </td>
+                            <th class="align-middle">
+                                <?php echo $day; ?><br><?php echo $formattedDate; ?>
+                            </th>
                         <?php endforeach; ?>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php
+                    // Mảng để giữ các ca học
+                    $shifts = ['Sáng', 'Chiều', 'Tối'];
+                    foreach ($shifts as $shift): ?>
+                        <tr>
+                            <td class="align-middle"><?php echo $shift; ?></td>
+                            <?php foreach ($daysOfWeek as $index => $day): ?>
+                                <?php
+                                // Lấy ngày cụ thể trong tuần
+                                $currentDate = clone $startDate;
+                                $currentDate->modify("+$index days");
+                                $formattedDate = $currentDate->format('Y-m-d');
+                                ?>
+                                <td>
+                                    <?php if (isset($weeklySchedules[$formattedDate])): ?>
+                                        <div class="schedule-boxes">
+                                            <?php foreach ($weeklySchedules[$formattedDate] as $schedule): ?>
+                                                <?php if ($schedule['ca_hoc'] === $shift): ?>
+                                                    <div class="schedule-item">
+                                                        <strong><?php echo htmlspecialchars($schedule['class_name']); ?></strong><br>
+                                                        <small><?php echo htmlspecialchars($schedule['course_name']); ?></small><br>
+                                                        <small>Tiết: <?php echo htmlspecialchars($schedule['start_time']) . ' - ' . htmlspecialchars($schedule['end_time']); ?></small>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+                            <?php endforeach; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function printSchedule() {
+            window.print();
+        }
+    </script>
 </body>
 
 </html>

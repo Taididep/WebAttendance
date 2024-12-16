@@ -46,3 +46,20 @@ body {
     display: flex;
     justify-content: flex-end;
 }
+
+/* Ẩn mọi phần không cần in */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #printable-area, #printable-area * {
+        visibility: visible;
+    }
+    #printable-area {
+        margin: 0 auto;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
