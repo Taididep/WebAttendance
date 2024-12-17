@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 30, 2024 lúc 05:40 PM
+-- Thời gian đã tạo: Th12 18, 2024 lúc 12:55 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -79,6 +79,15 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CheckClassStudentExistence` (IN `p_
     SELECT COUNT(*) INTO p_exists
     FROM class_students
     WHERE class_id = p_class_id AND student_id = p_student_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CheckScheduleExists` (IN `class_id` CHAR(36), IN `schedule_date` DATETIME, IN `start_time` INT, IN `end_time` INT, OUT `exists_flag` INT)   BEGIN
+    SELECT COUNT(*) INTO exists_flag
+    FROM schedules
+    WHERE class_id = class_id 
+    AND date = schedule_date
+    AND start_time = start_time
+    AND end_time = end_time;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `CheckStudentExistence` (IN `p_student_id` INT, OUT `p_exists` INT)   BEGIN
@@ -454,6 +463,29 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentsByClassIdAndStudentId` (
     WHERE cs.class_id = classId AND s.student_id = studentId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentScheduleForTomorrow` (IN `tomorrow` DATE)   BEGIN
+    SELECT 
+        st.email, 
+        st.firstname, 
+        st.lastname, 
+        sc.date, 
+        sc.start_time, 
+        sc.end_time, 
+        c.course_name
+    FROM 
+        students AS st
+    JOIN 
+        class_students AS cs ON st.student_id = cs.student_id
+    JOIN 
+        schedules AS sc ON cs.class_id = sc.class_id
+    JOIN 
+        classes AS cl ON sc.class_id = cl.class_id
+    JOIN 
+        courses AS c ON cl.course_id = c.course_id
+    WHERE 
+        sc.date = tomorrow;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStudentSchedules` (IN `startDate` DATE, IN `endDate` DATE, IN `semesterId` INT, IN `student_id` INT)   BEGIN
     SELECT 
         c.class_name,
@@ -501,6 +533,28 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherInfo` (IN `teacher_id_par
     SELECT lastname, firstname 
     FROM teachers 
     WHERE teacher_id = teacher_id_param;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherScheduleForTomorrow` (IN `tomorrow` DATE)   BEGIN
+    SELECT 
+        t.email, 
+        t.firstname, 
+        t.lastname, 
+        sc.date, 
+        sc.start_time, 
+        sc.end_time, 
+        c.course_name, 
+        cl.class_id
+    FROM 
+        teachers AS t
+    JOIN 
+        classes AS cl ON t.teacher_id = cl.teacher_id
+    JOIN 
+        schedules AS sc ON cl.class_id = sc.class_id
+    JOIN 
+        courses AS c ON cl.course_id = c.course_id
+    WHERE 
+        sc.date = tomorrow;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTeacherSchedules` (IN `startDate` DATE, IN `endDate` DATE, IN `semesterId` INT, IN `teacher_id` INT)   BEGIN
@@ -772,13 +826,6 @@ CREATE TABLE `announcements` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Đang đổ dữ liệu cho bảng `announcements`
---
-
-INSERT INTO `announcements` (`announcement_id`, `class_id`, `title`, `content`, `created_at`, `updated_at`) VALUES
-(24, '95410e04', 'Chao mung', 'Các em lưu ý kỹ là....', '2024-11-30 15:22:03', '2024-11-30 15:22:21');
-
 -- --------------------------------------------------------
 
 --
@@ -812,7 +859,52 @@ INSERT INTO `attendances` (`attendance_id`, `schedule_id`, `student_id`, `status
 (12, 165, 2001215678, 0, '2024-11-30 16:29:00'),
 (13, 165, 2001215679, 0, '2024-11-30 16:29:00'),
 (14, 165, 2001216780, 2, '2024-11-30 16:29:00'),
-(15, 165, 2001216789, 2, '2024-11-30 16:29:00');
+(16, 166, 2001210123, 2, '2024-12-16 08:58:30'),
+(17, 167, 2001210123, 0, '2024-12-16 08:58:30'),
+(18, 166, 2001210224, 2, '2024-12-16 08:58:30'),
+(19, 167, 2001210224, 1, '2024-12-17 22:23:24'),
+(20, 166, 2001211234, 2, '2024-12-16 08:58:31'),
+(21, 167, 2001211234, 0, '2024-12-16 08:58:31'),
+(22, 166, 2001211785, 1, '2024-12-16 08:58:31'),
+(23, 167, 2001211785, 0, '2024-12-16 08:58:31'),
+(24, 166, 2001212345, 1, '2024-12-16 08:58:31'),
+(25, 167, 2001212345, 0, '2024-12-16 08:58:31'),
+(26, 166, 2001212346, 1, '2024-12-16 08:58:31'),
+(27, 167, 2001212346, 0, '2024-12-16 08:58:31'),
+(28, 166, 2001213456, 0, '2024-12-16 08:58:31'),
+(29, 167, 2001213456, 0, '2024-12-16 08:58:31'),
+(30, 166, 2001213457, 0, '2024-12-16 08:58:31'),
+(31, 167, 2001213457, 0, '2024-12-16 08:58:31'),
+(32, 166, 2001214567, 0, '2024-12-16 08:58:31'),
+(33, 167, 2001214567, 0, '2024-12-16 08:58:31'),
+(34, 166, 2001214568, 0, '2024-12-16 08:58:31'),
+(35, 167, 2001214568, 0, '2024-12-16 08:58:31'),
+(36, 166, 2001215678, 0, '2024-12-16 08:58:31'),
+(37, 167, 2001215678, 0, '2024-12-16 08:58:31'),
+(38, 166, 2001215679, 0, '2024-12-16 08:58:31'),
+(39, 167, 2001215679, 0, '2024-12-16 08:58:31'),
+(40, 166, 2001216114, 0, '2024-12-16 08:58:31'),
+(41, 167, 2001216114, 0, '2024-12-16 08:58:31'),
+(42, 166, 2001216780, 0, '2024-12-16 08:58:31'),
+(43, 167, 2001216780, 0, '2024-12-16 08:58:31'),
+(46, 168, 2001216114, 1, '2024-12-17 23:20:07'),
+(47, 168, 2001210123, 0, '2024-12-17 23:21:00'),
+(48, 168, 2001210224, 0, '2024-12-17 23:21:00'),
+(49, 168, 2001211234, 0, '2024-12-17 23:21:00'),
+(50, 168, 2001211785, 1, '2024-12-17 23:21:00'),
+(51, 168, 2001212345, 2, '2024-12-17 23:21:00'),
+(52, 168, 2001212346, 0, '2024-12-17 23:21:00'),
+(53, 168, 2001213456, 0, '2024-12-17 23:21:00'),
+(54, 168, 2001213457, 0, '2024-12-17 23:21:00'),
+(55, 168, 2001214567, 0, '2024-12-17 23:21:00'),
+(56, 168, 2001214568, 0, '2024-12-17 23:21:00'),
+(57, 168, 2001215678, 0, '2024-12-17 23:21:00'),
+(58, 168, 2001215679, 0, '2024-12-17 23:21:00'),
+(59, 168, 2001216780, 0, '2024-12-17 23:21:00'),
+(60, 165, 2001216789, 0, '2024-12-17 23:52:38'),
+(61, 166, 2001216789, 0, '2024-12-17 23:52:38'),
+(62, 167, 2001216789, 0, '2024-12-17 23:52:38'),
+(63, 168, 2001216789, 0, '2024-12-17 23:52:38');
 
 --
 -- Bẫy `attendances`
@@ -991,21 +1083,21 @@ CREATE TABLE `attendance_reports` (
 --
 
 INSERT INTO `attendance_reports` (`report_id`, `class_id`, `student_id`, `total_present`, `total_absent`, `total_late`, `total`) VALUES
-(1, '95410e04', 2001216114, 0, 0, 1, 15),
-(2, '95410e04', 2001210123, 0, 1, 0, 15),
-(3, '95410e04', 2001210224, 0, 1, 0, 15),
-(4, '95410e04', 2001211234, 0, 1, 0, 15),
-(5, '95410e04', 2001211785, 0, 1, 0, 15),
-(6, '95410e04', 2001212345, 0, 1, 0, 15),
-(7, '95410e04', 2001212346, 0, 1, 0, 15),
-(8, '95410e04', 2001213456, 0, 1, 0, 15),
-(9, '95410e04', 2001213457, 0, 1, 0, 15),
-(10, '95410e04', 2001214567, 0, 1, 0, 15),
-(11, '95410e04', 2001214568, 0, 1, 0, 15),
-(12, '95410e04', 2001215678, 0, 1, 0, 15),
-(13, '95410e04', 2001215679, 0, 1, 0, 15),
-(14, '95410e04', 2001216780, 0, 0, 1, 15),
-(15, '95410e04', 2001216789, 0, 0, 1, 15);
+(1, '95410e04', 2001216114, 1, 2, 1, 15),
+(2, '95410e04', 2001210123, 0, 3, 1, 15),
+(3, '95410e04', 2001210224, 1, 2, 1, 15),
+(4, '95410e04', 2001211234, 0, 3, 1, 15),
+(5, '95410e04', 2001211785, 2, 2, 0, 15),
+(6, '95410e04', 2001212345, 1, 2, 1, 15),
+(7, '95410e04', 2001212346, 1, 3, 0, 15),
+(8, '95410e04', 2001213456, 0, 4, 0, 15),
+(9, '95410e04', 2001213457, 0, 4, 0, 15),
+(10, '95410e04', 2001214567, 0, 4, 0, 15),
+(11, '95410e04', 2001214568, 0, 4, 0, 15),
+(12, '95410e04', 2001215678, 0, 4, 0, 15),
+(13, '95410e04', 2001215679, 0, 4, 0, 15),
+(14, '95410e04', 2001216780, 0, 3, 1, 15),
+(16, '95410e04', 2001216789, 0, 4, 0, 15);
 
 -- --------------------------------------------------------
 
@@ -1061,6 +1153,7 @@ INSERT INTO `class_students` (`class_id`, `student_id`, `status`) VALUES
 ('1432cd49', 2001216114, 0),
 ('1432cd49', 2001216780, 0),
 ('1432cd49', 2001216789, 0),
+('1432cd49', 2001218902, 0),
 ('95410e04', 2001210123, 0),
 ('95410e04', 2001210224, 0),
 ('95410e04', 2001211234, 0),
@@ -1090,14 +1183,6 @@ CREATE TABLE `comments` (
   `content` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `comments`
---
-
-INSERT INTO `comments` (`comment_id`, `announcement_id`, `user_id`, `content`, `created_at`) VALUES
-(10, 24, 1000001234, 'xin nhac lai là', '2024-11-30 15:22:38'),
-(11, 24, 2001216114, 'dạ vâng', '2024-11-30 15:25:08');
 
 -- --------------------------------------------------------
 
@@ -1235,8 +1320,8 @@ INSERT INTO `schedules` (`schedule_id`, `class_id`, `date`, `start_time`, `end_t
 (107, '1432cd49', '2025-01-01 00:00:00', 1, 3, 0),
 (165, '95410e04', '2024-11-30 23:27:00', 4, 6, 0),
 (166, '95410e04', '2024-12-07 00:00:00', 4, 6, 0),
-(167, '95410e04', '2024-12-14 00:00:00', 4, 6, 0),
-(168, '95410e04', '2024-12-21 00:00:00', 4, 6, 0),
+(167, '95410e04', '2024-12-14 11:00:00', 4, 6, 0),
+(168, '95410e04', '2024-12-18 00:00:00', 4, 6, 1),
 (169, '95410e04', '2024-12-28 00:00:00', 4, 6, 0),
 (170, '95410e04', '2025-01-04 00:00:00', 4, 6, 0),
 (171, '95410e04', '2025-01-11 00:00:00', 4, 6, 0),
@@ -1269,10 +1354,7 @@ CREATE TABLE `semesters` (
 
 INSERT INTO `semesters` (`semester_id`, `semester_name`, `is_active`, `start_date`, `end_date`) VALUES
 (1, 'HK3 (Hè 2023 - 2024)', 0, '2024-07-10', '2024-08-07'),
-(2, 'HK1 (2024 - 2025)', 1, '2024-08-15', '2025-12-17'),
-(3, 'HK2 (2021)', 1, '2013-03-30', '2005-08-09'),
-(4, 'HK2 (2024)', 1, '2013-03-30', '2019-08-09'),
-(5, 'HK2 (2024)', 1, '2013-03-30', '2019-08-09');
+(2, 'HK1 (2024 - 2025)', 1, '2024-08-15', '2025-12-17');
 
 -- --------------------------------------------------------
 
@@ -1361,9 +1443,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
-(1, 'admin1', '$2y$10$cfG.Glj5s4GTocadoW.QDupZ/HMVIOwf74xes7gEjqWx5J8fV3GuO'),
+(1, 'admin1', '$2y$10$PgfPRPqiRCIdMbVbFHoBb.cTo5T/j3waxk1vN5KOu68K6RIz7Eq7u'),
 (2, 'admin2', '$2y$10$dqut0FsGPQwl.1S1n9m9MuXqwbynWDAutKAs9/kUe5D9uev1zRKpK'),
-(1000001234, '1000001234', '$2y$10$4fhM2Q0vP6grGN.pbFApVONMOI5b41zd93DoPt1RafqjB1si6LtLC'),
+(1000001234, '1000001234', '$2y$10$WoXGPcxQkxxIQ6wkvKPj7.RYvbbyFVhtL5X2J54Drf8OhwSKWS6Hi'),
 (1000001235, '1000001235', '$2y$10$P3vImaR.pFuxTs8c43oT1.XPMXGtAk5NqZBazDAelrv8usUORCw5e'),
 (1000001236, '1000001236', '$2y$10$tyeWDRjI15fzNm2W5YcM6Okq2Wwt81gLZBlJBleRlClF4sWV.LnRS'),
 (2001210123, '2001210123', '$2y$10$jxw0hNSfkHGIDszeNylgYeRVSN2mBQwYPBTto7fEXLSBiu8qryTt2'),
@@ -1383,7 +1465,7 @@ INSERT INTO `users` (`user_id`, `username`, `password`) VALUES
 (2001216789, '2001216789', '$2y$10$OnzCVCYPBvYEdMq4NJcHDO4hPfHP3l33ZO4l4enj0FbDc15WFz22O'),
 (2001217890, '2001217890', '$2y$10$1E04RyXbXUo.Dj80UB357eyKDT5EynWHjG9QIWSJmQlKVqXxDRYP.'),
 (2001217891, '2001217891', '$2y$10$KB/51VXfiDBAszgYJXmqDuxmZHi68DRbszhRzkXuWvGd6f.7jL0qS'),
-(2001218901, '2001218901', '$2y$10$l0lYUwjX/xJAL6xWDvYZyeD8hyWztXKj2S/aTQu3r39oB5jcxqd8O'),
+(2001218901, '2001218901test', '$2y$10$l0lYUwjX/xJAL6xWDvYZyeD8hyWztXKj2S/aTQu3r39oB5jcxqd8O'),
 (2001218902, '2001218902', '$2y$10$XqkzEaGOuT7MmMNldNEHhu3twAQVSYe.mjUQA9rbFibcPWqs88B66'),
 (2001219012, '2001219012', '$2y$10$wynEYi.KyKkc2HoI9CHZBeKlmpIdF/fhbyy8zVX8wRfYbQb3RNkS.'),
 (2001219019, '123', '$2y$10$wPW6IS23ZZYCx9kkP90h.OFa6hnZQ/8/XtFL1iGk6/86vgizMmAGG'),
@@ -1513,6 +1595,7 @@ ALTER TABLE `roles`
 --
 ALTER TABLE `schedules`
   ADD PRIMARY KEY (`schedule_id`),
+  ADD UNIQUE KEY `unique_class_date` (`class_id`,`date`),
   ADD KEY `class_id` (`class_id`);
 
 --
@@ -1567,13 +1650,13 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT cho bảng `attendances`
 --
 ALTER TABLE `attendances`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT cho bảng `attendance_reports`
 --
 ALTER TABLE `attendance_reports`
-  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT cho bảng `comments`
@@ -1603,13 +1686,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT cho bảng `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=180;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=191;
 
 --
 -- AUTO_INCREMENT cho bảng `semesters`
 --
 ALTER TABLE `semesters`
-  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `semester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT cho bảng `students`

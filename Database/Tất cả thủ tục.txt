@@ -1586,3 +1586,31 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-91
+DELIMITER $$
+
+CREATE PROCEDURE GetTeacherScheduleForTomorrow(IN tomorrow DATE)
+BEGIN
+    SELECT 
+        t.email, 
+        t.firstname, 
+        t.lastname, 
+        sc.date, 
+        sc.start_time, 
+        sc.end_time, 
+        c.course_name, 
+        cl.class_id
+    FROM 
+        teachers AS t
+    JOIN 
+        classes AS cl ON t.teacher_id = cl.teacher_id
+    JOIN 
+        schedules AS sc ON cl.class_id = sc.class_id
+    JOIN 
+        courses AS c ON cl.course_id = c.course_id
+    WHERE 
+        sc.date = tomorrow;
+END$$
+
+DELIMITER ;

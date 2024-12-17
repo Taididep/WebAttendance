@@ -75,7 +75,6 @@ $currentDate = date('Y-m-d');
         <table class="table table-striped" id="studentList" style="table-layout: fixed;">
             <thead>
                 <tr>
-                    <th style="width: 80px;">STT</th>
                     <th style="width: 150px;">Mã sinh viên</th>
                     <th style="width: 200px;">Họ đệm</th>
                     <th style="width: 150px;">Tên</th>
@@ -90,7 +89,6 @@ $currentDate = date('Y-m-d');
             <tbody>
                 <?php foreach ($students as $index => $student): ?>
                     <tr>
-                        <td style="padding-left: 10px;"><?php echo $index + 1; ?></td>
                         <td><?php echo htmlspecialchars($student['student_id']); ?></td>
                         <td><?php echo htmlspecialchars($student['lastname']); ?></td>
                         <td><?php echo htmlspecialchars($student['firstname']); ?></td>
@@ -138,7 +136,7 @@ $currentDate = date('Y-m-d');
                                     if ($status === '1') {
                                         echo 'Có mặt'; // Có mặt
                                     } elseif ($status === '2') {
-                                        echo 'Muộn'; // Muộn
+                                        echo 'Đi trễ'; // Muộn
                                     } elseif ($schedule['date'] > $currentDate) {
                                         echo ''; // Để trống nếu ngày hiện tại chưa đến ngày điểm danh
                                     } else {

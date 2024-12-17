@@ -1,4 +1,5 @@
 <?php
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -25,30 +26,11 @@ session_start();
 $tomorrow = date("Y-m-d", strtotime('+1 day'));
 
 // Truy vấn lấy thông tin lịch dạy của giảng viên vào ngày mai
-$sql = "
-    SELECT 
-        t.email, 
-        t.firstname, 
-        t.lastname, 
-        sc.date, 
-        sc.start_time, 
-        sc.end_time, 
-        c.course_name, 
-        cl.class_id
-    FROM 
-        teachers AS t
-    JOIN 
-        classes AS cl ON t.teacher_id = cl.teacher_id
-    JOIN 
-        schedules AS sc ON cl.class_id = sc.class_id
-    JOIN 
-        courses AS c ON cl.course_id = c.course_id
-    WHERE 
-        sc.date = :tomorrow
-";
+$sql = "CALL GetTeacherScheduleForTomorrow(:tomorrow)";
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':tomorrow', $tomorrow, PDO::PARAM_STR);
 $stmt->execute();
+
 
 // Tạo danh sách email
 $emails = [];
@@ -110,8 +92,8 @@ if ($stmt->rowCount() > 0) {
 
             // Người nhận
             $mail->addAddress($email, "$firstname $lastname");
-            
-            
+
+
             // Thêm tệp đính kèm hình ảnh
             $mail->AddEmbeddedImage('D:/Nam4/DoAnTN/WebAttendance/Image/LogoEmail.png', 'logo_cid', 'LogoEmail.png');
             // Nội dung email
@@ -148,4 +130,3 @@ if ($stmt->rowCount() > 0) {
 }
 
 $conn = null;  // Đóng kết nối cơ sở dữ liệu
-?>

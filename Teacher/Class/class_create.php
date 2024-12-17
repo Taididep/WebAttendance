@@ -90,9 +90,9 @@ $stmt_semesters->closeCursor();
                 <input type="text" class="form-control" id="class_name" name="class_name" required>
             </div>
             <div class="mb-3">
-                <label for="course_id" class="form-label">Khóa học</label>
+                <label for="course_id" class="form-label">Môn học</label>
                 <select class="form-select" id="course_id" name="course_id" required>
-                    <option value="" disabled selected>Chọn khóa học</option>
+                    <option value="" disabled selected>Chọn môn học</option>
                     <?php foreach ($courses as $course): ?>
                         <option value="<?php echo $course['course_id']; ?>">
                             <?php echo htmlspecialchars($course['course_id']) . ' - ' . htmlspecialchars($course['course_name']); ?>
