@@ -1544,3 +1544,45 @@ END //
 DELIMITER ;
 
 -89
+DELIMITER $$
+
+CREATE PROCEDURE GetStudentScheduleForTomorrow(IN tomorrow DATE)
+BEGIN
+    SELECT 
+        st.email, 
+        st.firstname, 
+        st.lastname, 
+        sc.date, 
+        sc.start_time, 
+        sc.end_time, 
+        c.course_name
+    FROM 
+        students AS st
+    JOIN 
+        class_students AS cs ON st.student_id = cs.student_id
+    JOIN 
+        schedules AS sc ON cs.class_id = sc.class_id
+    JOIN 
+        classes AS cl ON sc.class_id = cl.class_id
+    JOIN 
+        courses AS c ON cl.course_id = c.course_id
+    WHERE 
+        sc.date = tomorrow;
+END$$
+
+DELIMITER ;
+
+-90
+DELIMITER $$
+
+CREATE PROCEDURE CheckScheduleExists(IN class_id CHAR(36), IN schedule_date DATETIME, IN start_time INT, IN end_time INT, OUT exists_flag INT)
+BEGIN
+    SELECT COUNT(*) INTO exists_flag
+    FROM schedules
+    WHERE class_id = class_id 
+    AND date = schedule_date
+    AND start_time = start_time
+    AND end_time = end_time;
+END $$
+
+DELIMITER ;

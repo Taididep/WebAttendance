@@ -95,7 +95,7 @@ scheduleCells.forEach(cell => {
     const scheduleDate = new Date(year, month - 1, day);  // Tạo đối tượng Date từ ngày, tháng, năm
 
     // So sánh ngày điểm danh với thời gian hiện tại
-    if (scheduleDate.toDateString() === currentDateTime.toDateString()) {
+    if (scheduleDate.toDateString() >= currentDateTime.toDateString()) {
         // Nếu ngày là hôm nay
         cell.classList.add('today', 'unlocked');
     }
@@ -119,7 +119,7 @@ scheduleCells.forEach(cell => {
         } else {
             // Nếu buổi học chưa tới hoặc đã qua
             cell.classList.add('table-secondary');
-            cell.innerHTML = cell.innerHTML;  // Không thêm icon ổ khóa
+            cell.innerHTML = cell.innerHTML;
             const link = cell.querySelector('a');
             if (link) link.style.pointerEvents = 'none';  // Tắt link
             cell.style.pointerEvents = 'none';  // Tắt ô điểm danh

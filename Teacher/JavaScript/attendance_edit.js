@@ -43,8 +43,15 @@ document.getElementById('confirmAttendanceBtnEdit').addEventListener('click', fu
     });
 });
 
-// Lấy ngày hiện tại với giờ, phút, giây
-var currentDate = new Date().toISOString().split('.')[0];  // Định dạng 'Y-m-dTH:i:s'
+// Lấy ngày hiện tại
+var currentDate = new Date();
+
+// Thêm 1 ngày vào ngày hiện tại
+var nextDay = new Date(currentDate);
+nextDay.setDate(currentDate.getDate() + 1);
+
+// Chuyển ngày hiện tại cộng thêm 1 ngày sang định dạng ISO
+var nextDayISOString = nextDay.toISOString().split('.')[0]; // Định dạng 'Y-m-dTH:i:s'
 
 // Lấy tất cả các dropdown attendance
 var attendanceSelects = document.querySelectorAll('.attendance-select');
@@ -53,8 +60,8 @@ var attendanceSelects = document.querySelectorAll('.attendance-select');
 attendanceSelects.forEach(function (select) {
     var scheduleDate = select.getAttribute('data-date');  // Lấy ngày điểm danh từ thuộc tính data-date
 
-    // So sánh ngày điểm danh với ngày hiện tại
-    if (scheduleDate + 'T' + currentDate.split('T')[1] > currentDate) {
+    // So sánh ngày điểm danh với ngày hiện tại cộng thêm 1 ngày
+    if (scheduleDate + 'T' + currentDate.toISOString().split('T')[1] > nextDayISOString) {
         // Đặt giá trị của select thành rỗng
         select.value = '';
 
@@ -62,6 +69,8 @@ attendanceSelects.forEach(function (select) {
         select.disabled = true;
     }
 });
+
+
 
 
 
